@@ -13,10 +13,6 @@ provider "kubernetes" {
   config_path = kind_cluster.istio.kubeconfig_path
 }
 
-provider "kubernetes-alpha" {
-  config_path = kind_cluster.istio.kubeconfig_path
-}
-
 provider "helm" {
   kubernetes {
     config_path = kind_cluster.istio.kubeconfig_path

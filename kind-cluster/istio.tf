@@ -1,24 +1,51 @@
 resource "kubernetes_namespace" "istio_system" {
   metadata {
     name = "istio-system"
-    labels = {
-      istio-injection = "disabled"
-    }
   }
 }
 
-resource "kubernetes_manifest" "istiocontrolplane" {
-  provider = kubernetes-alpha
-  manifest = yamldecode(file("${path.module}/istiocontrolplane.yaml"))
+resource "helm_release" "istio_base" {
+  chart = "${path.module}/manifests/charts/base"
+  name = "istio-base"
+  namespace = kubernetes_namespace.istio_system.metadata[0].name
+}
 
-  wait_for = {
-    fields = {
-      "status.status" = "HEALTHY"
-    }
-  }
+resource "helm_release" "istiod" {
+  chart = "${path.module}/manifests/charts/istio-control/istio-discovery"
+  name = "istiod"
+  namespace = kubernetes_namespace.istio_system.metadata[0].name
+
+  values = [
+    yamlencode({
+      global = {
+        hub = "docker.io/istio"
+        tag = "1.8.1"
+        jwtPolicy = "first-party-jwt"
+      }
+    })
+  ]
 
   depends_on = [
-    helm_release.istio_operator,
-    kubernetes_namespace.istio_system
+    helm_release.istio_base
+  ]
+}
+
+resource "helm_release" "istio_ingress" {
+  chart = "${path.module}/manifests/charts/gateways/istio-ingress"
+  name = "istio-ingress"
+  namespace = kubernetes_namespace.istio_system.metadata[0].name
+
+  values = [
+    yamlencode({
+      global = {
+        hub = "docker.io/istio"
+        tag = "1.8.1"
+        jwtPolicy = "first-party-jwt"
+      }
+    })
+  ]
+
+  depends_on = [
+    helm_release.istio_base
   ]
 }
