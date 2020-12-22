@@ -41,6 +41,19 @@ resource "helm_release" "istio_ingress" {
         hub = "docker.io/istio"
         tag = "1.8.1"
         jwtPolicy = "first-party-jwt"
+        defaultPodDisruptionBudget = { enabled = false }
+        logging = { level = "default:debug" }
+      }
+      gateways = {
+        istio-ingressgateway = {
+          nodeSelector = { ingress-ready = "true" }
+          type = "NodePort"
+          ports = [
+            { name = "status-port", nodePort = 30002, port = 15021, targetPort = 15021 },
+            { name = "http2", nodePort = 30000, port = 80, targetPort = 8080 },
+            { name = "https", nodePort = 30001, port = 443, targetPort = 8443 }
+          ]
+        }
       }
     })
   ]
