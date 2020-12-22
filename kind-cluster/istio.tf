@@ -43,6 +43,7 @@ resource "helm_release" "istio_ingress" {
         jwtPolicy = "first-party-jwt"
         defaultPodDisruptionBudget = { enabled = false }
         logging = { level = "default:debug" }
+        proxy = { componentLogLevel = "misc:debug", logLevel = "debug" }
       }
       gateways = {
         istio-ingressgateway = {
