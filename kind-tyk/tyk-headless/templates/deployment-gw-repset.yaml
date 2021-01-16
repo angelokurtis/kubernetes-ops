@@ -1,0 +1,171 @@
+{{ if .Values.rbac }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tyk-k8s
+rules:
+  - apiGroups: ["extensions", "networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["extensions", "networking.k8s.io"]
+    resources: ["ingresses/status"]
+    verbs: ["update"]
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets", "pods", "endpoints", "services"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tyk-k8s
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tyk-k8s
+subjects:
+  - kind: ServiceAccount
+    name: tyk-k8s
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tyk-k8s
+---{{ end }}
+apiVersion: apps/v1
+kind: {{ .Values.gateway.kind }}
+metadata:
+  name: gateway-{{ include "tyk-headless.fullname" . }}
+  labels:
+    app: gateway-{{ include "tyk-headless.fullname" . }}
+    chart: {{ include "tyk-headless.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+{{- if eq .Values.gateway.kind "Deployment" }}
+  replicas: {{ .Values.gateway.replicaCount }}
+{{- end }}
+  minReadySeconds: 5
+{{- if eq .Values.gateway.kind "Deployment" }}
+  strategy:
+{{- else }}
+  updateStrategy:
+{{- end }}
+    # indicate which strategy we want for rolling update
+    type: RollingUpdate
+    rollingUpdate:
+{{- if eq .Values.gateway.kind "Deployment" }}
+      maxSurge: 2
+{{- end }}
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: gateway-{{ include "tyk-headless.fullname" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: gateway-{{ include "tyk-headless.fullname" . }}
+        release: {{ .Release.Name }}
+    spec:
+      {{ if .Values.rbac }}serviceAccountName: tyk-k8s {{ end }}
+{{- if .Values.gateway.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.gateway.nodeSelector | indent 8 }}
+{{- end }}
+{{- if .Values.gateway.tolerations }}
+      tolerations:
+{{ toYaml .Values.gateway.tolerations | indent 8 }}
+{{- end }}
+{{- if .Values.gateway.affinity }}
+      affinity:
+{{ toYaml .Values.gateway.affinity | indent 8 }}
+{{- end }}
+      containers:
+      - name: gateway-{{ .Chart.Name }}
+        image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}"
+        imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
+        env:
+          - name: TYK_GW_LISTENPORT
+            value: "{{ .Values.gateway.containerPort }}"
+          - name: REDIGOCLUSTER_SHARDCOUNT
+            value: "{{ .Values.redis.shardCount }}"
+          - name: TYK_GW_STORAGE_HOSTS
+            value: "{{ .Values.redis.host }}:{{ .Values.redis.port }}"
+          - name: TYK_GW_STORAGE_PASSWORD
+            value: "{{ .Values.redis.pass }}"
+          - name: TYK_GW_STORAGE_USESSL
+            value: "{{ .Values.redis.useSSL }}"
+          - name: TYK_GW_SECRET
+            value: "{{ .Values.secrets.APISecret }}"
+          - name: TYK_GW_NODESECRET
+            value: "{{ .Values.secrets.APISecret }}"
+          - name: TYK_GW_HTTPSERVEROPTIONS_USESSL
+            value: "{{ .Values.gateway.tls }}"
+        {{- if .Values.gateway.extraEnvs }}
+        {{- range $env := .Values.gateway.extraEnvs }}
+          - name: {{ $env.name }}
+            value: {{ $env.value | quote }}
+        {{- end }}
+        {{- end }}
+        command: ["/opt/tyk-gateway/tyk", "--conf=/etc/tyk-gateway/tyk.conf"]
+        workingDir: /opt/tyk-gateway
+        ports:
+        - containerPort: {{ .Values.gateway.containerPort }}
+        resources:
+{{ toYaml .Values.gateway.resources | indent 12 }}
+        volumeMounts:
+          - name: tyk-mgmt-gateway-conf
+            mountPath: /etc/tyk-gateway
+          - name: {{ .Release.Name }}-default-cert
+            mountPath: /etc/certs
+        livenessProbe:
+          httpGet:
+            scheme: "HTTP{{ if .Values.gateway.tls }}S{{ end }}"
+            path: /hello
+            port: {{ .Values.gateway.containerPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 3
+          failureThreshold: 2
+        readinessProbe:
+          httpGet:
+            scheme: "HTTP{{ if .Values.gateway.tls }}S{{ end }}"
+            path: /hello
+            port: {{ .Values.gateway.containerPort }}
+          initialDelaySeconds: 1
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+
+      - name: tyk-k8s
+        image: "{{ .Values.tyk_k8s.image.repository }}:{{ .Values.tyk_k8s.image.tag }}"
+        imagePullPolicy: {{ .Values.tyk_k8s.image.pullPolicy }}
+        workingDir: "/opt/tyk-k8s"
+        command: ["/opt/tyk-k8s/tyk-k8s", "start"]
+        env:
+          - name: TK8S_TYK_SECRET
+            value: "{{ .Values.secrets.APISecret }}"
+          - name: TK8S_TYK_ORG
+            value: "{{ .Values.secrets.OrgID }}"
+        volumeMounts:
+          - name: tyk-k8s-conf
+            mountPath: /etc/tyk-k8s
+        resources:
+{{ toYaml .Values.tyk_k8s.resources | indent 12 }}
+      volumes:
+        - name: tyk-k8s-conf
+          configMap:
+            name: k8s-conf-{{ include "tyk-headless.fullname" . }}
+            items:
+              - key: tyk_k8s.yaml
+                path: tyk-k8s.yaml
+        - name: tyk-mgmt-gateway-conf
+          configMap:
+            name: mgmt-gateway-conf-{{ include "tyk-headless.fullname" . }}
+            items:
+              - key: tyk_mgmt.conf
+                path: tyk.conf
+        - name: {{ .Release.Name }}-default-cert
+          secret:
+            secretName: {{ .Release.Name }}-default-cert

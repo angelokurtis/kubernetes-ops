@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pump-{{ include "tyk-headless.fullname" . }}
+  labels:
+    app: pump-{{ include "tyk-headless.fullname" . }}
+    chart: {{ include "tyk-headless.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.pump.replicaCount }}
+  selector:
+    matchLabels:
+      app: pump-{{ include "tyk-headless.fullname" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: pump-{{ include "tyk-headless.fullname" . }}
+        release: {{ .Release.Name }}
+    spec:
+{{- if .Values.pump.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.pump.nodeSelector | indent 8 }}
+{{- end }}
+{{- if .Values.pump.tolerations }}
+      tolerations:
+{{ toYaml .Values.pump.tolerations | indent 8 }}
+{{- end }}
+{{- if .Values.pump.affinity }}
+      affinity:
+{{ toYaml .Values.pump.affinity | indent 8 }}
+{{- end }}
+      containers:
+      - name: pump-{{ .Chart.Name }}
+        image: "{{ .Values.pump.image.repository }}:{{ .Values.pump.image.tag }}"
+        imagePullPolicy: {{ .Values.pump.image.pullPolicy }}
+        workingDir: "/opt/tyk-pump"
+        env:
+          - name: REDIGOCLUSTER_SHARDCOUNT
+            value: "{{ .Values.redis.shardCount }}"
+          - name: PMP_MONGO_MONGOURL
+            value: "{{ .Values.mongo.mongoURL }}"
+          - name: PMP_MONGO_MONGOUSESSL
+            value: "{{ .Values.mongo.useSSL }}"
+          - name: PMP_MONGOAGG_MONGOURL
+            value:  "{{ .Values.mongo.mongoURL }}"
+          - name: PMP_MONGOAGG_MONGOUSESSL
+            value:  "{{ .Values.mongo.useSSL }}"
+          - name: TYK_PMP_ANALYTICSSTORAGECONFIG_HOSTS
+            value: "{{ .Values.redis.host }}:{{ .Values.redis.port }}"
+          - name: TYK_PMP_ANALYTICSSTORAGECONFIG_PASSWORD
+            value: "{{ .Values.redis.pass }}"
+          - name: TYK_PMP_ANALYTICSSTORAGECONFIG_REDISUSESSL
+            value: "{{ .Values.redis.useSSL }}"
+        {{- if .Values.pump.extraEnvs }}
+        {{- range $env := .Values.pump.extraEnvs }}
+          - name: {{ $env.name }}
+            value: {{ $env.value | quote }}
+        {{- end }}
+        {{- end }}
+        command: ["/opt/tyk-pump/tyk-pump", "-c", "/etc/tyk-pump/pump.conf"]
+        volumeMounts:
+          - name: tyk-pump-conf
+            mountPath: /etc/tyk-pump
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+        - name: tyk-pump-conf
+          configMap:
+            name: pump-conf-{{ include "tyk-headless.fullname" . }}
+            items:
+              - key: pump.conf
+                path: pump.conf
