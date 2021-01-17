@@ -1,7 +1,6 @@
 resource "helm_release" "tyk_gateway" {
-  chart = "${path.module}/tyk-headless"
   name = "tyk-gateway"
-  version = "0.4.0"
+  chart = "${path.module}/tyk-headless"
   namespace = kubernetes_namespace.tyk_ingress.metadata[0].name
   timeout = 60
 
@@ -20,13 +19,13 @@ resource "helm_release" "tyk_gateway" {
         "nodeSelector" = {}
         "replicaCount" = 1
         "resources" = {}
-        "service" = { "annotations" = {}, "externalTrafficPolicy" = "Local", "port" = 443, "type" = "LoadBalancer" }
+        "service" = { "annotations" = {}, "externalTrafficPolicy" = "Local", "port" = 443, "type" = "NodePort" }
         "tags" = "ingress"
         "tls" = true
         "tolerations" = [ { effect = "NoSchedule", key = "node-role.kubernetes.io/master" }, ]
       }
       "mongo" = {
-        "mongoURL" = "mongodb://root:pass@tyk-mongo-mongodb.tyk-ingress.svc.cluster.local:27017/tyk-dashboard?authSource=admin"
+        "mongoURL" = "mongodb://root:${var.mongodb_pass}@tyk-mongo-mongodb.${helm_release.tyk_mongo.namespace}.svc.cluster.local:27017/tyk-dashboard?authSource=admin"
         "useSSL" = false
       }
       "nameOverride" = ""
@@ -41,7 +40,13 @@ resource "helm_release" "tyk_gateway" {
         "tolerations" = []
       }
       "rbac" = true
-      "redis" = { "host" = "tyk-redis-master.tyk-ingress.svc.cluster.local", "port" = 6379, "shardCount" = 128, "useSSL" = false }
+      "redis" = {
+        "host" = "tyk-redis-master.${helm_release.tyk_redis.namespace}.svc.cluster.local"
+        "port" = 6379
+        "pass" = var.redis_pass
+        "shardCount" = 128
+        "useSSL" = false
+      }
       "secrets" = { "APISecret" = "CHANGEME", "OrgID" = "1" }
       "tyk_k8s" = {
         "affinity" = {}
@@ -62,26 +67,31 @@ resource "helm_release" "tyk_gateway" {
 }
 
 resource "helm_release" "tyk_mongo" {
-  repository = "https://charts.helm.sh/stable"
-  chart = "stable/mongodb"
   name = "tyk-mongo"
-  version = "7.8.10"
+  chart = "https://charts.bitnami.com/bitnami/mongodb-10.1.3.tgz"
   namespace = kubernetes_namespace.tyk_ingress.metadata[0].name
   timeout = 60
 
-  set {
-    name = "replicaSet.enabled"
-    value = "true"
-  }
+  values = [
+    yamlencode({
+      auth = {
+        rootPassword = var.mongodb_pass
+      }
+    })
+  ]
 }
 
 resource "helm_release" "tyk_redis" {
-  repository = "https://charts.helm.sh/stable"
-  chart = "stable/redis"
   name = "tyk-redis"
-  version = "7.8.10"
+  chart = "https://charts.bitnami.com/bitnami/redis-12.1.1.tgz"
   namespace = kubernetes_namespace.tyk_ingress.metadata[0].name
   timeout = 60
+
+  values = [
+    yamlencode({
+      password = var.redis_pass
+    })
+  ]
 }
 
 resource "kubernetes_namespace" "tyk_ingress" {
