@@ -8,11 +8,20 @@ resource "kind_cluster" "tyk" {
 
     node {
       role = "control-plane"
-    }
+      image = "kindest/node:v1.18.15"
 
-    node {
-      role = "worker"
-      image = "kindest/node:v1.18.8"
+      kubeadm_config_patches = [
+        yamlencode({
+          "kind" = "InitConfiguration"
+          "nodeRegistration" = { "kubeletExtraArgs" = { "node-labels" = "ingress-ready=true" } }
+        }),
+      ]
+
+      extra_port_mappings {
+        container_port = 80
+        host_port = 80
+        protocol = "TCP"
+      }
     }
   }
 }
