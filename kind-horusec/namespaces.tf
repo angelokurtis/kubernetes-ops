@@ -15,3 +15,9 @@ resource "kubernetes_namespace" "queue" {
     name = "queue"
   }
 }
+
+resource "kubernetes_namespace" "controller" {
+  metadata {
+    name = "controller"
+  }
+}
