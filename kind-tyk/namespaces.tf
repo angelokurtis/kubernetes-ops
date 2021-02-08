@@ -1,5 +1,11 @@
-resource "kubernetes_namespace" "tyk_ingress" {
+resource "kubernetes_namespace" "gateway" {
   metadata {
-    name = "tyk-ingress"
+    name = "gateway"
+  }
+}
+
+resource "kubernetes_namespace" "database" {
+  metadata {
+    name = "database"
   }
 }
