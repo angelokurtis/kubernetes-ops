@@ -18,8 +18,8 @@ resource "kind_cluster" "tyk" {
       ]
 
       extra_port_mappings {
-        container_port = 80
-        host_port = 80
+        container_port = 8080
+        host_port = 8080
         protocol = "TCP"
       }
     }
