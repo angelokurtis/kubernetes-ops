@@ -1,0 +1,18 @@
+### Terraform ###
+**/.terraform/*
+*.lock.hcl
+*.tfstate
+*.tfstate.*
+*_override.tf
+*_override.tf.json
+crash.log
+override.tf
+override.tf.json
+
+### JetBrains ###
+*.iml
+*.iws
+.idea/*
+
+### Generated project files ###
+horusec*config
