@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tyk
+  labels:
+    app: tyk
+    version: {{ .Chart.AppVersion }}
+spec:
+  selector:
+    app: tyk
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      protocol: TCP
+      targetPort: http
+  type: {{ .Values.service.type }}

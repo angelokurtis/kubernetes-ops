@@ -1,0 +1,19 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/tykio
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+nodeSelector: { }
+
+containerPort:
+  http: 8080
+
+hostPort:
+  enabled: false
+  ports:
+    http: 8080

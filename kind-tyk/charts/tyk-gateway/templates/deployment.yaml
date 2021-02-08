@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tyk
+  labels:
+    app: tyk
+    version: {{ .Chart.AppVersion }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: tyk
+      labels:
+        app: tyk
+        version: {{ .Chart.AppVersion }}
+    spec:
+      containers:
+        - name: tyk
+          image: {{ .Values.image.repository -}}/tyk-gateway:v{{- .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TYK_GW_SECRET
+              value: 352d20ee67be67f6340b4c0605b044b7
+          ports:
+          {{- $hostPort  := .Values.hostPort -}}
+          {{- range $key, $value := .Values.containerPort }}
+            - name: {{ $key }}
+              containerPort: {{ $value }}
+              protocol: TCP
+            {{- if $hostPort.enabled }}
+              hostPort: {{ index $hostPort.ports $key | default $value }}
+            {{- end }}
+          {{- end }}
+      restartPolicy: Always
+    {{- if .Values.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
+    {{- end }}
+  selector:
+    matchLabels:
+      app: tyk
