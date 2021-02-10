@@ -1,4 +1,4 @@
-resource "helm_release" "ingress_controller" {
+resource "helm_release" "ingress_nginx" {
   name = "ingress-nginx"
   chart = "https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-3.22.0/ingress-nginx-3.22.0.tgz"
   namespace = kubernetes_namespace.controller.metadata[0].name
