@@ -1,4 +1,6 @@
 resource "helm_release" "account" {
+  count = var.account_enabled ? 1 : 0
+
   name = "account"
   // TODO use a proper repository
   chart = "${var.horusec_project_path}/horusec-account/deployments/helm/horusec-account"

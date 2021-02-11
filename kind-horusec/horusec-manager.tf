@@ -1,4 +1,6 @@
 resource "helm_release" "manager" {
+  count = var.manager_enabled ? 1 : 0
+
   name = "manager"
   // TODO use a proper repository
   chart = "${var.horusec_project_path}/horusec-manager/deployments/helm/horusec-manager"

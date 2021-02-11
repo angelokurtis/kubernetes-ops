@@ -1,4 +1,6 @@
 resource "helm_release" "auth" {
+  count = var.auth_enabled ? 1 : 0
+
   name = "auth"
   // TODO use a proper repository
   chart = "${var.horusec_project_path}/horusec-auth/deployments/helm/horusec-auth"
