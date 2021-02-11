@@ -9,6 +9,7 @@ resource "helm_release" "horusec_api" {
 
   values = [
     yamlencode({
+      "fullnameOverride" = "api"
       "env" = [
         { name = "HORUSEC_SWAGGER_HOST", value = "0.0.0.0" },
         { name = "HORUSEC_BROKER_HOST", value = "${helm_release.rabbit.name}.${helm_release.rabbit.namespace}" },
