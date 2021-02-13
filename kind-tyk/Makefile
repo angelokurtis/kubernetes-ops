@@ -16,3 +16,6 @@ down: ## Uninstall all solution components and destroy the local Kubernetes clus
 
 clean:
 	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* tyk-config
+
+template:
+	helm template tyk ./charts/tyk-gateway -n gateway > manifests.yaml

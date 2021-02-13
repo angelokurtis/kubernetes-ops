@@ -1,15 +1,14 @@
 resource "helm_release" "tyk" {
   name = "tyk"
   chart = "${path.root}/charts/tyk-gateway"
-  version = "1.0.0"
+  version = "1.0.2"
   namespace = kubernetes_namespace.gateway.metadata[0].name
   timeout = 240
 
   values = [
     yamlencode({
-      "service" = { "type" = "NodePort" }
-      "hostPort" = { "enabled" = true }
-      "nodeSelector" = { "ingress-ready" = "true" }
+      "hostPort" = { "enabled" = false }
+      "config" = jsondecode(file("./tyk.json"))
     })
   ]
 
