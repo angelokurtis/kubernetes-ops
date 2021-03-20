@@ -8,7 +8,7 @@ resource "kind_cluster" "istio" {
 
     node {
       role = "control-plane"
-      image = "kindest/node:v1.17.17"
+      image = "kindest/node:v1.20.2"
 
       kubeadm_config_patches = [
         yamlencode({
