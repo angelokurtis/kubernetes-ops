@@ -14,12 +14,7 @@ variable "registry_port" {
   default = 5000
 }
 
-variable "istio_hub" {
+variable "ingress_domain" {
   type = string
-  default = "docker.io/istio"
-}
-
-variable "istio_tag" {
-  type = string
-  default = "1.8.1"
+  default = "istio.local"
 }
