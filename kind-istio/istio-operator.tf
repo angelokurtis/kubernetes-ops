@@ -25,7 +25,14 @@ resource "kustomization_resource" "istio" {
     "spec" = {
       "profile" = "demo"
       "meshConfig" = {
-        "defaultConfig" = { "tracing" = { "zipkin" = { "address" = "zipkin:9411" }, "sampling" = 100 } }
+        "defaultConfig" = {
+          "tracing" = {
+            "zipkin" = {
+              "address" = "jaeger-collector.${kubernetes_namespace.tracing.metadata[0].name}.svc.cluster.local:9411"
+            },
+            "sampling" = 100
+          }
+        }
       }
       "components" = {
         "egressGateways" = [ { enabled = false, name = "istio-egressgateway" } ]
