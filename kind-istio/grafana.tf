@@ -1,3 +1,33 @@
+resource "kubernetes_config_map" "istio_grafana_dashboards" {
+  count = var.addons.grafana.enabled ? 1 : 0
+
+  metadata {
+    name = "istio-grafana-dashboards"
+    namespace = kubernetes_namespace.istio_system.metadata[0].name
+  }
+
+  binary_data = {
+    "pilot-dashboard.json" = filebase64("${path.module}/dashboards/pilot-dashboard.json")
+    "istio-performance-dashboard.json" = filebase64("${path.module}/dashboards/istio-performance-dashboard.json")
+  }
+}
+
+resource "kubernetes_config_map" "istio_services_grafana_dashboards" {
+  count = var.addons.grafana.enabled ? 1 : 0
+
+  metadata {
+    name = "istio-services-grafana-dashboards"
+    namespace = kubernetes_namespace.istio_system.metadata[0].name
+  }
+
+  binary_data = {
+    "istio-workload-dashboard.json" = filebase64("${path.module}/dashboards/istio-workload-dashboard.json")
+    "istio-service-dashboard.json" = filebase64("${path.module}/dashboards/istio-service-dashboard.json")
+    "istio-mesh-dashboard.json" = filebase64("${path.module}/dashboards/istio-mesh-dashboard.json")
+    "istio-extension-dashboard.json" = filebase64("${path.module}/dashboards/istio-extension-dashboard.json")
+  }
+}
+
 resource "helm_release" "grafana" {
   count = var.addons.grafana.enabled ? 1 : 0
 
@@ -35,8 +65,8 @@ resource "helm_release" "grafana" {
         }
       }
       "dashboardsConfigMaps" = {
-        "istio" = "istio-grafana-dashboards"
-        "istio-services" = "istio-services-grafana-dashboards"
+        "istio" = kubernetes_config_map.istio_grafana_dashboards[0].metadata[0].name
+        "istio-services" = kubernetes_config_map.istio_services_grafana_dashboards[0].metadata[0].name
       }
       "datasources" = {
         "datasources.yaml" = {
@@ -70,7 +100,9 @@ resource "helm_release" "grafana" {
   ]
 
   depends_on = [
-    kustomization_resource.istio
+    kustomization_resource.istio,
+    kubernetes_config_map.istio_grafana_dashboards,
+    kubernetes_config_map.istio_services_grafana_dashboards,
   ]
 }
 
@@ -91,7 +123,7 @@ resource "kustomization_resource" "grafana_virtual_service" {
         route = [ {
           destination = {
             "host" = "grafana.${kubernetes_namespace.istio_system.metadata[0].name}.svc.cluster.local"
-            "port" = { "number" = 20001 }
+            "port" = { "number" = 3000 }
           }
         } ]
       } ]
