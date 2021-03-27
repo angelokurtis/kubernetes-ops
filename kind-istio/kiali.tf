@@ -1,4 +1,6 @@
 resource "helm_release" "kiali" {
+  count = var.addons.kiali.enabled ? 1 : 0
+
   name = "kiali"
   namespace = kubernetes_namespace.istio_system.metadata[0].name
 
@@ -35,6 +37,8 @@ resource "helm_release" "kiali" {
 }
 
 resource "kustomization_resource" "kiali_virtual_service" {
+  count = var.addons.kiali.enabled ? 1 : 0
+
   manifest = jsonencode({
     "apiVersion" = "networking.istio.io/v1alpha3"
     "kind" = "VirtualService"
