@@ -8,10 +8,10 @@ locals {
       local.prometheus.host
     ]
   }
-  kiali = { host = "kiali.${var.ingress_domain}" }
-  grafana = { host = "grafana.${var.ingress_domain}" }
-  tracing = { host = "tracing.${var.ingress_domain}" }
-  prometheus = { host = "prometheus.${var.ingress_domain}" }
+  kiali = { host = "kiali.${local.cluster_domain}" }
+  grafana = { host = "grafana.${local.cluster_domain}" }
+  tracing = { host = "tracing.${local.cluster_domain}" }
+  prometheus = { host = "prometheus.${local.cluster_domain}" }
 }
 
 resource "kustomization_resource" "addons_gateway" {

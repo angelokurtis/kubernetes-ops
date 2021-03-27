@@ -1,4 +1,9 @@
+locals {
+  cluster_domain = "${kind_cluster.istio.name}.local"
+}
+
 resource "kind_cluster" "istio" {
+
   name = "istio"
   wait_for_ready = true
 
