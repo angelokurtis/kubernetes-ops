@@ -28,6 +28,10 @@ resource "helm_release" "kiali" {
         "pod_annotations" = { "sidecar.istio.io/inject" = "false" }
       }
       "login_token" = { "signing_key" = "CHANGEME" }
+      "external_services" = {
+        "tracing" = { "in_cluster_url" = "http://jaeger-query:16686/jaeger" }
+        "grafana" = { "in_cluster_url" = "http://grafana:3000" }
+      }
     })
   ]
 
