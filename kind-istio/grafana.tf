@@ -36,7 +36,7 @@ resource "helm_release" "grafana" {
 
   repository = "https://grafana.github.io/helm-charts"
   chart = "grafana"
-  version = "5.8.10"
+  version = "6.6.4"
 
   values = [
     yamlencode({

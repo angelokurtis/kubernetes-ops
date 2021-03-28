@@ -6,7 +6,7 @@ resource "helm_release" "kiali" {
 
   repository = "https://kiali.org/helm-charts"
   chart = "kiali-server"
-  version = "1.29.0"
+  version = "1.32.0"
 
   set {
     name = "nameOverride"
@@ -23,14 +23,19 @@ resource "helm_release" "kiali" {
       "auth" = { "strategy" = "anonymous" }
       "deployment" = {
         "accessible_namespaces" = [ "**" ]
-        "image_version" = "v1.29"
         "ingress_enabled" = "false"
         "pod_annotations" = { "sidecar.istio.io/inject" = "false" }
       }
       "login_token" = { "signing_key" = "CHANGEME" }
       "external_services" = {
-        "tracing" = { "in_cluster_url" = "http://jaeger-query:16686/jaeger" }
-        "grafana" = { "in_cluster_url" = "http://grafana:3000" }
+        "tracing" = {
+          "url" = "http://tracing.istio.local"
+          "in_cluster_url" = "http://jaeger-query:16686/jaeger"
+        }
+        "grafana" = {
+          "url" = "http://grafana.istio.local"
+          "in_cluster_url" = "http://grafana:3000"
+        }
       }
     })
   ]

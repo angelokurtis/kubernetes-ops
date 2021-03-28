@@ -6,12 +6,11 @@ resource "helm_release" "prometheus" {
 
   repository = "https://prometheus-community.github.io/helm-charts"
   chart = "prometheus"
-  version = "11.16.2"
+  version = "13.6.0"
 
   values = [
     yamlencode({
       "alertmanager" = { "enabled" = false }
-      "image" = { "tag" = "v2.19.2" }
       "kubeStateMetrics" = { "enabled" = false }
       "nodeExporter" = { "enabled" = false }
       "pushgateway" = { "enabled" = false }
