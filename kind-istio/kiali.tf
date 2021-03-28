@@ -29,11 +29,11 @@ resource "helm_release" "kiali" {
       "login_token" = { "signing_key" = "CHANGEME" }
       "external_services" = {
         "tracing" = {
-          "url" = "http://tracing.istio.local"
+          "url" = "http://${local.tracing.host}"
           "in_cluster_url" = "http://jaeger-query:16686/jaeger"
         }
         "grafana" = {
-          "url" = "http://grafana.istio.local"
+          "url" = "http://${local.grafana.host}"
           "in_cluster_url" = "http://grafana:3000"
         }
       }
