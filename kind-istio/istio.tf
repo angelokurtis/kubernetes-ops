@@ -8,7 +8,9 @@ resource "kustomization_resource" "istio" {
     }
     "spec" = {
       "profile" = "demo"
-      "meshConfig" = { "defaultConfig" = { "tracing" = { "sampling" = 100 } } }
+      "meshConfig" = {
+        "defaultConfig" = { "tracing" = { "zipkin" = { "address" = "jaeger-collector:9411" }, "sampling" = 100 } }
+      }
       "components" = {
         "egressGateways" = [ { enabled = false, name = "istio-egressgateway" } ]
         "ingressGateways" = [
