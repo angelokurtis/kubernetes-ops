@@ -10,6 +10,8 @@ resource "helm_release" "jaeger_operator" {
 }
 
 resource "kustomization_resource" "jaeger" {
+  count = var.addons.tracing.enabled ? 1 : 0
+
   manifest = jsonencode({
     apiVersion = "jaegertracing.io/v1"
     kind = "Jaeger"
