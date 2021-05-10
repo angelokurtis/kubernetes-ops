@@ -15,4 +15,4 @@ down: ## Uninstall all solution components and destroy the local Kubernetes clus
 	terraform destroy -auto-approve
 
 clean: ## Removing all Terraform generated config files
-	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* horusec-config
+	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* *-config
