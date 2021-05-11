@@ -16,8 +16,8 @@ resource "kubernetes_namespace" "queue" {
   }
 }
 
-resource "kubernetes_namespace" "controller" {
+resource "kubernetes_namespace" "ingress" {
   metadata {
-    name = "controller"
+    name = "ingress"
   }
 }

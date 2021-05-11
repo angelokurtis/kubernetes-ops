@@ -1,6 +1,5 @@
 variable "horusec_project_path" {
   type = string
-  default = "/home/tiagoangelo/wrkspc/github.com/ZupIT/horusec"
 }
 
 variable account_enabled {

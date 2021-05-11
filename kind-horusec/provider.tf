@@ -4,6 +4,17 @@ terraform {
       source = "kyma-incubator/kind"
       version = "0.0.7"
     }
+    kustomization = {
+      source = "kbst/kustomization"
+      version = "0.5.0"
+    }
+  }
+  required_version = ">= 0.13"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = kind_cluster.horusec.kubeconfig_path
   }
 }
 
@@ -13,8 +24,6 @@ provider "kubernetes" {
   config_path = kind_cluster.horusec.kubeconfig_path
 }
 
-provider "helm" {
-  kubernetes {
-    config_path = kind_cluster.horusec.kubeconfig_path
-  }
+provider "kustomization" {
+  kubeconfig_path = kind_cluster.horusec.kubeconfig_path
 }

@@ -1,13 +1,15 @@
 resource "helm_release" "ingress_nginx" {
   name = "ingress-nginx"
-  chart = "https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-3.22.0/ingress-nginx-3.22.0.tgz"
-  namespace = kubernetes_namespace.controller.metadata[0].name
-  timeout = 240
+  namespace = kubernetes_namespace.ingress.metadata[0].name
+
+  repository = "https://kubernetes.github.io/ingress-nginx"
+  chart = "ingress-nginx"
+  version = "3.30.0"
 
   values = [
     yamlencode({
       "controller" = {
-        "extraArgs" = { "publish-status-address": "localhost" }
+        "extraArgs" = { "publish-status-address": "127.0.0.1" }
         "publishService" = { "enabled" = false }
         "service" = { "type" = "NodePort" }
         "hostPort" = {

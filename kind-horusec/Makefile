@@ -9,10 +9,19 @@ init: ## Initialize Terraform configurations
 	terraform init
 
 up: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
-	terraform apply -auto-approve
+	terraform apply -auto-approve -var-file=testing.tfvars
 
 down: ## Uninstall all solution components and destroy the local Kubernetes cluster
 	terraform destroy -auto-approve
 
+plan:
+	terraform plan -var-file=testing.tfvars
+
 clean:
 	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* horusec-config
+
+template-manager:
+	helm template manager /home/tiagoangelo/wrkspc/github.com/ZupIT/horusec/horusec-manager/deployments/helm/horusec-manager -f ./values/manager.yaml -n horusec > manifests.yaml
+
+template-auth:
+	helm template auth /home/tiagoangelo/wrkspc/github.com/ZupIT/horusec/horusec-auth/deployments/helm/horusec-auth -f ./values/auth.yaml -n horusec > manifests.yaml

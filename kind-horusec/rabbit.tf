@@ -1,13 +1,15 @@
 resource "helm_release" "rabbit" {
   name = "rabbitmq"
-  chart = "https://charts.bitnami.com/bitnami/rabbitmq-8.9.2.tgz"
+  chart = "https://charts.bitnami.com/bitnami/rabbitmq-8.13.1.tgz"
   namespace = kubernetes_namespace.queue.metadata[0].name
-  timeout = 240
 
-  values = [
-    yamlencode({
-      "service" = { "labels" = { "app" = "rabbitmq" } }
-      "podLabels" = { "app" = "rabbitmq" }
-    })
-  ]
+  set {
+    name = "auth.password"
+    value = "qQAUEGhQ6R"
+  }
+
+  set {
+    name = "auth.erlangCookie"
+    value = "DX5NKjaLajEYC9t6hJujJa25PqpbFXF4"
+  }
 }

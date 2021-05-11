@@ -5,7 +5,7 @@ resource "kubernetes_secret" "jwt_token" {
   }
 
   data = {
-    "jwt-token" = uuid()
+    "jwt-token" = "4ff42f67-5929-fc52-65f1-3afc77ad86d5"
   }
 }
 
