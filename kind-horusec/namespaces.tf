@@ -4,18 +4,6 @@ resource "kubernetes_namespace" "horusec" {
   }
 }
 
-resource "kubernetes_namespace" "database" {
-  metadata {
-    name = "database"
-  }
-}
-
-resource "kubernetes_namespace" "queue" {
-  metadata {
-    name = "queue"
-  }
-}
-
 resource "kubernetes_namespace" "ingress" {
   metadata {
     name = "ingress"

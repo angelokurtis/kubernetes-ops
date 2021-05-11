@@ -1,7 +1,7 @@
 resource "helm_release" "rabbit" {
   name = "rabbitmq"
   chart = "https://charts.bitnami.com/bitnami/rabbitmq-8.13.1.tgz"
-  namespace = kubernetes_namespace.queue.metadata[0].name
+  namespace = kubernetes_namespace.horusec.metadata[0].name
 
   set {
     name = "auth.password"
