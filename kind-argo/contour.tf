@@ -4,26 +4,15 @@ data "kustomization_overlay" "contour" {
   patches {
     patch = yamlencode([
       {
-        op = "replace"
-        path = "/spec/template/spec/nodeSelector"
-        value = {
-          "ingress-ready":"true"
-        }
+        op = "replace", path = "/spec/template/spec/nodeSelector"
+        value = { "ingress-ready":"true" }
       },
       {
-        op = "replace"
-        path = "/spec/template/spec/tolerations"
-        value = [{
-          effect = "NoSchedule"
-          key = "node-role.kubernetes.io/master"
-          operator = "Equal"
-        }]
+        op = "replace", path = "/spec/template/spec/tolerations"
+        value = [ { effect = "NoSchedule", key = "node-role.kubernetes.io/master", operator = "Equal" } ]
       }
     ])
-    target = {
-      kind = "DaemonSet"
-      label_selector = "app=envoy"
-    }
+    target = { kind = "DaemonSet", label_selector = "app=envoy" }
   }
 }
 
