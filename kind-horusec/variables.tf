@@ -2,7 +2,7 @@ variable "horusec_project_path" {
   type = string
 }
 
-variable account_enabled {
+variable core_enabled {
   type = bool
   description = "If set to true, it will install the Horusec Accounts service"
   default = true
