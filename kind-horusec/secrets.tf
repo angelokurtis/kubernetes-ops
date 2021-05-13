@@ -53,6 +53,39 @@ resource "kubernetes_secret" "database_uri" {
   }
 }
 
+resource "kubernetes_secret" "smtp_username" {
+  metadata {
+    name = "smtp-username"
+    namespace = kubernetes_namespace.horusec.metadata[0].name
+  }
+
+  data = {
+    "smtp-username" = "3dcf6374062286"
+  }
+}
+
+resource "kubernetes_secret" "smtp_password" {
+  metadata {
+    name = "smtp-password"
+    namespace = kubernetes_namespace.horusec.metadata[0].name
+  }
+
+  data = {
+    "smtp-password" = "1a29e895468521"
+  }
+}
+
+resource "kubernetes_secret" "analytic_database_uri" {
+  metadata {
+    name = "analytic-database-uri"
+    namespace = kubernetes_namespace.horusec.metadata[0].name
+  }
+
+  data = {
+    "analytic-database-uri" = "postgresql://${kubernetes_secret.database_username.data.database-username}:${kubernetes_secret.database_password.data.database-password}@${helm_release.postgres.name}.${helm_release.postgres.namespace}:5432/horusec_db?sslmode=disable"
+  }
+}
+
 resource "kubernetes_secret" "database_username" {
   metadata {
     name = "database-username"
