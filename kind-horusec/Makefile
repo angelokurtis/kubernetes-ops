@@ -12,7 +12,7 @@ up: ## Starts a Kubernetes cluster running local using Docker containers and app
 	terraform apply -auto-approve -var-file=testing.tfvars
 
 down: ## Uninstall all solution components and destroy the local Kubernetes cluster
-	terraform destroy -auto-approve
+	terraform destroy -auto-approve -var-file=testing.tfvars
 
 plan:
 	terraform plan -var-file=testing.tfvars
