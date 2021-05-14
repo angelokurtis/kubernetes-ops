@@ -6,6 +6,15 @@ resource "helm_release" "api" {
   namespace = kubernetes_namespace.horusec.metadata[0].name
   timeout = 240
 
+  values = [
+    yamlencode({
+      image = {
+        tag = "local"
+        pullPolicy = "Never"
+      }
+    })
+  ]
+
   depends_on = [
     kubernetes_secret.jwt_token,
     helm_release.rabbit,

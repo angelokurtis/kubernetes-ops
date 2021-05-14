@@ -5,4 +5,13 @@ resource "helm_release" "webhook" {
   chart = "${var.horusec_project_path}/deployments/helm/webhook"
   namespace = kubernetes_namespace.horusec.metadata[0].name
   timeout = 240
+
+  values = [
+    yamlencode({
+      image = {
+        tag = "local"
+        pullPolicy = "Never"
+      }
+    })
+  ]
 }
