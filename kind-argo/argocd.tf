@@ -4,7 +4,7 @@ resource "helm_release" "argocd" {
 
   repository = "https://argoproj.github.io/argo-helm"
   chart = "argo-cd"
-  version = "3.2.2"
+  version = "3.2.4"
 
   values = [
     yamlencode({
@@ -12,14 +12,11 @@ resource "helm_release" "argocd" {
       "global" = { "image" = { "repository": "argoproj/argocd", "tag": "v2.0.1" } }
       "server" = {
         "extraArgs" = [ "--insecure" ]
-        "ingress" = {
-          "enabled" = true
-          "hosts" = [ "argocd.local" ]
-        }
+        "ingress" = { "enabled" = true, "hosts" = [ "argocd.local" ] }
       }
       "configs" = {
         "secret" = {
-          "argocdServerAdminPassword" = bcrypt("admin")
+          "argocdServerAdminPassword" = bcrypt("admin"),
           "argocdServerAdminPasswordMtime" = "2021-05-01T00:00:00Z"
         }
       }
