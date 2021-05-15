@@ -3,12 +3,12 @@ data "kustomization_overlay" "bets" {
     "${path.root}/bets"
   ]
 
-  namespace = kubernetes_namespace.ops.metadata[0].name
+  namespace = var.argo_namespace
 
   patches {
     patch = yamlencode([{
       op = "replace", path = "/spec/destination/namespace"
-      value = kubernetes_namespace.bets.metadata[0].name
+      value = var.bets_namespace
     }])
     target = {
       apiVersion: "argoproj.io/v1alpha1",
@@ -29,7 +29,7 @@ resource "kustomization_resource" "bets" {
 
 resource "kubernetes_namespace" "bets" {
   metadata {
-    name = "bets"
+    name = var.bets_namespace
     annotations = {
       "linkerd.io/inject" = "enabled"
     }

@@ -1,6 +1,6 @@
 resource "helm_release" "linkerd" {
   name = "linkerd"
-  namespace = kubernetes_namespace.mesh.metadata[0].name
+  namespace = kubernetes_namespace.linkerd.metadata[0].name
 
   repository = "https://helm.linkerd.io/stable"
   chart = "linkerd2"
@@ -8,7 +8,7 @@ resource "helm_release" "linkerd" {
 
   values = [
     yamlencode({
-      namespace = kubernetes_namespace.mesh.metadata[0].name
+      namespace = kubernetes_namespace.linkerd.metadata[0].name
       installNamespace = false
       identityTrustAnchorsPEM = local.ca.public_key
       identity = {
@@ -21,8 +21,8 @@ resource "helm_release" "linkerd" {
   ]
 }
 
-resource "kubernetes_namespace" "mesh" {
+resource "kubernetes_namespace" "linkerd" {
   metadata {
-    name = "mesh"
+    name = var.linkerd_namespace
   }
 }

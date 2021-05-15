@@ -26,6 +26,6 @@ resource "helm_release" "argocd" {
 
 resource "kubernetes_namespace" "ops" {
   metadata {
-    name = "ops"
+    name = var.argo_namespace
   }
 }
