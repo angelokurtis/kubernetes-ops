@@ -1,5 +1,5 @@
 data "kustomization_overlay" "contour" {
-  resources = [ "https://github.com/projectcontour/contour/examples/render?ref=v1.15.0" ]
+  resources = [ "https://github.com/projectcontour/contour/examples/render?ref=v1.15.1" ]
 
   patches {
     patch = yamlencode([
