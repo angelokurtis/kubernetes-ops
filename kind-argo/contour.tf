@@ -1,11 +1,13 @@
 data "kustomization_overlay" "contour" {
   resources = [ "https://github.com/projectcontour/contour/examples/render?ref=v1.15.1" ]
 
+  namespace = var.contour_namespace
+
   patches {
     patch = yamlencode([
       {
         op = "replace", path = "/spec/template/spec/nodeSelector"
-        value = { "ingress-ready":"true" }
+        value = { "ingress-ready" = "true" }
       },
       {
         op = "replace", path = "/spec/template/spec/tolerations"
