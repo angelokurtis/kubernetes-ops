@@ -7,16 +7,14 @@ resource "helm_release" "horusec_platform" {
   values = [
     yamlencode({
       global = {
-        jwt = {
-          secretKeyRef = { key = "jwt-token", name = "jwt-token" }
-        }
+        jwt = { secretKeyRef = { key = "jwt-token", name = "jwt-token" } }
         broker = {
           host = "rabbitmq.${kubernetes_namespace.horusec.metadata[0].name}"
           user = { secretKeyRef = { key = "broker-username", name = "broker-username" } }
           password = { secretKeyRef = { key = "rabbitmq-password", name = "rabbitmq" } }
         }
         database = {
-          host = "postgres-platform-postgresql.${kubernetes_namespace.platform_db.metadata[0].name}"
+          host = "${helm_release.postgres.name}-postgresql.${helm_release.postgres.namespace}.svc.cluster.local"
           user = { secretKeyRef = { key = "postgresql-username", name = "platform-db" } }
           password = { secretKeyRef = { key = "postgresql-password", name = "platform-db" } }
         }
@@ -24,10 +22,13 @@ resource "helm_release" "horusec_platform" {
       components = {
         analytic = {
           database = {
-            host = "postgres-analytic-postgresql.${kubernetes_namespace.analytic_db.metadata[0].name}"
+            host = "${helm_release.postgres.name}-postgresql.${helm_release.postgres.namespace}.svc.cluster.local"
             user = { secretKeyRef = { key = "postgresql-username", name = "analytic-db" } }
             password = { secretKeyRef = { key = "postgresql-password", name = "analytic-db" } }
           }
+        }
+        manager = {
+          container = { image = { pullPolicy = "Never", registry = "horuszup", tag = "v2.12.1.BUILD-SNAPSHOT" } }
         }
       }
     })
