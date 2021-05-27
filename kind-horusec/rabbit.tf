@@ -5,11 +5,22 @@ resource "helm_release" "rabbit" {
 
   set {
     name = "auth.password"
-    value = "qQAUEGhQ6R"
+    value = "1f17949a"
   }
 
   set {
     name = "auth.erlangCookie"
-    value = "DX5NKjaLajEYC9t6hJujJa25PqpbFXF4"
+    value = "93c7308ffc78e6916eec"
+  }
+}
+
+resource "kubernetes_secret" "broker_username" {
+  metadata {
+    name = "broker-username"
+    namespace = kubernetes_namespace.horusec.metadata[0].name
+  }
+
+  data = {
+    "broker-username" = "user"
   }
 }
