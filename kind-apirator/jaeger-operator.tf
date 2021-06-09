@@ -4,7 +4,7 @@ resource "helm_release" "jaeger_operator" {
 
   repository = "https://jaegertracing.github.io/helm-charts"
   chart = "jaeger-operator"
-  version = "2.21.1"
+  version = "2.21.2"
 }
 
 resource "kustomization_resource" "jaeger_custom_resource" {
