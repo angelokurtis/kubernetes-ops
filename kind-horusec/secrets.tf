@@ -9,24 +9,38 @@ resource "kubernetes_secret" "jwt_token" {
   }
 }
 
-resource "kubernetes_secret" "smtp_username" {
+resource "kubernetes_secret" "smtp" {
   metadata {
-    name = "smtp-username"
+    name = "smtp"
     namespace = kubernetes_namespace.horusec.metadata[0].name
   }
 
   data = {
-    "smtp-username" = "3dcf6374062286"
+    "username" = "3dcf6374062286"
+    "password" = "1a29e895468521"
   }
 }
 
-resource "kubernetes_secret" "smtp_password" {
+resource "kubernetes_secret" "platform_database" {
   metadata {
-    name = "smtp-password"
+    name = "platform-database"
     namespace = kubernetes_namespace.horusec.metadata[0].name
   }
 
   data = {
-    "smtp-password" = "1a29e895468521"
+    "username" = local.database.platform.username
+    "password" = local.database.platform.password
+  }
+}
+
+resource "kubernetes_secret" "analytic_database" {
+  metadata {
+    name = "analytic-database"
+    namespace = kubernetes_namespace.horusec.metadata[0].name
+  }
+
+  data = {
+    "username" = local.database.analytic.username
+    "password" = local.database.analytic.password
   }
 }
