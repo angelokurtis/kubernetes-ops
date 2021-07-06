@@ -4,7 +4,7 @@ resource "helm_release" "ingress_nginx" {
 
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart = "ingress-nginx"
-  version = "3.30.0"
+  version = "3.34.0"
 
   values = [
     yamlencode({
@@ -20,4 +20,10 @@ resource "helm_release" "ingress_nginx" {
       }
     })
   ]
+}
+
+resource "kubernetes_namespace" "ingress" {
+  metadata {
+    name = "ingress"
+  }
 }

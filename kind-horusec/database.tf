@@ -5,48 +5,35 @@ locals {
   }
 }
 
-resource "helm_release" "postgres" {
-  name = "horusec-database"
-  chart = "https://charts.bitnami.com/bitnami/postgresql-10.4.8.tgz"
-  namespace = kubernetes_namespace.horusec.metadata[0].name
+resource "helm_release" "postgresql" {
+  name = "postgresql"
+  namespace = kubernetes_namespace.database.metadata[0].name
 
-  set {
-    name = "postgresqlPassword"
-    value = "c9e7678d535a"
-  }
+  repository = "https://charts.bitnami.com/bitnami"
+  chart = "postgresql"
+  version = "10.5.1"
 
   set {
     name = "initdbScriptsSecret"
     value = kubernetes_secret.userdata.metadata[0].name
   }
-}
 
-resource "kubernetes_secret" "platform-db" {
-  metadata {
-    name = "platform-db"
-    namespace = kubernetes_namespace.horusec.metadata[0].name
-  }
-  data = {
-    postgresql-username = local.database.platform.username
-    postgresql-password = local.database.platform.password
+  set {
+    name = "nameOverride"
+    value = "postgresql"
   }
 }
 
-resource "kubernetes_secret" "analytic_db" {
+resource "kubernetes_namespace" "database" {
   metadata {
-    name = "analytic-db"
-    namespace = kubernetes_namespace.horusec.metadata[0].name
-  }
-  data = {
-    postgresql-username = local.database.analytic.username
-    postgresql-password = local.database.analytic.password
+    name = "database"
   }
 }
 
 resource "kubernetes_secret" "userdata" {
   metadata {
     name = "userdata"
-    namespace = kubernetes_namespace.horusec.metadata[0].name
+    namespace = kubernetes_namespace.database.metadata[0].name
   }
   data = {
     "userdata.sql" = <<-EOT

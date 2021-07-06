@@ -1,0 +1,56 @@
+components:
+  analytic:
+    database:
+      host: "${POSTGRESQL_HOST}"
+      name: analytic_db
+      password:
+        secretKeyRef:
+          key: postgresql-password
+          name: "${ANALYTIC_DB_SECRET_NAME}"
+      user:
+        secretKeyRef:
+          key: postgresql-username
+          name: "${ANALYTIC_DB_SECRET_NAME}"
+  messages:
+    container:
+      livenessProbe:
+        timeoutSeconds: 3
+      readinessProbe:
+        timeoutSeconds: 3
+    enabled: true
+    mailServer:
+      host: smtp.mailtrap.io
+      password:
+        secretKeyRef:
+          key: password
+          name: "${SMTP_SECRET_NAME}"
+      port: 2525
+      user:
+        secretKeyRef:
+          key: username
+          name: "${SMTP_SECRET_NAME}"
+global:
+  broker:
+    host: "${RABBITMQ_HOST}"
+    password:
+      secretKeyRef:
+        key: password
+        name: "${RABBITMQ_SECRET_NAME}"
+    user:
+      secretKeyRef:
+        key: username
+        name: "${RABBITMQ_SECRET_NAME}"
+  database:
+    host: "${POSTGRESQL_HOST}"
+    password:
+      secretKeyRef:
+        key: postgresql-password
+        name: "${PLATFORM_DB_SECRET_NAME}"
+    user:
+      secretKeyRef:
+        key: postgresql-username
+        name: "${PLATFORM_DB_SECRET_NAME}"
+  jwt:
+    secretKeyRef:
+      key: secret-key
+      name: "${JWT_SECRET_NAME}"

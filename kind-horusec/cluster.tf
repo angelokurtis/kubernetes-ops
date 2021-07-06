@@ -8,7 +8,7 @@ resource "kind_cluster" "horusec" {
 
     node {
       role = "control-plane"
-      image = "kindest/node:v1.18.15"
+      image = "kindest/node:v1.20.7"
 
       kubeadm_config_patches = [
         yamlencode({
