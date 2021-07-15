@@ -13,17 +13,11 @@ terraform {
 }
 
 provider "helm" {
-  kubernetes {
-    config_path = kind_cluster.workflows.kubeconfig_path
-  }
+  kubernetes { config_path = kind_cluster.workflows.kubeconfig_path }
 }
 
 provider "kind" {}
 
-provider "kubernetes" {
-  config_path = kind_cluster.workflows.kubeconfig_path
-}
+provider "kubernetes" { config_path = kind_cluster.workflows.kubeconfig_path }
 
-provider "kustomization" {
-  kubeconfig_path = kind_cluster.workflows.kubeconfig_path
-}
+provider "kustomization" { kubeconfig_path = kind_cluster.workflows.kubeconfig_path }

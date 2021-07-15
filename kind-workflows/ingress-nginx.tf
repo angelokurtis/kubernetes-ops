@@ -23,7 +23,5 @@ resource "helm_release" "ingress_nginx" {
 }
 
 resource "kubernetes_namespace" "ingress" {
-  metadata {
-    name = "ingress"
-  }
+  metadata { name = "ingress" }
 }
