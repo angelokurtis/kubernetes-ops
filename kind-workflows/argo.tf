@@ -12,27 +12,20 @@ resource "helm_release" "argo_workflows" {
         persistence: {
           archive = true
           archiveTTL = "7d"
-          connectionPool = {
-            connMaxLifetime = "0s"
-            maxIdleConns = 100
-            maxOpenConns = 0
-          }
+          connectionPool = { connMaxLifetime = "0s", maxIdleConns = 100, maxOpenConns = 0 }
           nodeStatusOffLoad = true
           postgresql = {
             database = "postgres"
             host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-            passwordSecret = {
-              key = "password"
-              name = kubernetes_secret.argo_postgres_config.metadata[0].name
-            }
+            passwordSecret = { key = "password", name = kubernetes_secret.argo_postgres_config.metadata[0].name }
             port = 5432
             tableName = "argo_workflows"
-            userNameSecret = {
-              key = "username"
-              name = kubernetes_secret.argo_postgres_config.metadata[0].name
-            }
+            userNameSecret = { key = "username", name = kubernetes_secret.argo_postgres_config.metadata[0].name }
           }
         }
+      }
+      server = {
+        ingress = { enabled = true, hosts = [ "argocd.127.0.1.1.nip.io" ] }
       }
     })
   ]
