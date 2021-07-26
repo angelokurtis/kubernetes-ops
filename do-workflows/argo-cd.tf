@@ -19,6 +19,19 @@ resource "helm_release" "argo_cd" {
       server = {
         ingress = { enabled = true, hosts = [ "argo-cd-${local.cluster_host}" ] }
         additionalApplications = [
+          {
+            destination = { namespace = "cert-manager", server = "https://kubernetes.default.svc" }
+            name = "cert-manager"
+            namespace = "continuous-deployment"
+            project = "default"
+            source = {
+              chart = "cert-manager"
+              helm = { parameters = [ { name = "installCRDs", value = "true" } ] }
+              repoURL = "https://charts.jetstack.io"
+              targetRevision = "v1.4.1"
+            }
+            syncPolicy = { automated = { prune = true, selfHeal = true }, syncOptions = [ "CreateNamespace=true" ] }
+          }
         ]
       }
     })
