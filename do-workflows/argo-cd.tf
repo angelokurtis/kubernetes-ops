@@ -20,14 +20,16 @@ resource "helm_release" "argo_cd" {
         ingress = {
           enabled = true,
           hosts = [ "argo-cd-${local.cluster_host}" ]
-          annotations = { kubernetes.io/ingress.class: "nginx", cert-manager.io/cluster-issuer: "letsencrypt-prod" }
+          annotations = {
+            "kubernetes.io/ingress.class": "nginx"
+            "cert-manager.io/cluster-issuer": "letsencrypt-prod"
+          }
         }
         additionalApplications = [
           {
             destination = { namespace = "cert-manager", server = "https://kubernetes.default.svc" }
             finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
             name = "cert-manager"
-            namespace = "continuous-deployment"
             project = "default"
             source = {
               chart = "cert-manager"
