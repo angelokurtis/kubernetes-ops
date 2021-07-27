@@ -18,12 +18,15 @@ resource "helm_release" "argo_cd" {
       }
       server = {
         ingress = {
-          enabled = true,
+          enabled = true
           hosts = [ "argo-cd-${local.cluster_host}" ]
-          tls = [ { hosts = [ "argo-cd-${local.cluster_host}" ] secretName = "argo-cd-cert" } ]
+          https = true
+          tls = [ { hosts = [ "argo-cd-${local.cluster_host}" ], secretName = "argo-cd-cert" } ]
           annotations = {
             "kubernetes.io/ingress.class": "nginx"
             "cert-manager.io/cluster-issuer": "letsencrypt-prod"
+            "nginx.ingress.kubernetes.io/backend-protocol": "HTTPS"
+            "nginx.ingress.kubernetes.io/ssl-redirect": "true"
           }
         }
         additionalApplications = [
@@ -48,8 +51,4 @@ resource "helm_release" "argo_cd" {
 
 resource "kubernetes_namespace" "ops" {
   metadata { name = "continuous-deployment" }
-}
-
-output "argo-cd-ing" {
-  value = yamldecode(file("/home/tiagoangelo/wrkspc/github.com/angelokurtis/kubernetes-ops/do-workflows/tmp/manifests/continuous-deployment/Ingress.networking.k8s.io/argo-cd-server.yaml"))
 }
