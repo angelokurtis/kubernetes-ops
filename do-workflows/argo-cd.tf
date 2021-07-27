@@ -42,6 +42,18 @@ resource "helm_release" "argo_cd" {
               targetRevision = "v1.4.1"
             }
             syncPolicy = { automated = { prune = true, selfHeal = true }, syncOptions = [ "CreateNamespace=true" ] }
+          },
+          {
+            destination = { server = "https://kubernetes.default.svc" }
+            finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
+            name = "letsencrypt"
+            project = "default"
+            source = {
+              path = "letsencrypt"
+              repoURL = "https://github.com/angelokurtis/k8s-automation"
+              targetRevision = "HEAD"
+            }
+            syncPolicy = { automated = { prune = true, selfHeal = true } }
           }
         ]
       }
