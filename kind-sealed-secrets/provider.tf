@@ -13,11 +13,11 @@ terraform {
 }
 
 provider "helm" {
-  kubernetes { config_path = kind_cluster.sealed_secrets.kubeconfig_path }
+  kubernetes { config_path = kind_cluster.safe.kubeconfig_path }
 }
 
 provider "kind" {}
 
-provider "kubernetes" { config_path = kind_cluster.sealed_secrets.kubeconfig_path }
+provider "kubernetes" { config_path = kind_cluster.safe.kubeconfig_path }
 
-provider "kustomization" { kubeconfig_path = kind_cluster.sealed_secrets.kubeconfig_path }
+provider "kustomization" { kubeconfig_path = kind_cluster.safe.kubeconfig_path }

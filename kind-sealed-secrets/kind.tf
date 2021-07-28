@@ -1,5 +1,5 @@
-resource "kind_cluster" "sealed_secrets" {
-  name = "sealed-secrets"
+resource "kind_cluster" "safe" {
+  name = "safe"
   wait_for_ready = true
 
   kind_config {
