@@ -12,10 +12,6 @@ terraform {
       source = "hashicorp/helm"
       version = "2.2.0"
     }
-    kustomization = {
-      source = "kbst/kustomization"
-      version = "0.5.0"
-    }
   }
 }
 
@@ -35,8 +31,4 @@ provider "helm" {
     token = digitalocean_kubernetes_cluster.api_workflow.kube_config[0].token
     cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.api_workflow.kube_config[0].cluster_ca_certificate)
   }
-}
-
-provider "kustomization" {
-  kubeconfig_raw = digitalocean_kubernetes_cluster.api_workflow.kube_config[0].raw_config
 }
