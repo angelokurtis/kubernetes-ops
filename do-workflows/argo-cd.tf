@@ -44,7 +44,7 @@ resource "helm_release" "argo_cd" {
             syncPolicy = { automated = { prune = true, selfHeal = true }, syncOptions = [ "CreateNamespace=true" ] }
           },
           {
-            destination = { server = "https://kubernetes.default.svc" }
+            destination = { namespace = "cert-manager", server = "https://kubernetes.default.svc" }
             finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
             name = "letsencrypt"
             project = "default"
@@ -54,6 +54,19 @@ resource "helm_release" "argo_cd" {
               targetRevision = "HEAD"
             }
             syncPolicy = { automated = { prune = true, selfHeal = true } }
+          },
+          {
+            destination = { namespace = "events", server = "https://kubernetes.default.svc" }
+            finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
+            name = "argo-events"
+            namespace = "continuous-deployment"
+            project = "default"
+            source = {
+              chart = "argo-events"
+              repoURL = "https://argoproj.github.io/argo-helm"
+              targetRevision = "1.6.4"
+            }
+            syncPolicy = { automated = { prune = true, selfHeal = true }, syncOptions = [ "CreateNamespace=true" ] }
           }
         ]
       }
