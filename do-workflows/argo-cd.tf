@@ -10,6 +10,7 @@ locals {
     merge(local.default_application, local.argo_events),
     merge(local.default_application, local.cert_manager),
     merge(local.default_application, local.lets_encrypt),
+    merge(local.default_application, local.sealed_secrets),
   ]
 }
 

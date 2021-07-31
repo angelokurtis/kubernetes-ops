@@ -3,5 +3,13 @@ variable "digitalocean_token" {
 }
 
 variable "email" {
-  description = "Email address used for ACME registration"
+  description = "Email address used for ACME registration."
+}
+
+variable "private_key" {
+  description = "The private key used to decrypt sealed secrets."
+}
+
+variable "public_key" {
+  description = "The public key used for sealing secrets."
 }
