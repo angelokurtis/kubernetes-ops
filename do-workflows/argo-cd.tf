@@ -1,10 +1,25 @@
+locals {
+  default_application = {
+    destination = { server = "https://kubernetes.default.svc" }
+    finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
+    namespace = kubernetes_namespace.ops.metadata[0].name
+    project = "default"
+    syncPolicy = { automated = { prune = true, selfHeal = true }, syncOptions = [ "CreateNamespace=true" ] }
+  }
+  applications = [
+    merge(local.default_application, local.argo_events),
+    merge(local.default_application, local.cert_manager),
+    merge(local.default_application, local.lets_encrypt),
+  ]
+}
+
 resource "helm_release" "argo_cd" {
   name = "argo-cd"
   namespace = kubernetes_namespace.ops.metadata[0].name
 
   repository = "https://argoproj.github.io/argo-helm"
   chart = "argo-cd"
-  version = "3.10.0"
+  version = "3.11.1"
 
   values = [
     yamlencode({
@@ -29,46 +44,7 @@ resource "helm_release" "argo_cd" {
             "nginx.ingress.kubernetes.io/ssl-redirect": "true"
           }
         }
-        additionalApplications = [
-          {
-            destination = { namespace = "cert-manager", server = "https://kubernetes.default.svc" }
-            finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
-            name = "cert-manager"
-            project = "default"
-            source = {
-              chart = "cert-manager"
-              helm = { parameters = [ { name = "installCRDs", value = "true" } ] }
-              repoURL = "https://charts.jetstack.io"
-              targetRevision = "v1.4.1"
-            }
-            syncPolicy = { automated = { prune = true, selfHeal = true }, syncOptions = [ "CreateNamespace=true" ] }
-          },
-          {
-            destination = { namespace = "cert-manager", server = "https://kubernetes.default.svc" }
-            finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
-            name = "letsencrypt"
-            project = "default"
-            source = {
-              path = "letsencrypt"
-              repoURL = "https://github.com/angelokurtis/k8s-automation"
-              targetRevision = "HEAD"
-            }
-            syncPolicy = { automated = { prune = true, selfHeal = true } }
-          },
-          {
-            destination = { namespace = "events", server = "https://kubernetes.default.svc" }
-            finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
-            name = "argo-events"
-            namespace = "continuous-deployment"
-            project = "default"
-            source = {
-              chart = "argo-events"
-              repoURL = "https://argoproj.github.io/argo-helm"
-              targetRevision = "1.6.4"
-            }
-            syncPolicy = { automated = { prune = true, selfHeal = true }, syncOptions = [ "CreateNamespace=true" ] }
-          }
-        ]
+        additionalApplications = local.applications
       }
     })
   ]
