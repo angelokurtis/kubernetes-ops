@@ -1,6 +1,6 @@
 locals {
   ingress_ip = data.kubernetes_service.ingress_nginx.status[0].load_balancer[0].ingress[0].ip
-  cluster_host = "${join("", formatlist("%x", split(".", local.ingress_ip)))}.nip.io"
+  cluster_host = "${join("", formatlist("%02x", split(".", local.ingress_ip)))}.nip.io"
 }
 
 resource "helm_release" "nginx" {
