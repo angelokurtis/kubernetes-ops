@@ -17,3 +17,11 @@ data "template_file" "horusec_platform" {
     PLATFORM_DB_SECRET_NAME = kubernetes_secret.platform_db.metadata[0].name
   }
 }
+
+resource "helm_release" "horusec_platform" {
+  name = "horusec-platform"
+  namespace = kubernetes_namespace.horusec_system.metadata[0].name
+  chart = "${path.cwd}/horusec-platform.tar.gz"
+
+  values = [ data.template_file.horusec_platform.rendered ]
+}

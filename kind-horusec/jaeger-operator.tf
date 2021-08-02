@@ -28,7 +28,7 @@ resource "kustomization_resource" "jaeger_custom_resource" {
       namespace = kubernetes_namespace.tracing[0].metadata[0].name
     }
     spec = {
-      ingress = { enabled = true, hosts = [ "tracing.zup" ] }
+      ingress = { enabled = true, hosts = [ "tracing.lvh.me" ] }
     }
   })
 

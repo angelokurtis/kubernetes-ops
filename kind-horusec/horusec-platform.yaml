@@ -1,5 +1,25 @@
 components:
+  auth:
+    ingress:
+      host: "auth.lvh.me"
+  api:
+    ingress:
+      host: "api.lvh.me"
+  core:
+    ingress:
+      host: "core.lvh.me"
+  manager:
+    ingress:
+      host: "manager.lvh.me"
+  vulnerability:
+    ingress:
+      host: "vulnerability.lvh.me"
+  webhook:
+    ingress:
+      host: "webhook.lvh.me"
   analytic:
+    ingress:
+      host: "analytic.lvh.me"
     database:
       host: "${POSTGRESQL_HOST}"
       name: analytic_db
@@ -12,6 +32,8 @@ components:
           key: postgresql-username
           name: "${ANALYTIC_DB_SECRET_NAME}"
   messages:
+    ingress:
+      host: "messages.lvh.me"
     container:
       livenessProbe:
         timeoutSeconds: 3

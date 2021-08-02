@@ -8,6 +8,7 @@ resource "helm_release" "ingress_nginx" {
 
   values = [
     yamlencode({
+      "fullnameOverride" = "nginx"
       "controller" = {
         "extraArgs" = { "publish-status-address": "127.0.0.1" }
         "publishService" = { "enabled" = false }

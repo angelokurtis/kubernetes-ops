@@ -11,8 +11,8 @@ resource "helm_release" "openldap" {
   values = [
     yamlencode({
       replicaCount = 1,
-      ltb-passwd = { ingress = { hosts = [ "ldap.password.local", ] } }
-      phpldapadmin = { ingress = { hosts = [ "ldap.admin.local", ] } }
+      ltb-passwd = { ingress = { hosts = [ "ldap-pwd.lvh.me", ] } }
+      phpldapadmin = { ingress = { hosts = [ "ldap-adm.lvh.me", ] } }
     })
   ]
 }
