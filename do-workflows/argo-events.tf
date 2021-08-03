@@ -6,6 +6,9 @@ locals {
       chart = "argo-events"
       repoURL = "https://argoproj.github.io/argo-helm"
       targetRevision = "1.6.4"
+      helm = {
+        values = yamlencode({ singleNamespace = false })
+      }
     }
   }
 }
