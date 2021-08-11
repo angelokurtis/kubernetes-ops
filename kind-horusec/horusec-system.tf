@@ -60,3 +60,15 @@ resource "kubernetes_secret" "horusec_smtp" {
     "password" = "5ef8b1c956f4c6"
   }
 }
+
+resource "kubernetes_secret" "horusec_administrator" {
+  metadata {
+    name = "horusec-administrator"
+    namespace = kubernetes_namespace.horusec_system.metadata[0].name
+  }
+
+  data = {
+    "username" = "Bobby T. Tom"
+    "password" = "eiJiep2iig"
+  }
+}

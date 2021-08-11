@@ -76,3 +76,10 @@ global:
     secretKeyRef:
       key: secret-key
       name: "${JWT_SECRET_NAME}"
+  administrator:
+    email: "admin2@minhaempresa.com.br"
+    enabled: true
+    password:
+      secretKeyRef:
+        key: password
+        name: horusec-administrator

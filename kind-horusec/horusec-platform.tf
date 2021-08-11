@@ -1,5 +1,5 @@
 output "horusec_platform" {
-  value = yamldecode(data.template_file.horusec_platform.rendered)
+  value = data.template_file.horusec_platform.rendered
 }
 
 data "template_file" "horusec_platform" {
