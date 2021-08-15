@@ -1,0 +1,22 @@
+---
+apiVersion: rbacmanager.reactiveops.io/v1beta1
+kind: RBACDefinition
+metadata:
+  name: users
+rbacBindings:
+  - name: api-developers
+    subjects:
+      - kind: User
+        name: tiago
+      - kind: User
+        name: claudio
+    clusterRoleBindings:
+      - clusterRole: view
+    roleBindings:
+      - clusterRole: edit
+        namespaceSelector:
+          matchExpressions:
+            - key: maintainer
+              operator: In
+              values:
+                - developer
