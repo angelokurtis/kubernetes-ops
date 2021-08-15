@@ -2,7 +2,7 @@ locals {
   default_application = {
     destination = { server = "https://kubernetes.default.svc" }
     finalizers = [ "resources-finalizer.argocd.argoproj.io" ]
-    namespace = kubernetes_namespace.ops.metadata[0].name
+    namespace = kubernetes_namespace.cd.metadata[0].name
     project = "default"
     syncPolicy = { automated = { prune = true, selfHeal = true }, syncOptions = [ "CreateNamespace=true" ] }
   }
@@ -18,11 +18,11 @@ locals {
 
 resource "helm_release" "argo_cd" {
   name = "argo-cd"
-  namespace = kubernetes_namespace.ops.metadata[0].name
+  namespace = kubernetes_namespace.cd.metadata[0].name
 
   repository = "https://argoproj.github.io/argo-helm"
   chart = "argo-cd"
-  version = "3.11.1"
+  version = "3.11.3"
 
   values = [
     yamlencode({
@@ -53,6 +53,6 @@ resource "helm_release" "argo_cd" {
   ]
 }
 
-resource "kubernetes_namespace" "ops" {
+resource "kubernetes_namespace" "cd" {
   metadata { name = "continuous-deployment" }
 }
