@@ -1,3 +1,8 @@
+resource "local_file" "kube_config" {
+  content = digitalocean_kubernetes_cluster.api_workflow.kube_config[0].raw_config
+  filename = "kubeconfig.admin"
+}
+
 resource "digitalocean_kubernetes_cluster" "api_workflow" {
   name = "api-workflow"
   region = "nyc1"
