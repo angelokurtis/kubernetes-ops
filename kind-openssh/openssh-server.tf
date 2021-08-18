@@ -1,28 +1,25 @@
 resource "kubernetes_pod" "openssh_server" {
   metadata {
     name = "openssh-server"
-    namespace = "default"
+    namespace = data.kubernetes_namespace.default.metadata[0].name
     labels = { "app" = "openssh-server" }
   }
   spec {
     container {
-      env {
-        name = "USER_NAME"
-        value = "linuxserver"
-      }
-      env {
-        name = "PUBLIC_KEY"
-        value_from {
-          secret_key_ref {
-            key = "id_rsa.pub"
-            name = kubernetes_secret.ssh_public_key.metadata[0].name
-          }
-        }
-      }
-      image = "ghcr.io/linuxserver/openssh-server"
-      image_pull_policy = "IfNotPresent"
       name = "openssh-server"
-      port { container_port = 2222 }
+      image = "kurtis/openssh-server"
+      image_pull_policy = "IfNotPresent"
+      port { container_port = 22 }
+      volume_mount {
+        mount_path = "/root/.ssh"
+        name = "ssh-public-key"
+      }
+    }
+    volume {
+      name = "ssh-public-key"
+      secret {
+        secret_name = kubernetes_secret.ssh_public_key.metadata[0].name
+      }
     }
     restart_policy = "Always"
   }

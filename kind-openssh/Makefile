@@ -26,6 +26,5 @@ clean:
 	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* openssh-config
 
 connect:
-	nohup kubectl port-forward openssh-server 2222:2222 >/dev/null 2>&1 &
-	chmod 400 ssh/*
-	ssh -i ssh/id_rsa -p 2222 linuxserver@127.0.0.1
+	nohup kubectl port-forward openssh-server 2222:22 >/dev/null 2>&1 &
+	ssh -i ./ssh/id_rsa -p 2222 root@127.0.0.1

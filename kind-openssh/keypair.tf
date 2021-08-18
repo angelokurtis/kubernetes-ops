@@ -5,20 +5,12 @@ resource "tls_private_key" "openssh" {
 
 resource "local_file" "private_key" {
   filename = "${path.cwd}/ssh/id_rsa"
+  file_permission = "0400"
   content = tls_private_key.openssh.private_key_pem
 }
 
 resource "local_file" "public_key" {
   filename = "${path.cwd}/ssh/id_rsa.pub"
+  file_permission = "0400"
   content = tls_private_key.openssh.public_key_openssh
-}
-
-resource "kubernetes_secret" "ssh_public_key" {
-  metadata {
-    name = "ssh-public-key"
-    namespace = "default"
-  }
-  data = {
-    "id_rsa.pub" = tls_private_key.openssh.public_key_openssh
-  }
 }
