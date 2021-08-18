@@ -12,3 +12,13 @@ resource "local_file" "public_key" {
   filename = "${path.cwd}/ssh/id_rsa.pub"
   content = tls_private_key.openssh.public_key_openssh
 }
+
+resource "kubernetes_secret" "ssh_public_key" {
+  metadata {
+    name = "ssh-public-key"
+    namespace = "default"
+  }
+  data = {
+    "id_rsa.pub" = tls_private_key.openssh.public_key_openssh
+  }
+}

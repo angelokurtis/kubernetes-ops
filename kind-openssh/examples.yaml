@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: openssh-server
+  name: openssh-server
+spec:
+  containers:
+    - env:
+        - name: USER_NAME
+          value: linuxserver
+        - name: PUBLIC_KEY
+          valueFrom:
+            secretKeyRef:
+              key: id_rsa.pub
+              name: ssh-public-key
+              optional: false
+      image: ghcr.io/linuxserver/openssh-server
+      imagePullPolicy: IfNotPresent
+      name: openssh-server
+      ports:
+        - containerPort: 2222
+          protocol: TCP
+---
+apiVersion: v1
+data:
+  id_rsa.pub: c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFDQVFDNnA2S3JOSFUvOVBLWlJHWFg2MVRpd1puR1pZVDdyNUJQL1Qvczh4ZWkrbmM1M1ZCZjljQ1BOenFpUEFrU2J1RWdUZ3NQUnZNSDVSU3JOaWY0d0pnTXhySzlEYWxLTm10eUp3MUdjOTF5elZsb1VQL0ZyWGUvL1VNQm5HZjR5Tmt3QWZGNWVYdEpVclJSZG5PdTYyUmc2OGt5c2tueHFrWjBjKzZ6TUtZRTUzTnozN1o4bmVkM1RoY3NZNk1heU5yTHZvQUhuNFVtZUdBRTJqMzVoM0swRGUwMmxUc3cyUmVXVFBEcXp0YnRMbi9qVm1DTEJTY2doS3Uwb3cvZFVNRklkSHh5OTcrQXhwcXBPTVQxblRYTjR3K2VSNHhlRGU1Z1YvZGJQLy92dDE5YWEzMk01NkZ0ZlZOOEt4RmFlbVFpZmU5eUdMVDJJV1p6QzFiMkRIcERjY0RLN1I0NzUwSUlYS2NFNWdId29DdUU1eVd6SlJodWtFa1k0eXJzVDRBQ3c2TTVnbStGSCtocjZ1T3JCdWh4RU1LVjhVN0k0SHdwMjMwcERza3VqbjRHZ2ZQeWxxNHJ3WkQ5ZkxvVmRsdXRJeDFMM0pCbEdOVThLZTdBdzdOSXJlT1k1c1hJRktqa1kwaFZiUVIrWTNabUVidWVzazl0KzR4WEFKSEF5UXlmOW5FODlpUHZESlc0a1ZaUzBaR1RrTkl2aXp3Q3FoVktKY2M4aWkrc2JkTENMWk5DTUp4TmxNWUN3QWhzQVJsakgwbkdGWk9za2kzN3NOU2Z1ZjBzVWpZUWFkMXZUdmYrTjg4RHdaQStzd3V1N2pkZWNUam1iaEQ1VktmMGdUbFZ0K294RW0xSGMrUFdPOUFvUDhZc2YzZkgrN0Z6M2lXbmVVMDVIVWl6M1E9PQo=
+kind: Secret
+metadata:
+  name: ssh-public-key
+type: Opaque
