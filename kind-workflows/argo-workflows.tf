@@ -18,10 +18,10 @@ resource "helm_release" "argo_workflows" {
   values = [
     yamlencode({
       executor = { image = { tag = local.argo_workflows.version } }
-      controller: {
+      controller = {
         image = { tag = local.argo_workflows.version }
         containerRuntimeExecutor = "pns"
-        persistence: {
+        persistence = {
           archive = true
           archiveTTL = "7d"
           connectionPool = { connMaxLifetime = "0s", maxIdleConns = 100, maxOpenConns = 0 }
