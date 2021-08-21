@@ -4,7 +4,12 @@ resource "helm_release" "postgresql" {
 
   repository = "https://charts.bitnami.com/bitnami"
   chart = "postgresql"
-  version = "10.5.3"
+  version = "10.9.3"
+
+  set {
+    name = "nameOverride"
+    value = "postgresql"
+  }
 }
 
 resource "kubernetes_namespace" "database" {

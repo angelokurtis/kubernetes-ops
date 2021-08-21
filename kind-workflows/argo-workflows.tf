@@ -1,14 +1,26 @@
+locals {
+  argo_workflows = { version = "v3.1.8" }
+}
+
 resource "helm_release" "argo_workflows" {
   name = "argo-workflows"
-  namespace = kubernetes_namespace.argo.metadata[0].name
+  namespace = kubernetes_namespace.workflows.metadata[0].name
 
   repository = "https://argoproj.github.io/argo-helm"
   chart = "argo-workflows"
-  version = "0.2.7"
+  version = "0.4.1"
+
+  set {
+    name = "nameOverride"
+    value = "argo-workflows"
+  }
 
   values = [
     yamlencode({
+      executor = { image = { tag = local.argo_workflows.version } }
+      server = { image = { tag = local.argo_workflows.version } }
       controller: {
+        image = { tag = local.argo_workflows.version }
         persistence: {
           archive = true
           archiveTTL = "7d"
@@ -25,7 +37,7 @@ resource "helm_release" "argo_workflows" {
         }
       }
       server = {
-        ingress = { enabled = true, hosts = [ "argocd.127.0.1.1.nip.io" ] }
+        ingress = { enabled = true, hosts = [ "argo-workflows.lvh.me" ] }
       }
     })
   ]
@@ -34,7 +46,7 @@ resource "helm_release" "argo_workflows" {
 resource "kubernetes_secret" "argo_postgres_config" {
   metadata {
     name = "argo-postgres-config"
-    namespace = kubernetes_namespace.argo.metadata[0].name
+    namespace = kubernetes_namespace.workflows.metadata[0].name
   }
   data = {
     username = "postgres"
@@ -42,6 +54,6 @@ resource "kubernetes_secret" "argo_postgres_config" {
   }
 }
 
-resource "kubernetes_namespace" "argo" {
-  metadata { name = "argo" }
+resource "kubernetes_namespace" "workflows" {
+  metadata { name = "workflows" }
 }
