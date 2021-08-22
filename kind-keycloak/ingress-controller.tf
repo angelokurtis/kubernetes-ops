@@ -1,7 +1,15 @@
 resource "helm_release" "ingress_nginx" {
   name = "ingress-nginx"
-  chart = "https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-3.24.0/ingress-nginx-3.24.0.tgz"
   namespace = kubernetes_namespace.ingress.metadata[0].name
+
+  repository = "https://kubernetes.github.io/ingress-nginx"
+  chart = "ingress-nginx"
+  version = "3.35.0"
+
+  set {
+    name = "nameOverride"
+    value = "ingress-nginx"
+  }
 
   values = [
     yamlencode({
@@ -20,7 +28,5 @@ resource "helm_release" "ingress_nginx" {
 }
 
 resource "kubernetes_namespace" "ingress" {
-  metadata {
-    name = "ingress"
-  }
+  metadata { name = "ingress" }
 }
