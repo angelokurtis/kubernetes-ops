@@ -14,7 +14,7 @@ resource "helm_release" "keycloak" {
 
   repository = "https://charts.bitnami.com/bitnami"
   chart = "keycloak"
-  version = "3.1.1"
+  version = "5.0.1"
 
   set {
     name = "nameOverride"
