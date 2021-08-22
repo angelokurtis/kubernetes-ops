@@ -1,3 +1,13 @@
+locals {
+  keycloak = {
+    host = "keycloak.lvh.me"
+    admin = {
+      user = "admin"
+      password = "admin"
+    }
+  }
+}
+
 resource "helm_release" "keycloak" {
   name = "keycloak"
   namespace = kubernetes_namespace.iam.metadata[0].name
@@ -14,10 +24,10 @@ resource "helm_release" "keycloak" {
   values = [
     yamlencode({
       auth = {
-        adminUser = "admin"
-        adminPassword = "admin"
+        adminUser = local.keycloak.admin.user
+        adminPassword = local.keycloak.admin.password
       }
-      ingress = { enabled = true, hostname = "keycloak.lvh.me" }
+      ingress = { enabled = true, hostname = local.keycloak.host }
       service = { type = "ClusterIP" }
       extraEnvVars = [
         { name = "KEYCLOAK_LOGLEVEL", value = "DEBUG" },
