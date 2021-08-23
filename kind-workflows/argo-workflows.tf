@@ -45,6 +45,23 @@ resource "helm_release" "argo_workflows" {
   ]
 }
 
+resource "kubernetes_role_binding" "default_admin" {
+  metadata {
+    name = "default-admin"
+    namespace = kubernetes_namespace.workflows.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind = "ClusterRole"
+    name = "admin"
+  }
+  subject {
+    kind = "ServiceAccount"
+    name = "default"
+    namespace = kubernetes_namespace.workflows.metadata[0].name
+  }
+}
+
 resource "kubernetes_secret" "argo_postgres_config" {
   metadata {
     name = "argo-postgres-config"
