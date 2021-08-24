@@ -4,13 +4,11 @@ terraform {
       source = "kyma-incubator/kind"
       version = "0.0.7"
     }
-    kustomization = {
-      source = "kbst/kustomization"
-      version = "0.5.0"
-    }
   }
   required_version = ">= 0.13"
 }
+
+provider "kind" {}
 
 provider "helm" {
   kubernetes {
@@ -18,12 +16,6 @@ provider "helm" {
   }
 }
 
-provider "kind" {}
-
 provider "kubernetes" {
   config_path = kind_cluster.apicurio.kubeconfig_path
-}
-
-provider "kustomization" {
-  kubeconfig_path = kind_cluster.apicurio.kubeconfig_path
 }
