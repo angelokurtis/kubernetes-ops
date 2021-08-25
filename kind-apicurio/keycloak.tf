@@ -20,6 +20,7 @@ resource "helm_release" "keycloak" {
 
   values = [
     yamlencode({
+      image = { repository = "bitnami/keycloak", tag = "15.0.2" }
       auth = {
         adminUser = local.keycloak.admin.user
         adminPassword = local.keycloak.admin.password
@@ -32,6 +33,11 @@ resource "helm_release" "keycloak" {
       ]
       postgresql = { enabled = false }
       externalDatabase = { existingSecret = kubernetes_secret.database_env_vars.metadata[0].name }
+      keycloakConfigCli = {
+        enabled = true
+        configuration = { "realm.json" = file("${path.root}/config/realm.json") }
+        image = { repository = "adorsys/keycloak-config-cli", tag = "v4.2.1-rc0-15.0.1" }
+      }
     })
   ]
 
