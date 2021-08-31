@@ -9,6 +9,9 @@ locals {
       chart = "sealed-secrets"
       repoURL = "https://bitnami-labs.github.io/sealed-secrets"
       targetRevision = "1.16.1"
+      helm = {
+        values = yamlencode({ commandArgs = ["--update-status"] })
+      }
     }
   }
 }
