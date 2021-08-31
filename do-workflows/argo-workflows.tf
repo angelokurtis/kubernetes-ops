@@ -5,7 +5,7 @@ locals {
     source = {
       chart = "argo-workflows"
       repoURL = "https://argoproj.github.io/argo-helm"
-      targetRevision = "0.2.12"
+      targetRevision = "0.5.0"
       helm = {
         values = yamlencode({
           server = {

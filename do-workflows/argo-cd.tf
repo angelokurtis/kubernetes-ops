@@ -22,12 +22,12 @@ resource "helm_release" "argo_cd" {
 
   repository = "https://argoproj.github.io/argo-helm"
   chart = "argo-cd"
-  version = "3.11.3"
+  version = "3.17.5"
 
   values = [
     yamlencode({
       fullnameOverride = "argo-cd",
-      global = { image = { repository: "argoproj/argocd", tag: "v2.0.5" } }
+      global = { image = { repository: "argoproj/argocd", tag: "v2.1.1" } }
       configs = {
         secret = {
           argocdServerAdminPassword = "$2a$10$XgehbPznARhg75GhRgNNee/N/0bKsUWmdvvvuJ.W6JyNO/SGzuoRa",

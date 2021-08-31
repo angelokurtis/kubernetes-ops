@@ -6,7 +6,7 @@ locals {
       chart = "cert-manager"
       helm = { parameters = [ { name = "installCRDs", value = "true" } ] }
       repoURL = "https://charts.jetstack.io"
-      targetRevision = "v1.4.3"
+      targetRevision = "v1.5.3"
     }
   }
 }
