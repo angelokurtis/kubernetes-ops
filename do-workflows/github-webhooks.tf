@@ -3,8 +3,8 @@ locals {
     name = "api-docs-eventsource"
     destination = { namespace = "events", server = "https://kubernetes.default.svc" }
     source = {
-      path = "events"
-      repoURL = "https://github.com/apirator/workflow-definitions"
+      path = "do-workflows/overlays/nip.io"
+      repoURL = "https://github.com/angelokurtis/kubernetes-ops"
       targetRevision = "HEAD"
     }
   }
