@@ -1,0 +1,11 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: api-docs
+  namespace: events
+spec:
+  github:
+    example:
+      webhook:
+        url: https://api-docs-8ff4c855.nip.io

@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/apirator/workflow-definitions/events?ref=main
+patchesStrategicMerge:
+  - api-docs.event-source.yaml
+  - api-docs.ingress.yaml

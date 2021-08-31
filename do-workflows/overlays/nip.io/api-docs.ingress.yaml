@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-docs
+  namespace: events
+spec:
+  rules:
+    - host: api-docs-8ff4c855.nip.io
+  tls:
+    - hosts:
+        - api-docs-8ff4c855.nip.io
