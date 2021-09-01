@@ -4,7 +4,7 @@ resource "helm_release" "ingress_nginx" {
 
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart = "ingress-nginx"
-  version = "3.35.0"
+  version = "4.0.1"
 
   set {
     name = "nameOverride"
