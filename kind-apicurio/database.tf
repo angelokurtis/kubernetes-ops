@@ -21,7 +21,7 @@ resource "helm_release" "postgresql" {
 
   repository = "https://charts.bitnami.com/bitnami"
   chart = "postgresql"
-  version = "10.9.0"
+  version = "10.9.4"
 
   set {
     name = "initdbScriptsSecret"
