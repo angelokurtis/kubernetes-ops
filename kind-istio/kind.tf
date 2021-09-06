@@ -1,5 +1,5 @@
 locals {
-  cluster_domain = "${kind_cluster.istio.name}.local"
+  cluster_domain = "lvh.me"
 }
 
 resource "kind_cluster" "istio" {
