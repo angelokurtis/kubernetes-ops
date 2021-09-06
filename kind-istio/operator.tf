@@ -1,7 +1,10 @@
 resource "helm_release" "istio_operator" {
   name = "istio-operator"
-  chart = "https://s3-sa-east-1.amazonaws.com/charts.kurtis/istio-operator-1.9.2.tgz"
   namespace = kubernetes_namespace.istio_system.metadata[0].name
+
+  repository = "https://charts.kurtis.dev.br/"
+  chart = "istio-operator"
+  version = "1.9.1"
 
   set {
     name = "tag"
