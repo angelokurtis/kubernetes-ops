@@ -15,13 +15,28 @@ resource "helm_release" "charlescd" {
       hostGlobal = "http://charles.${local.cluster_domain}"
       CharlesApplications = {
         ui = { image = { tag = local.charlescd.version } }
-        circleMatcher = { image = { tag = local.charlescd.version } }
+        circleMatcher = {
+          redis = {
+            host = "redis-master.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+            password = data.kubernetes_secret.redis.data.redis-password
+          }
+          image = { tag = local.charlescd.version }
+        }
         gate = {
           database = {
             host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
             name = local.database["charlescd_moove"]["database"]
             user = local.database["charlescd_moove"]["user"]
             password = local.database["charlescd_moove"]["password"]
+          }
+          image = { tag = local.charlescd.version }
+        }
+        hermes = {
+          database = {
+            host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+            name = local.database["charlescd_hermes"]["database"]
+            user = local.database["charlescd_hermes"]["user"]
+            password = local.database["charlescd_hermes"]["password"]
           }
           image = { tag = local.charlescd.version }
         }
