@@ -55,6 +55,7 @@ resource "kubernetes_secret" "userdata" {
       %{ for db in local.databases ~}
       create database ${local.database[db]["database"]};
       create user ${local.database[db]["user"]} with encrypted password '${local.database[db]["password"]}';
+      alter user ${local.database[db]["user"]} with superuser;
       grant all privileges on database ${local.database[db]["database"]} to ${local.database[db]["user"]};
       %{ endfor ~}
     EOT
