@@ -21,5 +21,4 @@ resource "random_password" "rabbitmq" {
   for_each = toset(["password", "erlangCookie"])
   keepers = { database = each.key }
   length = 16
-  special = false
 }
