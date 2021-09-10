@@ -17,8 +17,8 @@ resource "helm_release" "charlescd" {
         ui = { image = { tag = local.charlescd.version } }
         circleMatcher = {
           redis = {
-            host = "redis-master.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-            password = data.kubernetes_secret.redis.data.redis-password
+            host = "redis-master.${kubernetes_namespace.cache.metadata[0].name}.svc.cluster.local"
+            password = random_password.redis.result
           }
           image = { tag = local.charlescd.version }
         }
