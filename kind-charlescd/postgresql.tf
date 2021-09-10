@@ -39,12 +39,6 @@ resource "helm_release" "postgresql" {
   }
 }
 
-resource "kubernetes_namespace" "database" {
-  metadata {
-    name = "database"
-  }
-}
-
 resource "kubernetes_secret" "userdata" {
   metadata {
     name = "userdata"

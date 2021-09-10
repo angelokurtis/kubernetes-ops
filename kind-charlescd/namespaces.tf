@@ -8,3 +8,11 @@ resource "kubernetes_namespace" "istio_system" {
     labels = { istio-injection = "disabled" }
   }
 }
+
+resource "kubernetes_namespace" "database" {
+  metadata { name = "database" }
+}
+
+resource "kubernetes_namespace" "queue" {
+  metadata { name = "queue" }
+}

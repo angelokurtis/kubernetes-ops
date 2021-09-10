@@ -38,6 +38,7 @@ resource "helm_release" "charlescd" {
             user = local.database["charlescd_hermes"]["user"]
             password = local.database["charlescd_hermes"]["password"]
           }
+          amqp = { url = "amqp://user:${random_password.rabbitmq["password"].result}@rabbitmq.${kubernetes_namespace.queue.metadata[0].name}.svc.cluster.local:5672/" }
           image = { tag = local.charlescd.version }
         }
         butler = {
