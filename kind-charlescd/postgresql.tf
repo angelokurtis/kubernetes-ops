@@ -17,7 +17,6 @@ resource "random_password" "databases" {
   for_each = toset(local.databases)
   keepers = { database = each.key }
   length = 16
-  special = false
 }
 
 resource "helm_release" "postgresql" {
@@ -36,6 +35,11 @@ resource "helm_release" "postgresql" {
   set {
     name = "fullnameOverride"
     value = "postgresql"
+  }
+
+  set {
+    name = "image.tag"
+    value = "13"
   }
 }
 
