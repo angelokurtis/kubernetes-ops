@@ -4,7 +4,7 @@ resource "helm_release" "istio_operator" {
 
   repository = "https://charts.kurtis.dev.br/"
   chart = "istio-operator"
-  version = "1.11.2"
+  version = "1.7.0"
 
   set {
     name = "operatorNamespace"
@@ -14,5 +14,15 @@ resource "helm_release" "istio_operator" {
   set {
     name = "watchedNamespaces"
     value = kubernetes_namespace.istio_system.metadata[0].name
+  }
+
+  set {
+    name = "hub"
+    value = "docker.io/istio"
+  }
+
+  set {
+    name = "tag"
+    value = "1.7.4-distroless"
   }
 }
