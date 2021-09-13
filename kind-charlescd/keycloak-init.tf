@@ -52,7 +52,7 @@ resource "kubernetes_config_map" "keycloak_scripts" {
   }
 }
 
-resource "random_password" "api_client_secret" {
+resource "random_password" "charlescd_client_secret" {
   length = 16
   special = true
 }
@@ -69,5 +69,6 @@ resource "kubernetes_secret" "keycloak_init_env_vars" {
     USERNAME = "admin"
     PASSWORD = local.keycloak.admin.password
     GRANT_TYPE = "password"
+    CLIENT_SECRET = random_password.charlescd_client_secret.result
   }
 }

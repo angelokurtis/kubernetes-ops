@@ -1,6 +1,7 @@
 module.exports = async function (keycloak) {
     const realm = 'charlescd';
     const publicClient = {clientId: 'charlescd-client'}
+    const confidentialClient = {clientId: 'realm-charlescd'}
 
     // create realm if not exists
     if (!await keycloak.realms.findOne({realm})) {
@@ -19,11 +20,22 @@ module.exports = async function (keycloak) {
             directAccessGrantsEnabled: true,
             implicitFlowEnabled: true,
             publicClient: true,
-            redirectUris: [ "http://charles.lvh.me/*" ],
+            redirectUris: ["http://charles.lvh.me/*"],
             serviceAccountsEnabled: true,
-            webOrigins: [ "*" ]
+            webOrigins: ["*"]
         });
         console.log(`client '${publicClient.clientId}' created`)
     }
-    console.log(JSON.stringify(clients[0]))
+
+    // create confidential client if not exists
+    clients = await keycloak.clients.find({clientId: confidentialClient.clientId});
+    if (!clients || clients.length === 0) {
+        await keycloak.clients.create({
+            clientId: confidentialClient.clientId,
+            secret: process.env.CLIENT_SECRET,
+            serviceAccountsEnabled: true,
+            standardFlowEnabled: false,
+        });
+        console.log(`client '${confidentialClient.clientId}' created`)
+    }
 }
