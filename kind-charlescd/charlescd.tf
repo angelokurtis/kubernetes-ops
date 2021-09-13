@@ -87,7 +87,6 @@ resource "helm_release" "charlescd" {
         }
       }
       ingress = { enabled = false }
-      envoy = { enabled = false }
       postgresql = { enabled = false }
       redis = { enabled = false }
       keycloak = { enabled = false }
