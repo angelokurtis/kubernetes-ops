@@ -5,6 +5,7 @@ locals {
     "charlescd_butler",
     "charlescd_hermes",
     "charlescd_compass",
+    "keycloak",
   ]
   database = {for db in local.databases : db => {
     database = "${db}_db"
