@@ -6,7 +6,7 @@ resource "helm_release" "kiali" {
 
   repository = "https://kiali.org/helm-charts"
   chart = "kiali-server"
-  version = "1.32.0"
+  version = "1.40.0"
 
   set {
     name = "nameOverride"

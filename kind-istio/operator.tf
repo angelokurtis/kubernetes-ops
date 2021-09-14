@@ -4,11 +4,11 @@ resource "helm_release" "istio_operator" {
 
   repository = "https://charts.kurtis.dev.br/"
   chart = "istio-operator"
-  version = "1.9.1"
+  version = "1.11.2"
 
   set {
     name = "tag"
-    value = "1.9.2-distroless"
+    value = "1.11.2-distroless"
   }
 
   set {
