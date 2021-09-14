@@ -3,7 +3,6 @@ locals {
 }
 
 resource "kind_cluster" "istio" {
-
   name = "istio"
   wait_for_ready = true
 
@@ -13,7 +12,7 @@ resource "kind_cluster" "istio" {
 
     node {
       role = "control-plane"
-      image = "kindest/node:v1.18.15"
+      image = "kindest/node:v1.21.2"
 
       kubeadm_config_patches = [
         yamlencode({
