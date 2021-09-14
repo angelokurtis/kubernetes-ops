@@ -2,15 +2,11 @@ terraform {
   required_providers {
     kind = {
       source = "kyma-incubator/kind"
-      version = "0.0.7"
+      version = "0.0.9"
     }
     kustomization = {
       source = "kbst/kustomization"
-      version = "0.4.2"
-    }
-    docker = {
-      source = "kreuzwerker/docker"
-      version = "2.10.0"
+      version = "0.5.0"
     }
   }
   required_version = ">= 0.13"
