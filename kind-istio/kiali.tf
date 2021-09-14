@@ -23,7 +23,7 @@ resource "helm_release" "kiali" {
       "auth" = { "strategy" = "anonymous" }
       "deployment" = {
         "accessible_namespaces" = [ "**" ]
-        "ingress_enabled" = "false"
+        "ingress_enabled" = false
         "pod_annotations" = { "sidecar.istio.io/inject" = "false" }
       }
       "login_token" = { "signing_key" = "CHANGEME" }
