@@ -1,7 +1,19 @@
 locals {
-  postgresql = {
-    keycloak = { database = "keycloak_db", user = "keycloak", password = "buk1azp.kqc5tbg*VZR" }
-  }
+  databases = [
+    "keycloak",
+  ]
+  database = {for db in local.databases : db => {
+    database = "${db}_db"
+    user = db
+    password = random_password.databases[db].result
+  }}
+}
+
+resource "random_password" "databases" {
+  for_each = toset(local.databases)
+  keepers = { database = each.key }
+  length = 16
+  special = false
 }
 
 resource "helm_release" "postgresql" {
@@ -10,7 +22,7 @@ resource "helm_release" "postgresql" {
 
   repository = "https://charts.bitnami.com/bitnami"
   chart = "postgresql"
-  version = "10.9.0"
+  version = "10.9.5"
 
   set {
     name = "initdbScriptsSecret"
@@ -18,13 +30,14 @@ resource "helm_release" "postgresql" {
   }
 
   set {
-    name = "nameOverride"
+    name = "fullnameOverride"
     value = "postgresql"
   }
-}
 
-resource "kubernetes_namespace" "database" {
-  metadata { name = "database" }
+  set {
+    name = "image.tag"
+    value = "13"
+  }
 }
 
 resource "kubernetes_secret" "userdata" {
@@ -34,9 +47,15 @@ resource "kubernetes_secret" "userdata" {
   }
   data = {
     "userdata.sql" = <<-EOT
-      create database ${local.postgresql.keycloak.database};
-      create user ${local.postgresql.keycloak.user} with encrypted password '${local.postgresql.keycloak.password}';
-      grant all privileges on database ${local.postgresql.keycloak.database} to ${local.postgresql.keycloak.user};
+      %{ for db in local.databases ~}
+      create database ${local.database[db]["database"]};
+      create user ${local.database[db]["user"]} with encrypted password '${local.database[db]["password"]}';
+      grant all privileges on database ${local.database[db]["database"]} to ${local.database[db]["user"]};
+      %{ endfor ~}
     EOT
   }
+}
+
+resource "kubernetes_namespace" "database" {
+  metadata { name = "database" }
 }
