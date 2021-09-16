@@ -8,26 +8,35 @@ module.exports = async function (keycloak) {
     await createClients(keycloak, [
         {
             clientId: 'demo-frontend',
-            attributes: {
-                'pkce.code.challenge.method': 'S256'
-            },
+            attributes: {'pkce.code.challenge.method': 'S256'},
             directAccessGrantsEnabled: true,
             publicClient: true,
-            redirectUris: [
-                'http://127.0.0.1:8000/*',
-                'http://0.0.0.0:8000/*',
-                'http://localhost:8000/*'
-            ],
-            webOrigins: [
-                'http://0.0.0.0:8000',
-                'http://127.0.0.1:8000',
-                'http://localhost:8000'
-            ]
+            redirectUris: ['http://127.0.0.1:8000/*', 'http://0.0.0.0:8000/*', 'http://localhost:8000/*'],
+            webOrigins: ['http://0.0.0.0:8000', 'http://127.0.0.1:8000', 'http://localhost:8000']
+        },
+        {clientId: 'demo-backend', secret: process.env.CLIENT_SECRET, standardFlowEnabled: false}
+    ])
+
+    await createUsers(keycloak, [
+        {
+            username: "tiago",
+            enabled: true,
+            totp: false,
+            emailVerified: true,
+            firstName: "Tiago",
+            lastName: "Angelo",
+            email: "tiago@gmail.com",
+            credentials: [{type: "password", value: "abc123", temporary: false}]
         },
         {
-            clientId: 'demo-backend',
-            secret: process.env.CLIENT_SECRET,
-            standardFlowEnabled: false,
+            username: "maria",
+            enabled: true,
+            totp: false,
+            emailVerified: true,
+            firstName: "Maria Cláudia",
+            lastName: "Saccomani",
+            email: "maria@gmail.com",
+            credentials: [{type: "password", value: "abc123", temporary: false}]
         }
     ])
 }
@@ -45,6 +54,16 @@ async function createClients(keycloak, clients) {
         if (!found || found.length === 0) {
             await keycloak.clients.create(client);
             console.log(`client '${client.clientId}' created`)
+        }
+    }
+}
+
+async function createUsers(keycloak, users) {
+    for (const user of users) {
+        const found = await keycloak.users.find({username: user.username});
+        if (!found || found.length === 0) {
+            await keycloak.users.create(user);
+            console.log(`users '${user.username}' created`)
         }
     }
 }
