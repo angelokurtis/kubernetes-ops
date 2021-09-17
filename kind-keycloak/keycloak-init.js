@@ -1,7 +1,7 @@
 module.exports = async function (keycloak) {
     const realm = 'Kurtis';
 
-    await createRealms(keycloak, [{id: realm, realm}])
+    await createRealms(keycloak, [{id: realm, realm, enabled: true}])
 
     keycloak.setConfig({realmName: realm});
 
