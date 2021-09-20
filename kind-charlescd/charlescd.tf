@@ -10,11 +10,16 @@ resource "helm_release" "charlescd" {
   chart = "charlescd"
   version = "0.7.0"
 
+  timeout = 10*60
+
   values = [
     yamlencode({
       hostGlobal = "http://charles.${local.cluster_domain}"
       CharlesApplications = {
-        ui = { image = { tag = local.charlescd.version } }
+        ui = {
+          authUri = "http://${local.keycloak.host}/keycloak"
+          image = { tag = local.charlescd.version }
+        }
         circleMatcher = {
           redis = {
             host = "redis-master.${kubernetes_namespace.cache.metadata[0].name}.svc.cluster.local"
@@ -94,4 +99,6 @@ resource "helm_release" "charlescd" {
       rabbitmq = { enabled = false }
     })
   ]
+
+  depends_on = [ helm_release.keycloak ]
 }
