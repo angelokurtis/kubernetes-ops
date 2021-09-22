@@ -1,7 +1,0 @@
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
-metadata:
-  name: infrastructure
-  namespace: continuous-delivery
-spec:
-  description: The Infrastructure Provider
