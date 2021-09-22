@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: application
+  namespace: continuous-delivery
+spec:
+  description: The Application Developer
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  sourceRepos:
+    - https://github.com/claudioed/bets-helm.git

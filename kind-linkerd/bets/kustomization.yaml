@@ -1,0 +1,5 @@
+resources:
+  - bets.application.yaml
+  - championships.application.yaml
+  - matches.application.yaml
+  - players.application.yaml

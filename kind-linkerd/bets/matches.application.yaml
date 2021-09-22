@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: matches
+  labels:
+    app.kubernetes.io/part-of: bets-system
+spec:
+  project: default
+  syncPolicy:
+    automated: {}
+  source:
+    repoURL: https://github.com/claudioed/bets-helm.git
+    targetRevision: HEAD
+    path: stable/matches
+    helm:
+      valueFiles:
+        - values-linkerd.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: bets
