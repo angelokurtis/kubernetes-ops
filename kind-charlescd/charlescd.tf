@@ -1,104 +1,132 @@
 locals {
-  charlescd = { version = "1.0.1" }
+  charlescd = {
+    version = "1.0.1"
+    host    = "charles.${local.cluster_domain}"
+  }
 }
 
 resource "helm_release" "charlescd" {
-  name = "charlescd"
-  namespace = kubernetes_namespace.cd.metadata[0].name
+  name      = "charlescd"
+  namespace = kubernetes_namespace.continuous_deployment.metadata[0].name
 
   repository = "https://charts.kurtis.dev.br/"
-  chart = "charlescd"
-  version = "0.7.0"
+  chart      = "charlescd"
+  version    = "0.7.0"
 
   timeout = 10*60
 
   values = [
     yamlencode({
-      hostGlobal = "http://charles.${local.cluster_domain}"
-      CharlesApplications = {
-        ui = {
+      hostGlobal               = "http://${local.charlescd.host}"
+      CharlesApplications      = {
+        ui            = {
           authUri = "http://${local.keycloak.host}/keycloak"
-          image = { tag = local.charlescd.version }
+          image   = { tag = local.charlescd.version }
         }
         circleMatcher = {
           redis = {
-            host = "redis-master.${kubernetes_namespace.cache.metadata[0].name}.svc.cluster.local"
+            host     = "redis-master.${kubernetes_namespace.cache.metadata[0].name}.svc.cluster.local"
             password = random_password.redis.result
           }
           image = { tag = local.charlescd.version }
         }
-        gate = {
+        gate          = {
           database = {
-            host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-            name = local.database["charlescd_moove"]["database"]
-            user = local.database["charlescd_moove"]["user"]
+            host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+            name     = local.database["charlescd_moove"]["database"]
+            user     = local.database["charlescd_moove"]["user"]
             password = local.database["charlescd_moove"]["password"]
           }
-          image = { tag = local.charlescd.version }
+          image    = { tag = local.charlescd.version }
         }
-        hermes = {
+        hermes        = {
           database = {
-            host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-            name = local.database["charlescd_hermes"]["database"]
-            user = local.database["charlescd_hermes"]["user"]
+            host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+            name     = local.database["charlescd_hermes"]["database"]
+            user     = local.database["charlescd_hermes"]["user"]
             password = local.database["charlescd_hermes"]["password"]
           }
-          amqp = { url = "amqp://user:${random_password.rabbitmq["password"].result}@rabbitmq.${kubernetes_namespace.queue.metadata[0].name}.svc.cluster.local:5672/" }
-          image = { tag = local.charlescd.version }
+          amqp     = {
+            url = "amqp://user:${random_password.rabbitmq["password"].result}@rabbitmq.${kubernetes_namespace.queue.metadata[0].name}.svc.cluster.local:5672/"
+          }
+          image    = { tag = local.charlescd.version }
         }
-        butler = {
+        butler        = {
           database = {
-            host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-            name = local.database["charlescd_butler"]["database"]
-            user = local.database["charlescd_butler"]["user"]
+            host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+            name     = local.database["charlescd_butler"]["database"]
+            user     = local.database["charlescd_butler"]["user"]
             password = local.database["charlescd_butler"]["password"]
           }
-          image = { tag = local.charlescd.version }
+          image    = { tag = local.charlescd.version }
         }
-        compass = {
+        compass       = {
           database = {
-            host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-            name = local.database["charlescd_compass"]["database"]
-            user = local.database["charlescd_compass"]["user"]
+            host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+            name     = local.database["charlescd_compass"]["database"]
+            user     = local.database["charlescd_compass"]["user"]
             password = local.database["charlescd_compass"]["password"]
           }
-          moove = {
+          moove    = {
             database = {
-              host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-              name = local.database["charlescd_moove"]["database"]
-              user = local.database["charlescd_moove"]["user"]
+              host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+              name     = local.database["charlescd_moove"]["database"]
+              user     = local.database["charlescd_moove"]["user"]
               password = local.database["charlescd_moove"]["password"]
             }
           }
-          image = { tag = local.charlescd.version }
+          image    = { tag = local.charlescd.version }
         }
-        moove = {
+        moove         = {
           database = {
-            host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-            name = local.database["charlescd_moove"]["database"]
-            user = local.database["charlescd_moove"]["user"]
+            host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+            name     = local.database["charlescd_moove"]["database"]
+            user     = local.database["charlescd_moove"]["user"]
             password = local.database["charlescd_moove"]["password"]
           }
-          image = { tag = local.charlescd.version }
+          image    = { tag = local.charlescd.version }
         }
-        villager = {
+        villager      = {
           database = {
-            host = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
-            name = local.database["charlescd_villager"]["database"]
-            user = local.database["charlescd_villager"]["user"]
+            host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+            name     = local.database["charlescd_villager"]["database"]
+            user     = local.database["charlescd_villager"]["user"]
             password = local.database["charlescd_villager"]["password"]
           }
-          image = { tag = local.charlescd.version }
+          image    = { tag = local.charlescd.version }
         }
       }
-      ingress = { enabled = false }
-      postgresql = { enabled = false }
-      redis = { enabled = false }
-      keycloak = { enabled = false }
+      ingress                  = { enabled = false }
+      postgresql               = { enabled = false }
+      redis                    = { enabled = false }
+      keycloak                 = { enabled = false }
       nginx_ingress_controller = { enabled = false }
-      rabbitmq = { enabled = false }
+      rabbitmq                 = { enabled = false }
     })
   ]
 
-  depends_on = [ helm_release.keycloak ]
+  depends_on = [helm_release.keycloak]
+}
+
+resource "kubernetes_ingress" "charlescd_ingress" {
+  metadata {
+    name        = "charlescd-ingress"
+    namespace   = kubernetes_namespace.continuous_deployment.metadata[0].name
+    annotations = { "kubernetes.io/ingress.class" = "istio" }
+  }
+  spec {
+    rule {
+      host = local.charlescd.host
+      http {
+        path {
+          backend {
+            service_name = "envoy-proxy"
+            service_port = "80"
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [helm_release.charlescd]
 }

@@ -5,7 +5,7 @@ module.exports = async function (keycloak) {
 
     // create realm if not exists
     if (!await keycloak.realms.findOne({realm})) {
-        await keycloak.realms.create({id: realm, realm});
+        await keycloak.realms.create({id: realm, realm, enabled: true});
         console.log(`realm '${realm}' created`)
     }
 

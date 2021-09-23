@@ -11,6 +11,9 @@ init: ## Initialize Terraform configurations
 up: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
 	terraform apply -auto-approve
 
+cluster-up: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+	terraform apply -target=kind_cluster.charlescd -auto-approve
+
 down: ## Uninstall all solution components and destroy the local Kubernetes cluster
 	terraform destroy -auto-approve
 

@@ -1,6 +1,6 @@
 resource "kubernetes_job" "keycloak_init" {
   metadata {
-    name = "keycloak-init"
+    name      = "keycloak-init"
     namespace = kubernetes_namespace.iam.metadata[0].name
   }
   spec {
@@ -8,12 +8,12 @@ resource "kubernetes_job" "keycloak_init" {
       metadata {}
       spec {
         container {
-          name = "keycloak-admin-client"
-          image = "kurtis/keycloak-admin-client:${local.keycloak.version}"
+          name              = "keycloak-admin-client"
+          image             = "kurtis/keycloak-admin-client:${local.keycloak.version}"
           image_pull_policy = "Always"
           volume_mount {
             mount_path = "/app/script"
-            name = "script"
+            name       = "script"
           }
           env_from {
             secret_ref {
@@ -26,7 +26,7 @@ resource "kubernetes_job" "keycloak_init" {
           config_map {
             name = kubernetes_config_map.keycloak_scripts.metadata[0].name
             items {
-              key = keys(kubernetes_config_map.keycloak_scripts.data)[0]
+              key  = keys(kubernetes_config_map.keycloak_scripts.data)[0]
               path = "index.js"
             }
           }
@@ -38,13 +38,12 @@ resource "kubernetes_job" "keycloak_init" {
   }
   wait_for_completion = true
 
-  depends_on = [
-    helm_release.keycloak]
+  depends_on = [helm_release.keycloak]
 }
 
 resource "kubernetes_config_map" "keycloak_scripts" {
   metadata {
-    name = "keycloak-scripts"
+    name      = "keycloak-scripts"
     namespace = kubernetes_namespace.iam.metadata[0].name
   }
   data = {
@@ -53,22 +52,22 @@ resource "kubernetes_config_map" "keycloak_scripts" {
 }
 
 resource "random_password" "charlescd_client_secret" {
-  length = 16
+  length  = 16
   special = true
 }
 
 resource "kubernetes_secret" "keycloak_init_env_vars" {
   metadata {
-    name = "keycloak-init-env-vars"
+    name      = "keycloak-init-env-vars"
     namespace = kubernetes_namespace.iam.metadata[0].name
   }
   data = {
-    BASE_URL = "http://keycloak.${kubernetes_namespace.iam.metadata[0].name}.svc.cluster.local/auth"
-    REALM_NAME = "master"
-    CLIENT_ID = "admin-cli"
-    USERNAME = "admin"
-    PASSWORD = local.keycloak.admin.password
-    GRANT_TYPE = "password"
+    BASE_URL      = "http://keycloak.${kubernetes_namespace.iam.metadata[0].name}.svc.cluster.local/auth"
+    REALM_NAME    = "master"
+    CLIENT_ID     = "admin-cli"
+    USERNAME      = "admin"
+    PASSWORD      = local.keycloak.admin.password
+    GRANT_TYPE    = "password"
     CLIENT_SECRET = random_password.charlescd_client_secret.result
   }
 }

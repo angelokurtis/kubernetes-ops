@@ -1,29 +1,34 @@
 resource "helm_release" "redis" {
-  name = "redis"
+  name      = "redis"
   namespace = kubernetes_namespace.cache.metadata[0].name
 
   repository = "https://charts.bitnami.com/bitnami"
-  chart = "redis"
-  version = "15.3.2"
+  chart      = "redis"
+  version    = "15.3.2"
 
   set {
-    name = "nameOverride"
+    name  = "nameOverride"
     value = "redis"
   }
 
   set {
-    name = "architecture"
+    name  = "architecture"
     value = "standalone"
   }
 
   set {
-    name = "auth.existingSecret"
+    name  = "auth.existingSecret"
     value = kubernetes_secret.redis.metadata[0].name
   }
 
   set {
-    name = "auth.existingSecretPasswordKey"
+    name  = "auth.existingSecretPasswordKey"
     value = "password"
+  }
+
+  set {
+    name  = "image.tag"
+    value = "6.2"
   }
 }
 
@@ -33,7 +38,7 @@ resource "random_password" "redis" {
 
 resource "kubernetes_secret" "redis" {
   metadata {
-    name = "redis"
+    name      = "redis"
     namespace = kubernetes_namespace.cache.metadata[0].name
   }
   data = {

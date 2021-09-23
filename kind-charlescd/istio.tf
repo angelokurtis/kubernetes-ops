@@ -1,22 +1,22 @@
 resource "kustomization_resource" "istio" {
   manifest = jsonencode({
     "apiVersion" = "install.istio.io/v1alpha1"
-    "kind" = "IstioOperator"
-    "metadata" = {
-      "name" = "control-plane"
+    "kind"       = "IstioOperator"
+    "metadata"   = {
+      "name"      = "control-plane"
       "namespace" = kubernetes_namespace.istio_system.metadata[0].name
     }
-    "spec" = {
-      "profile" = "demo"
+    "spec"       = {
+      "profile"    = "demo"
       "components" = {
-        "egressGateways" = [ { enabled = false, name = "istio-egressgateway" } ]
+        "egressGateways"  = [{ enabled = false, name = "istio-egressgateway" }]
         "ingressGateways" = [
           {
-            name = "istio-ingressgateway"
+            name    = "istio-ingressgateway"
             enabled = true
-            k8s = {
+            k8s     = {
               "nodeSelector" = { "ingress-ready" = "true" }
-              "service" = {
+              "service"      = {
                 "ports" = [
                   { name = "status-port", nodePort = 30002, port = 15021, targetPort = 15021 },
                   { name = "http2", nodePort = 30000, port = 80, targetPort = 8080 },
@@ -27,18 +27,16 @@ resource "kustomization_resource" "istio" {
           },
         ]
       }
-      "values" = {
+      "values"     = {
         "gateways" = { "istio-ingressgateway" = { "type" = "NodePort" } }
-        "global" = {
+        "global"   = {
           "defaultPodDisruptionBudget" = { "enabled" = false }
-          "logging" = { "level" = "default:debug" }
-          "proxy" = { "componentLogLevel" = "misc:debug", "logLevel" = "debug" }
+          "logging"                    = { "level" = "default:debug" }
+          "proxy"                      = { "componentLogLevel" = "misc:debug", "logLevel" = "debug" }
         }
       }
     }
   })
 
-  depends_on = [
-    helm_release.istio_operator
-  ]
+  depends_on = [helm_release.istio_operator]
 }

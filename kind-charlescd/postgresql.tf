@@ -7,47 +7,49 @@ locals {
     "charlescd_compass",
     "keycloak",
   ]
-  database = {for db in local.databases : db => {
+  database  = {
+  for db in local.databases : db => {
     database = "${db}_db"
-    user = db
+    user     = db
     password = random_password.databases[db].result
-  }}
+  }
+  }
 }
 
 resource "random_password" "databases" {
   for_each = toset(local.databases)
-  keepers = { database = each.key }
-  length = 16
-  special = false
+  keepers  = { database = each.key }
+  length   = 16
+  special  = false
 }
 
 resource "helm_release" "postgresql" {
-  name = "postgresql"
+  name      = "postgresql"
   namespace = kubernetes_namespace.database.metadata[0].name
 
   repository = "https://charts.bitnami.com/bitnami"
-  chart = "postgresql"
-  version = "10.9.5"
+  chart      = "postgresql"
+  version    = "10.9.5"
 
   set {
-    name = "initdbScriptsSecret"
+    name  = "initdbScriptsSecret"
     value = kubernetes_secret.userdata.metadata[0].name
   }
 
   set {
-    name = "fullnameOverride"
+    name  = "fullnameOverride"
     value = "postgresql"
   }
 
   set {
-    name = "image.tag"
+    name  = "image.tag"
     value = "13"
   }
 }
 
 resource "kubernetes_secret" "userdata" {
   metadata {
-    name = "userdata"
+    name      = "userdata"
     namespace = kubernetes_namespace.database.metadata[0].name
   }
   data = {
