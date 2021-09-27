@@ -38,4 +38,18 @@ module.exports = async function (keycloak) {
         });
         console.log(`client '${confidentialClient.clientId}' created`)
     }
+
+    // create admin user if not exists
+    const username = "charlesadmin@admin"
+    clients = await keycloak.users.find({username});
+    if (!clients || clients.length === 0) {
+        await keycloak.users.create({
+            username,
+            enabled: true,
+            emailVerified: true,
+            email: "charlesadmin@admin",
+            attributes: {isRoot: ["true"]},
+        });
+        console.log(`user '${username}' created`)
+    }
 }
