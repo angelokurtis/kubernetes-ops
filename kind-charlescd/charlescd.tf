@@ -20,36 +20,43 @@ resource "helm_release" "charlescd" {
       hostGlobal               = "http://${local.charlescd.host}"
       CharlesApplications      = {
         ui            = {
-          authUri = "http://${local.keycloak.host}/keycloak"
-          image   = { tag = local.charlescd.version }
+          allowedOriginHost = "http://${local.charlescd.host}"
+          apiHost           = "http://${local.charlescd.host}"
+          authUri           = "http://${local.keycloak.host}"
+          idmRedirectHost   = "http://${local.charlescd.host}"
+          image             = { tag = local.charlescd.version }
+          pullPolicy        = "IfNotPresent"
         }
         circleMatcher = {
-          redis = {
+          allowedOriginHost = "http://${local.charlescd.host}"
+          redis             = {
             host     = "redis-master.${kubernetes_namespace.cache.metadata[0].name}.svc.cluster.local"
             password = random_password.redis.result
           }
-          image = { tag = local.charlescd.version }
+          image             = { tag = local.charlescd.version, pullPolicy = "IfNotPresent" }
         }
         gate          = {
-          database = {
+          database   = {
             host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
             name     = local.database["charlescd_moove"]["database"]
             user     = local.database["charlescd_moove"]["user"]
             password = local.database["charlescd_moove"]["password"]
           }
-          image    = { tag = local.charlescd.version }
+          image      = { tag = local.charlescd.version }
+          pullPolicy = "IfNotPresent"
         }
         hermes        = {
-          database = {
+          database   = {
             host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
             name     = local.database["charlescd_hermes"]["database"]
             user     = local.database["charlescd_hermes"]["user"]
             password = local.database["charlescd_hermes"]["password"]
           }
-          amqp     = {
+          amqp       = {
             url = "amqp://user:${random_password.rabbitmq["password"].result}@rabbitmq.${kubernetes_namespace.queue.metadata[0].name}.svc.cluster.local:5672/"
           }
-          image    = { tag = local.charlescd.version }
+          image      = { tag = local.charlescd.version }
+          pullPolicy = "IfNotPresent"
         }
         butler        = {
           database = {
@@ -58,16 +65,16 @@ resource "helm_release" "charlescd" {
             user     = local.database["charlescd_butler"]["user"]
             password = local.database["charlescd_butler"]["password"]
           }
-          image    = { tag = local.charlescd.version }
+          image    = { tag = local.charlescd.version, pullPolicy = "IfNotPresent" }
         }
         compass       = {
-          database = {
+          database   = {
             host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
             name     = local.database["charlescd_compass"]["database"]
             user     = local.database["charlescd_compass"]["user"]
             password = local.database["charlescd_compass"]["password"]
           }
-          moove    = {
+          moove      = {
             database = {
               host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
               name     = local.database["charlescd_moove"]["database"]
@@ -75,25 +82,29 @@ resource "helm_release" "charlescd" {
               password = local.database["charlescd_moove"]["password"]
             }
           }
-          image    = { tag = local.charlescd.version }
+          image      = { tag = local.charlescd.version }
+          pullPolicy = "IfNotPresent"
         }
         moove         = {
-          database = {
+          allowedOriginHost = "http://${local.charlescd.host}"
+          image             = { tag = local.charlescd.version }
+          pullPolicy        = "IfNotPresent"
+          database          = {
             host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
             name     = local.database["charlescd_moove"]["database"]
             user     = local.database["charlescd_moove"]["user"]
             password = local.database["charlescd_moove"]["password"]
           }
-          image    = { tag = local.charlescd.version }
         }
         villager      = {
-          database = {
+          database   = {
             host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
             name     = local.database["charlescd_villager"]["database"]
             user     = local.database["charlescd_villager"]["user"]
             password = local.database["charlescd_villager"]["password"]
           }
-          image    = { tag = local.charlescd.version }
+          image      = { tag = local.charlescd.version }
+          pullPolicy = "IfNotPresent"
         }
       }
       ingress                  = { enabled = false }
@@ -102,6 +113,12 @@ resource "helm_release" "charlescd" {
       keycloak                 = { enabled = false }
       nginx_ingress_controller = { enabled = false }
       rabbitmq                 = { enabled = false }
+      envoy                    = {
+        idm = {
+          endpoint = "${local.keycloak.host}"
+          path     = "/auth/realms/charlescd/protocol/openid-connect/userinfo"
+        }
+      }
     })
   ]
 
