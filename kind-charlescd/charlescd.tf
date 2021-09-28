@@ -127,25 +127,33 @@ resource "helm_release" "charlescd" {
   depends_on = [helm_release.keycloak]
 }
 
-resource "kubernetes_ingress" "charlescd_ingress" {
-  metadata {
-    name        = "charlescd-ingress"
-    namespace   = kubernetes_namespace.continuous_deployment.metadata[0].name
-    annotations = { "kubernetes.io/ingress.class" = "istio" }
-  }
-  spec {
-    rule {
-      host = local.charlescd.host
-      http {
-        path {
-          backend {
-            service_name = "envoy-proxy"
-            service_port = "80"
+# TODO: this is a workaround as the current version of Charles Helm Chart is not able to set the `pathType`
+resource "kustomization_resource" "charlescd_ingress" {
+  manifest = jsonencode({
+    "apiVersion" = "networking.k8s.io/v1"
+    "kind"       = "Ingress"
+    "metadata"   = {
+      "name"        = "charlescd-ingress"
+      "namespace"   = kubernetes_namespace.continuous_deployment.metadata[0].name
+      "annotations" = { "kubernetes.io/ingress.class" = "istio" }
+    }
+    "spec"       = {
+      "rules" = [
+        {
+          "host" = local.charlescd.host
+          "http" = {
+            "paths" = [
+              {
+                "backend"  = { "service" = { "name" = "envoy-proxy", "port" = { "number" = 80 } } },
+                "path"     = "/",
+                "pathType" = "Prefix"
+              }
+            ]
           }
         }
-      }
+      ]
     }
-  }
+  })
 
   depends_on = [helm_release.charlescd]
 }
