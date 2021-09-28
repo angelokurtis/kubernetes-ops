@@ -56,6 +56,11 @@ resource "random_password" "charlescd_client_secret" {
   special = true
 }
 
+resource "random_password" "charlescd_user_password" {
+  length  = 16
+  special = true
+}
+
 resource "kubernetes_secret" "keycloak_init_env_vars" {
   metadata {
     name      = "keycloak-init-env-vars"
@@ -69,5 +74,6 @@ resource "kubernetes_secret" "keycloak_init_env_vars" {
     PASSWORD      = local.keycloak.admin.password
     GRANT_TYPE    = "password"
     CLIENT_SECRET = random_password.charlescd_client_secret.result
+    USER_PASSWORD = random_password.charlescd_user_password.result
   }
 }
