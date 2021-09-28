@@ -43,13 +43,18 @@ module.exports = async function (keycloak) {
     const username = "charlesadmin@admin"
     clients = await keycloak.users.find({username});
     if (!clients || clients.length === 0) {
-        await keycloak.users.create({
+        const {id} = (await keycloak.users.create({
             username,
             enabled: true,
             emailVerified: true,
-            email: "charlesadmin@admin",
+            email: username,
             attributes: {isRoot: ["true"]},
-        });
+        }))
         console.log(`user '${username}' created`)
+        await keycloak.users.resetPassword({
+            id,
+            credential: {type: "password", value: process.env.USER_PASSWORD, temporary: false},
+        });
+        console.log(`credentials of '${username}' have been set`)
     }
 }
