@@ -38,7 +38,7 @@ resource "kind_cluster" "charlescd" {
       }
 
       extra_port_mappings {
-        container_port = 30000
+        container_port = 30001
         host_port      = 443
       }
 
