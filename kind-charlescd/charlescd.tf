@@ -33,7 +33,8 @@ resource "helm_release" "charlescd" {
             host     = "redis-master.${kubernetes_namespace.cache.metadata[0].name}.svc.cluster.local"
             password = random_password.redis.result
           }
-          image             = { tag = local.charlescd.version, pullPolicy = "IfNotPresent" }
+          image             = { tag = local.charlescd.version }
+          pullPolicy        = "IfNotPresent"
         }
         gate          = {
           database   = {
@@ -59,13 +60,14 @@ resource "helm_release" "charlescd" {
           pullPolicy = "IfNotPresent"
         }
         butler        = {
-          database = {
+          database   = {
             host     = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
             name     = local.database["charlescd_butler"]["database"]
             user     = local.database["charlescd_butler"]["user"]
             password = local.database["charlescd_butler"]["password"]
           }
-          image    = { tag = local.charlescd.version, pullPolicy = "IfNotPresent" }
+          image      = { tag = local.charlescd.version }
+          pullPolicy = "IfNotPresent"
         }
         compass       = {
           database   = {
@@ -115,7 +117,7 @@ resource "helm_release" "charlescd" {
       rabbitmq                 = { enabled = false }
       envoy                    = {
         idm = {
-          endpoint = "${local.keycloak.host}"
+          endpoint = local.keycloak.host
           path     = "/auth/realms/charlescd/protocol/openid-connect/userinfo"
         }
       }
