@@ -33,7 +33,8 @@ resource "helm_release" "redis" {
 }
 
 resource "random_password" "redis" {
-  length = 16
+  special = false
+  length  = 16
 }
 
 resource "kubernetes_secret" "redis" {
