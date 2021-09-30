@@ -71,7 +71,7 @@ resource "kubernetes_secret" "keycloak_init_env_vars" {
     REALM_NAME    = "master"
     CLIENT_ID     = "admin-cli"
     USERNAME      = "admin"
-    PASSWORD      = local.keycloak.admin.password
+    PASSWORD      = random_password.keycloak_admin.result
     GRANT_TYPE    = "password"
     CLIENT_SECRET = random_password.charlescd_client_secret.result
     USER_PASSWORD = random_password.charlescd_user_password.result

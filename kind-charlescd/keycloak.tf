@@ -2,7 +2,6 @@ locals {
   keycloak = {
     version = "15.0.2"
     host    = "keycloak.${local.cluster_domain}"
-    admin   = { user = "admin", password = "admin" }
   }
 }
 
@@ -23,7 +22,7 @@ resource "helm_release" "keycloak" {
     yamlencode({
       image            = { repository = "bitnami/keycloak", tag = local.keycloak.version }
       auth             = {
-        adminUser                 = local.keycloak.admin.user
+        adminUser                 = "admin"
         existingSecretPerPassword = {
           adminPassword      = { name = kubernetes_secret.keycloak_passwords.metadata[0].name }
           managementPassword = { name = kubernetes_secret.keycloak_passwords.metadata[0].name }
@@ -51,6 +50,10 @@ resource "helm_release" "keycloak" {
   depends_on = [helm_release.postgresql]
 }
 
+resource "random_password" "keycloak_admin" {
+  length = 16
+}
+
 resource "random_password" "keycloak_management" {
   length = 16
 }
@@ -61,7 +64,7 @@ resource "kubernetes_secret" "keycloak_passwords" {
     namespace = kubernetes_namespace.iam.metadata[0].name
   }
   data = {
-    adminPassword      = local.keycloak.admin.password
+    adminPassword      = random_password.keycloak_admin.result
     managementPassword = random_password.keycloak_management.result
     databasePassword   = local.database["keycloak"]["password"]
   }
