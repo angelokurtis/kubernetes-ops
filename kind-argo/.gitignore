@@ -30,3 +30,8 @@ override.tf.json
 
 .terraform.lock.hcl
 *-config
+
+### JetBrains ###
+*.iml
+*.iws
+.idea/*
