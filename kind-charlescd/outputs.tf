@@ -1,5 +1,6 @@
 output "charles" {
-  value = {
+  sensitive = true
+  value     = {
     url         = "http://${local.charlescd.host}/auth/login"
     credentials = {
       user     = "charlesadmin@admin"
