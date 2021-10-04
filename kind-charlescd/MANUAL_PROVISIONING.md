@@ -260,3 +260,95 @@ curl -sbX PUT "http://keycloak.lvh.me/auth/admin/realms/charlescd/users/${USER_I
     --header 'Content-Type: application/json' \
     --data-raw '{"type":"password","value":"g_wl!U8Uyf2)$KKw","temporary":true}'
 ```
+
+### Deploy CharlesCD
+
+```shell
+export CHARLESCD_VERSION=1.0.1
+
+kubectl create namespace continuous-deployment
+
+curl https://github.com/ZupIT/charlescd/archive/refs/tags/${CHARLESCD_VERSION}.zip -OJL
+unzip ./charlescd-${CHARLESCD_VERSION}.zip
+( cd ./charlescd-${CHARLESCD_VERSION}/install/helm-chart ; helm dependency update )
+
+helm upgrade -i charlescd ./charlescd-${CHARLESCD_VERSION}/install/helm-chart -n continuous-deployment \
+    --set CharlesApplications.butler.database.host="postgresql.database.svc.cluster.local" \
+    --set CharlesApplications.butler.database.name="charlescd_butler_db" \
+    --set CharlesApplications.butler.database.password="fNq1milqfZI6v3aU" \
+    --set CharlesApplications.butler.database.user="charlescd_butler" \
+    --set CharlesApplications.butler.healthCheck.initialDelay="5" \
+    --set CharlesApplications.butler.image.tag="${CHARLESCD_VERSION}" \
+    --set CharlesApplications.butler.pullPolicy="IfNotPresent" \
+    --set CharlesApplications.butler.resources.limits=null \
+    --set CharlesApplications.circleMatcher.allowedOriginHost="http://charles.lvh.me" \
+    --set CharlesApplications.circleMatcher.healthCheck.initialDelay="5" \
+    --set CharlesApplications.circleMatcher.image.tag="${CHARLESCD_VERSION}" \
+    --set CharlesApplications.circleMatcher.pullPolicy="IfNotPresent" \
+    --set CharlesApplications.circleMatcher.redis.host="redis-master.cache.svc.cluster.local" \
+    --set CharlesApplications.circleMatcher.redis.password="V5waJ0OXte16WCR3" \
+    --set CharlesApplications.circleMatcher.resources.limits=null \
+    --set CharlesApplications.compass.database.host="postgresql.database.svc.cluster.local" \
+    --set CharlesApplications.compass.database.name="charlescd_compass_db" \
+    --set CharlesApplications.compass.database.password="5Pzmuji7NFYJAazk" \
+    --set CharlesApplications.compass.database.user="charlescd_compass" \
+    --set CharlesApplications.compass.healthCheck.initialDelay="5" \
+    --set CharlesApplications.compass.image.tag="${CHARLESCD_VERSION}" \
+    --set CharlesApplications.compass.moove.database.host="postgresql.database.svc.cluster.local" \
+    --set CharlesApplications.compass.moove.database.name="charlescd_moove_db" \
+    --set CharlesApplications.compass.moove.database.password="GnozoAWuCGoIYF6Z" \
+    --set CharlesApplications.compass.moove.database.user="charlescd_moove" \
+    --set CharlesApplications.compass.pullPolicy="IfNotPresent" \
+    --set CharlesApplications.compass.resources.limits=null \
+    --set CharlesApplications.gate.database.host="postgresql.database.svc.cluster.local" \
+    --set CharlesApplications.gate.database.name="charlescd_moove_db" \
+    --set CharlesApplications.gate.database.password="GnozoAWuCGoIYF6Z" \
+    --set CharlesApplications.gate.database.user="charlescd_moove" \
+    --set CharlesApplications.gate.healthCheck.initialDelay="5" \
+    --set CharlesApplications.gate.image.tag="${CHARLESCD_VERSION}" \
+    --set CharlesApplications.gate.pullPolicy="IfNotPresent" \
+    --set CharlesApplications.gate.resources.limits=null \
+    --set CharlesApplications.hermes.amqp.url="amqp://user:dI5FYfnN33i9xA9#@rabbitmq.queue.svc.cluster.local:5672/" \
+    --set CharlesApplications.hermes.database.host="postgresql.database.svc.cluster.local" \
+    --set CharlesApplications.hermes.database.name="charlescd_hermes_db" \
+    --set CharlesApplications.hermes.database.password="SN1rLfyMG96CzZyl" \
+    --set CharlesApplications.hermes.database.user="charlescd_hermes" \
+    --set CharlesApplications.hermes.healthCheck.initialDelay="5" \
+    --set CharlesApplications.hermes.image.tag="${CHARLESCD_VERSION}" \
+    --set CharlesApplications.hermes.pullPolicy="IfNotPresent" \
+    --set CharlesApplications.hermes.resources.limits=null \
+    --set CharlesApplications.moove.allowedOriginHost="http://charles.lvh.me" \
+    --set CharlesApplications.moove.database.host="postgresql.database.svc.cluster.local" \
+    --set CharlesApplications.moove.database.name="charlescd_moove_db" \
+    --set CharlesApplications.moove.database.password="GnozoAWuCGoIYF6Z" \
+    --set CharlesApplications.moove.database.user="charlescd_moove" \
+    --set CharlesApplications.moove.healthCheck.initialDelay="5" \
+    --set CharlesApplications.moove.image.tag="${CHARLESCD_VERSION}" \
+    --set CharlesApplications.moove.pullPolicy="IfNotPresent" \
+    --set CharlesApplications.moove.resources.limits=null \
+    --set CharlesApplications.ui.allowedOriginHost="http://charles.lvh.me" \
+    --set CharlesApplications.ui.apiHost="http://charles.lvh.me" \
+    --set CharlesApplications.ui.authUri="http://keycloak.lvh.me" \
+    --set CharlesApplications.ui.healthCheck.initialDelay="5" \
+    --set CharlesApplications.ui.idmRedirectHost="http://charles.lvh.me" \
+    --set CharlesApplications.ui.image.tag="${CHARLESCD_VERSION}" \
+    --set CharlesApplications.ui.pullPolicy="IfNotPresent" \
+    --set CharlesApplications.ui.resources.limits=null \
+    --set CharlesApplications.villager.database.host="postgresql.database.svc.cluster.local" \
+    --set CharlesApplications.villager.database.name="charlescd_villager_db" \
+    --set CharlesApplications.villager.database.password="pnvvseJ8BW2jNsrc" \
+    --set CharlesApplications.villager.database.user="charlescd_villager" \
+    --set CharlesApplications.villager.healthCheck.initialDelay="5" \
+    --set CharlesApplications.villager.image.tag="${CHARLESCD_VERSION}" \
+    --set CharlesApplications.villager.pullPolicy="IfNotPresent" \
+    --set CharlesApplications.villager.resources.limits=null \
+    --set envoy.idm.endpoint="keycloak.lvh.me" \
+    --set envoy.idm.path="/auth/realms/charlescd/protocol/openid-connect/userinfo" \
+    --set hostGlobal="http://charles.lvh.me" \
+    --set ingress.enabled="false" \
+    --set keycloak.enabled="false" \
+    --set nginx_ingress_controller.enabled="false" \
+    --set postgresql.enabled="false" \
+    --set rabbitmq.enabled="false" \
+    --set redis.enabled="false"
+```
