@@ -124,3 +124,50 @@ helm upgrade -i rabbitmq bitnami/rabbitmq -n queue \
     --set auth.password="dI5FYfnN33i9xA9#" \
     --set image.tag="3.9"
 ```
+
+### Deploy PostgreSQL
+
+```shell
+cat << EOF > ./userdata.sql
+    -- CharlesCD Moove
+    create database charlescd_moove_db;
+    create user charlescd_moove with encrypted password 'GnozoAWuCGoIYF6Z';
+    alter user charlescd_moove with superuser;
+    grant all privileges on database charlescd_moove_db to charlescd_moove;
+    -- CharlesCD Villager
+    create database charlescd_villager_db;
+    create user charlescd_villager with encrypted password 'pnvvseJ8BW2jNsrc';
+    alter user charlescd_villager with superuser;
+    grant all privileges on database charlescd_villager_db to charlescd_villager;
+    -- CharlesCD Butler
+    create database charlescd_butler_db;
+    create user charlescd_butler with encrypted password 'fNq1milqfZI6v3aU';
+    alter user charlescd_butler with superuser;
+    grant all privileges on database charlescd_butler_db to charlescd_butler;
+    -- CharlesCD Hermes
+    create database charlescd_hermes_db;
+    create user charlescd_hermes with encrypted password 'SN1rLfyMG96CzZyl';
+    alter user charlescd_hermes with superuser;
+    grant all privileges on database charlescd_hermes_db to charlescd_hermes;
+    -- CharlesCD Compass
+    create database charlescd_compass_db;
+    create user charlescd_compass with encrypted password '5Pzmuji7NFYJAazk';
+    alter user charlescd_compass with superuser;
+    grant all privileges on database charlescd_compass_db to charlescd_compass;
+    -- CharlesCD Keycloak
+    create database keycloak_db;
+    create user keycloak with encrypted password 'seDnCGd3cz8G5QCy';
+    alter user keycloak with superuser;
+    grant all privileges on database keycloak_db to keycloak;
+EOF
+```
+
+```shell
+kubectl create namespace database
+kubectl create secret generic userdata --from-file=./userdata.sql
+helm upgrade -i postgresql bitnami/postgresql -n database \
+    --set fullnameOverride="postgresql"
+    --set image.tag="13"
+    --set initdbScriptsSecret="userdata"
+```
+
