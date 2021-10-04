@@ -211,3 +211,52 @@ helm upgrade -i keycloak bitnami/keycloak --version 5.0.7 -n iam \
     --set postgresql.enabled="false" \
     --set service.type="ClusterIP"
 ```
+
+### Initialize Keycloak realm, clients and users
+
+```shell
+# authorize with username / password
+ACCESS_TOKEN=$(curl -sbX 'http://keycloak.lvh.me/auth/realms/master/protocol/openid-connect/token' \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --data-urlencode 'client_id=admin-cli' \
+    --data-urlencode 'client_secret=a=Dg0>PGyscSNu)i' \
+    --data-urlencode 'grant_type=password' \
+    --data-urlencode 'username=admin' \
+    --data-urlencode 'password=:gjUzkk{:h2bPB_6' \
+    | jq '.access_token' -r)
+
+# create realm
+curl -sbX 'http://keycloak.lvh.me/auth/admin/realms' \
+    --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+    --header 'Content-Type: application/json' \
+    --data-raw '{"enabled":true,"id":"charlescd","realm":"charlescd"}'
+
+# create public client
+curl -sbX 'http://keycloak.lvh.me/auth/admin/realms/charlescd/clients' \
+    --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+    --header 'Content-Type: application/json' \
+    --data-raw '{"clientId":"charlescd-client","directAccessGrantsEnabled":true,"implicitFlowEnabled":true,"publicClient":true,"redirectUris":["http://charles.lvh.me/*"],"serviceAccountsEnabled":true,"webOrigins":["*"]}'
+
+# create confidential client
+curl -sbX 'http://keycloak.lvh.me/auth/admin/realms/charlescd/clients' \
+    --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+    --header 'Content-Type: application/json' \
+    --data-raw '{"clientId":"realm-charlescd","secret":"vO]i?GSWWr0$zIZR","serviceAccountsEnabled":true,"standardFlowEnabled":false}'
+
+# create admin user
+curl -sbX 'http://keycloak.lvh.me/auth/admin/realms/charlescd/users' \
+    --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+    --header 'Content-Type: application/json' \
+    --data-raw '{"username":"charlesadmin@admin","enabled":true,"emailVerified":true,"email":"charlesadmin@admin","attributes":{"isRoot":["true"]}}'
+
+# get admin user identifier
+USER_ID=$(curl -s 'http://keycloak.lvh.me/auth/admin/realms/charlescd/users?username=charlesadmin@admin' \
+    --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+    | jq '.[0].id' -r)
+
+# create admin credentials
+curl -sbX PUT "http://keycloak.lvh.me/auth/admin/realms/charlescd/users/${USER_ID}/reset-password" \
+    --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+    --header 'Content-Type: application/json' \
+    --data-raw '{"type":"password","value":"g_wl!U8Uyf2)$KKw","temporary":true}'
+```
