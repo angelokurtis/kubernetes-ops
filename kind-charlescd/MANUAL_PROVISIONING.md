@@ -270,7 +270,7 @@ USER_ID=$(curl -s 'http://keycloak.lvh.me/auth/admin/realms/charlescd/users?user
 curl -X PUT "http://keycloak.lvh.me/auth/admin/realms/charlescd/users/${USER_ID}/reset-password" \
     --header "Authorization: Bearer ${ACCESS_TOKEN}" \
     --header 'Content-Type: application/json' \
-    --data-raw '{"type":"password","value":"g_wl!U8Uyf2)$KKw","temporary":true}'
+    --data-raw '{"type":"password","value":"g_wl!U8Uyf2)$KKw","temporary":false}'
 ```
 
 ### Deploy CharlesCD
