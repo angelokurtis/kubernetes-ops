@@ -193,30 +193,42 @@ kubectl create secret generic database-env-vars -n iam \
 kubectl create secret generic keycloak-passwords -n iam \
     --from-literal=adminPassword=":gjUzkk{:h2bPB_6" \
     --from-literal=databasePassword="seDnCGd3cz8G5QCy" \
-    --from-literal=managementPassword="cRF!5mz:2oLKHdeT"
+    --from-literal=managementPassword="cRF5mz:2oLKHdeT"
   
-helm upgrade -i keycloak bitnami/keycloak --version 5.0.7 -n iam \
-    --set auth.adminUser="admin" \
-    --set auth.existingSecretPerPassword.adminPassword.name="keycloak-passwords" \
-    --set auth.existingSecretPerPassword.databasePassword.name="keycloak-passwords" \
-    --set auth.existingSecretPerPassword.managementPassword.name="keycloak-passwords" \
-    --set externalDatabase.existingSecret="database-env-vars" \
-    --set image.repository="bitnami/keycloak" \
-    --set image.tag="15.0.2" \
-    --set ingress.annotations.kubernetes.io/ingress.class="istio" \
-    --set ingress.enabled="true" \
-    --set ingress.hostname="keycloak.lvh.me" \
-    --set ingress.pathType="Prefix" \
-    --set nameOverride="keycloak" \
-    --set postgresql.enabled="false" \
-    --set service.type="ClusterIP"
+helm upgrade -i keycloak bitnami/keycloak --version 5.0.7 -n iam -f - <<EOF
+    auth: 
+      adminUser: admin
+      existingSecretPerPassword: 
+        adminPassword: 
+          name: keycloak-passwords
+        databasePassword: 
+          name: keycloak-passwords
+        managementPassword: 
+          name: keycloak-passwords
+    externalDatabase: 
+      existingSecret: database-env-vars
+    image: 
+      repository: bitnami/keycloak
+      tag: "15.0.2"
+    ingress: 
+      annotations: 
+        kubernetes.io/ingress.class: istio
+      enabled: true
+      hostname: keycloak.lvh.me
+      pathType: Prefix
+    nameOverride: keycloak
+    postgresql: 
+      enabled: false
+    service: 
+      type: ClusterIP
+EOF
 ```
 
 ### Initialize Keycloak realm, clients and users
 
 ```shell
 # authorize with username / password
-ACCESS_TOKEN=$(curl -sbX 'http://keycloak.lvh.me/auth/realms/master/protocol/openid-connect/token' \
+ACCESS_TOKEN=$(curl -s 'http://keycloak.lvh.me/auth/realms/master/protocol/openid-connect/token' \
     --header 'Content-Type: application/x-www-form-urlencoded' \
     --data-urlencode 'client_id=admin-cli' \
     --data-urlencode 'client_secret=a=Dg0>PGyscSNu)i' \
@@ -226,25 +238,25 @@ ACCESS_TOKEN=$(curl -sbX 'http://keycloak.lvh.me/auth/realms/master/protocol/ope
     | jq '.access_token' -r)
 
 # create realm
-curl -sbX 'http://keycloak.lvh.me/auth/admin/realms' \
+curl -X POST 'http://keycloak.lvh.me/auth/admin/realms' \
     --header "Authorization: Bearer ${ACCESS_TOKEN}" \
     --header 'Content-Type: application/json' \
     --data-raw '{"enabled":true,"id":"charlescd","realm":"charlescd"}'
 
 # create public client
-curl -sbX 'http://keycloak.lvh.me/auth/admin/realms/charlescd/clients' \
+curl -X POST 'http://keycloak.lvh.me/auth/admin/realms/charlescd/clients' \
     --header "Authorization: Bearer ${ACCESS_TOKEN}" \
     --header 'Content-Type: application/json' \
     --data-raw '{"clientId":"charlescd-client","directAccessGrantsEnabled":true,"implicitFlowEnabled":true,"publicClient":true,"redirectUris":["http://charles.lvh.me/*"],"serviceAccountsEnabled":true,"webOrigins":["*"]}'
 
 # create confidential client
-curl -sbX 'http://keycloak.lvh.me/auth/admin/realms/charlescd/clients' \
+curl -X POST 'http://keycloak.lvh.me/auth/admin/realms/charlescd/clients' \
     --header "Authorization: Bearer ${ACCESS_TOKEN}" \
     --header 'Content-Type: application/json' \
     --data-raw '{"clientId":"realm-charlescd","secret":"vO]i?GSWWr0$zIZR","serviceAccountsEnabled":true,"standardFlowEnabled":false}'
 
 # create admin user
-curl -sbX 'http://keycloak.lvh.me/auth/admin/realms/charlescd/users' \
+curl -X POST 'http://keycloak.lvh.me/auth/admin/realms/charlescd/users' \
     --header "Authorization: Bearer ${ACCESS_TOKEN}" \
     --header 'Content-Type: application/json' \
     --data-raw '{"username":"charlesadmin@admin","enabled":true,"emailVerified":true,"email":"charlesadmin@admin","attributes":{"isRoot":["true"]}}'
@@ -255,7 +267,7 @@ USER_ID=$(curl -s 'http://keycloak.lvh.me/auth/admin/realms/charlescd/users?user
     | jq '.[0].id' -r)
 
 # create admin credentials
-curl -sbX PUT "http://keycloak.lvh.me/auth/admin/realms/charlescd/users/${USER_ID}/reset-password" \
+curl -X PUT "http://keycloak.lvh.me/auth/admin/realms/charlescd/users/${USER_ID}/reset-password" \
     --header "Authorization: Bearer ${ACCESS_TOKEN}" \
     --header 'Content-Type: application/json' \
     --data-raw '{"type":"password","value":"g_wl!U8Uyf2)$KKw","temporary":true}'
@@ -351,4 +363,28 @@ helm upgrade -i charlescd ./charlescd-${CHARLESCD_VERSION}/install/helm-chart -n
     --set postgresql.enabled="false" \
     --set rabbitmq.enabled="false" \
     --set redis.enabled="false"
+```
+
+```shell
+kubectl apply -f - <<EOF
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: istio
+      name: charlescd
+      namespace: continuous-deployment
+    spec:
+      rules:
+        - host: charles.lvh.me
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: envoy-proxy
+                    port:
+                      number: 80
+                path: /
+                pathType: Prefix
+EOF
 ```
