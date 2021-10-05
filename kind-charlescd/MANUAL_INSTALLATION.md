@@ -266,6 +266,9 @@ EOF
 
 ## Setup Keycloak realm, clients and users
 
+Keycloak is in charge of CharlesCD users then we need to configure it for that. We can do this in many ways but in this
+example I'll be using Keycloak APIs:
+
 ```shell
 # authorize with username / password
 ACCESS_TOKEN=$(curl -s 'http://keycloak.lvh.me/auth/realms/master/protocol/openid-connect/token' \
@@ -314,6 +317,8 @@ curl -X PUT "http://keycloak.lvh.me/auth/admin/realms/charlescd/users/${USER_ID}
 ```
 
 ## Deploy CharlesCD
+
+Now that all required components are up and running, we can finally install CharlesCD pointing to them:
 
 ```shell
 export CHARLESCD_VERSION=1.0.1
@@ -405,6 +410,11 @@ helm upgrade -i charlescd ./charlescd-${CHARLESCD_VERSION}/install/helm-chart -n
     --set redis.enabled="false"
 ```
 
+To access CharlesCD UI on your browser, create an Ingress resource using the host `charles.lvh.me`.
+
+The wildcard DNS service `lvh.me` will always resolve to `127.0.0.1` so you don't need to modify the `/etc/hosts` file
+or run your own DNS server:
+
 ```shell
 kubectl apply -f - <<EOF
     apiVersion: networking.k8s.io/v1
@@ -428,6 +438,9 @@ kubectl apply -f - <<EOF
                 pathType: Prefix
 EOF
 ```
+
+Now, access [http://charles.lvh.me/](http://charles.lvh.me/) on your browser, login with user `charlesadmin@admin` and
+password `g_wl!U8Uyf2)$KKw` and start to play with CharlesCD!
 
 ## Quick start
 
