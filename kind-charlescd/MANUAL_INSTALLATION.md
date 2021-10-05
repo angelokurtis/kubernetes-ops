@@ -23,6 +23,9 @@
 
 ## Create Kubernetes clusters with KinD
 
+To be able to access the Charles UI we need to forward ports from the host to the Istio ingress. We can do this by
+creating a kind cluster with `extraPortMappings`:
+
 ```shell
 cat <<EOF | kind create cluster --name "charles-testing" --config=-
 kind: Cluster
@@ -53,6 +56,8 @@ EOF
 
 ### Install Istio Operator
 
+Instead of manually installing Istio you can let the Istio Operator manage this for you:
+
 ```shell
 export ISTIO_VERSION=1.7.8
 
@@ -65,6 +70,9 @@ helm upgrade -i istio-operator ./istio-${ISTIO_VERSION}/manifests/charts/istio-o
 ```
 
 ### Install Istio and configure Istio Ingress as NodePort
+
+Once Istio Operator is installed, just create its Kubernetes resource mapping the node ports that was previously
+configured on `extraPortMappings`:
 
 ```shell
 kubectl create namespace istio-system
@@ -111,11 +119,17 @@ spec:
 EOF
 ```
 
+When the installation is completed and the Istio Ingress pod is running, you'll be able to get its health check
+endpoint:
+
 ```shell
 curl http://localhost:15021/healthz/ready -I
 ```
 
 ## Deploying applications packaged by Bitnami Helm Charts
+
+CharlesCD needs some infrastructure components to work. To deploy these components quickly and easily you can use
+Bitnami Helm Charts:
 
 ```shell
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -148,6 +162,9 @@ helm upgrade -i rabbitmq bitnami/rabbitmq --version 8.22.0 -n queue \
 ```
 
 ### Deploy PostgreSQL
+
+In order to save our computing resources let's use a single Postgres instance. For this, we will create a script in
+order to configure all databases and their respective users:
 
 ```shell
 cat << EOF > ./userdata.sql
@@ -188,6 +205,8 @@ cat << EOF > ./userdata.sql
     grant all privileges on database keycloak_db to keycloak;
 EOF
 ```
+
+Now, just create a secret containing this script and pass it to `initdbScriptsSecret`:
 
 ```shell
 kubectl create namespace database
