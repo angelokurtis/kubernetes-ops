@@ -20,7 +20,7 @@
 4. [Setup Keycloak realm, clients and users](#setup-keycloak-realm-clients-and-users)
 5. [Deploy CharlesCD](#deploy-charlescd)
 
-### Create Kubernetes clusters with KinD
+## Create Kubernetes clusters with KinD
 
 ```shell
 cat <<EOF | kind create cluster --name "charles-testing" --config=-
@@ -48,9 +48,9 @@ nodes:
 EOF
 ```
 
-### Install Istio on Kubernetes
+## Install Istio on Kubernetes
 
-#### Install Istio Operator
+### Install Istio Operator
 
 ```shell
 export ISTIO_VERSION=1.7.8
@@ -63,7 +63,7 @@ helm upgrade -i istio-operator ./istio-${ISTIO_VERSION}/manifests/charts/istio-o
     --set tag="${ISTIO_VERSION}-distroless"
 ```
 
-#### Install Istio and configure Istio Ingress as NodePort
+### Install Istio and configure Istio Ingress as NodePort
 
 ```shell
 kubectl create namespace istio-system
@@ -114,13 +114,13 @@ EOF
 curl http://localhost:15021/healthz/ready -I
 ```
 
-### Deploying applications packaged by Bitnami Helm Charts
+## Deploying applications packaged by Bitnami Helm Charts
 
 ```shell
 helm repo add bitnami https://charts.bitnami.com/bitnami
 ```
 
-#### Deploy Redis
+### Deploy Redis
 
 ```shell
 kubectl create namespace cache
@@ -135,7 +135,7 @@ helm upgrade -i redis bitnami/redis --version 15.3.2 -n cache \
     --set nameOverride="redis"
 ```
 
-#### Deploy RabbitMQ
+### Deploy RabbitMQ
 
 ```shell
 kubectl create namespace queue
@@ -146,7 +146,7 @@ helm upgrade -i rabbitmq bitnami/rabbitmq --version 8.22.0 -n queue \
     --set image.tag="3.9"
 ```
 
-#### Deploy PostgreSQL
+### Deploy PostgreSQL
 
 ```shell
 cat << EOF > ./userdata.sql
@@ -199,7 +199,7 @@ helm upgrade -i postgresql bitnami/postgresql --version 10.9.5 -n database \
     --set initdbScriptsSecret="userdata"
 ```
 
-#### Deploy Keycloak
+### Deploy Keycloak
 
 ```shell
 kubectl create namespace iam
@@ -244,7 +244,7 @@ helm upgrade -i keycloak bitnami/keycloak --version 5.0.7 -n iam -f - <<EOF
 EOF
 ```
 
-### Setup Keycloak realm, clients and users
+## Setup Keycloak realm, clients and users
 
 ```shell
 # authorize with username / password
@@ -293,7 +293,7 @@ curl -X PUT "http://keycloak.lvh.me/auth/admin/realms/charlescd/users/${USER_ID}
     --data-raw '{"type":"password","value":"g_wl!U8Uyf2)$KKw","temporary":false}'
 ```
 
-### Deploy CharlesCD
+## Deploy CharlesCD
 
 ```shell
 export CHARLESCD_VERSION=1.0.1
