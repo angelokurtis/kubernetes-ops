@@ -8,15 +8,16 @@
 * `kubectl`
 
 ## Table of Contents
+
 1. [Create Kubernetes clusters with KinD](#create-kubernetes-clusters-with-kind)
 2. [Install Istio on Kubernetes](#install-istio-on-kubernetes)
-   1. [Install Istio Operator](#install-istio-operator)
-   2. [Install Istio and configure Istio Ingress as NodePort](#install-istio-and-configure-istio-ingress-as-nodeport)
+    1. [Install Istio Operator](#install-istio-operator)
+    2. [Install Istio and configure Istio Ingress as NodePort](#install-istio-and-configure-istio-ingress-as-nodeport)
 3. [Deploying applications packaged by Bitnami Helm Charts](#deploying-applications-packaged-by-bitnami-helm-charts)
-      1. [Deploy Redis](#deploy-redis)
-      2. [Deploy RabbitMQ](#deploy-rabbitmq)
-      3. [Deploy PostgreSQL](#deploy-postgresql)
-      4. [Deploy Keycloak](#deploy-keycloak)
+    1. [Deploy Redis](#deploy-redis)
+    2. [Deploy RabbitMQ](#deploy-rabbitmq)
+    3. [Deploy PostgreSQL](#deploy-postgresql)
+    4. [Deploy Keycloak](#deploy-keycloak)
 4. [Setup Keycloak realm, clients and users](#setup-keycloak-realm-clients-and-users)
 5. [Deploy CharlesCD](#deploy-charlescd)
 
@@ -408,3 +409,8 @@ kubectl apply -f - <<EOF
                 pathType: Prefix
 EOF
 ```
+
+## Quick start
+
+Would you like a quick start or an automated way to get it all running on your local environment?
+Please, [check this out](./README.md).

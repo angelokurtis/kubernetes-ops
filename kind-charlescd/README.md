@@ -24,3 +24,8 @@ Deleting is equally simple:
 ```sh
 make down
 ```
+
+## Manual installation
+
+Would you like a step-by-step instructions to get it all running on your local environment?
+Please, [check this out](./MANUAL_INSTALLATION.md).
