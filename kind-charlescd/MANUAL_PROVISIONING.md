@@ -298,7 +298,7 @@ helm upgrade -i charlescd ./charlescd-${CHARLESCD_VERSION}/install/helm-chart -n
     --set CharlesApplications.circleMatcher.image.tag="${CHARLESCD_VERSION}" \
     --set CharlesApplications.circleMatcher.pullPolicy="IfNotPresent" \
     --set CharlesApplications.circleMatcher.redis.host="redis-master.cache.svc.cluster.local" \
-    --set CharlesApplications.circleMatcher.redis.password="V5waJ0OXte16WCR3" \
+    --set CharlesApplications.circleMatcher.redis.password="cmXeuBSE6ElcCnEH" \
     --set CharlesApplications.circleMatcher.resources.limits=null \
     --set CharlesApplications.compass.database.host="postgresql.database.svc.cluster.local" \
     --set CharlesApplications.compass.database.name="charlescd_compass_db" \
