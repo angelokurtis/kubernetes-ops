@@ -10,7 +10,7 @@ resource "helm_release" "istio_operator" {
 
   repository = "https://charts.kurtis.dev.br/"
   chart      = "istio-operator"
-  version    = "1.11.3"
+  version    = local.istio.version
 
   set {
     name  = "operatorNamespace"
@@ -29,6 +29,6 @@ resource "helm_release" "istio_operator" {
 
   set {
     name  = "tag"
-    value = "1.11.3-distroless"
+    value = "${local.istio.version}-distroless"
   }
 }
