@@ -12,7 +12,7 @@ resource "kind_cluster" "knative" {
 
     node {
       role  = "control-plane"
-      image = "kindest/node:v1.22.1"
+      image = "kindest/node@sha256:f638a08c1f68fe2a99e724ace6df233a546eaf6713019a0b310130a4f91ebe7f" # v1.22.2
 
       kubeadm_config_patches = [
         yamlencode({
