@@ -1,11 +1,13 @@
 locals {
   knative = {
-    version = "0.26.0"
+    operator = { version = "0.26.2" }
+    eventing = { version = "0.26.1" }
+    serving  = { version = "0.26.0" }
   }
 }
 
 data "kustomization_overlay" "knative_operator" {
-  resources = ["https://github.com/knative/operator/releases/download/v${local.knative.version}/operator.yaml"]
+  resources = ["https://github.com/knative/operator/releases/download/v${local.knative.operator.version}/operator.yaml"]
   namespace = "knative-operator"
 }
 

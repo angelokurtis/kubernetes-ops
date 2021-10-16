@@ -6,7 +6,7 @@ resource "kustomization_resource" "knative_serving" {
       "name"      = "knative-serving"
       "namespace" = kubernetes_namespace.knative_serving.metadata[0].name
     }
-    "spec"       = { "version" = local.knative.version }
+    "spec"       = { "version" = local.knative.serving.version }
   })
 
   depends_on = [kustomization_resource.knative_operator]

@@ -6,7 +6,7 @@ resource "kustomization_resource" "knative_eventing" {
       "name"      = "knative-eventing"
       "namespace" = kubernetes_namespace.knative_eventing.metadata[0].name
     }
-    "spec"       = { "version" = local.knative.version }
+    "spec"       = { "version" = local.knative.eventing.version }
   })
 
   depends_on = [kustomization_resource.knative_operator]
