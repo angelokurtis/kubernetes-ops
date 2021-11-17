@@ -1,15 +1,23 @@
 terraform {
   required_providers {
-    kind = {
-      source = "kyma-incubator/kind"
-      version = "0.0.7"
+    kind          = {
+      source  = "kyma-incubator/kind"
+      version = ">= 0.0"
     }
     kustomization = {
-      source = "kbst/kustomization"
-      version = "0.5.0"
+      source  = "kbst/kustomization"
+      version = ">= 0.7"
+    }
+    helm          = {
+      source  = "hashicorp/helm"
+      version = ">= 2.4"
+    }
+    kubernetes    = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.6"
     }
   }
-  required_version = ">= 0.13"
+  required_version = ">= 1.0"
 }
 
 provider "helm" {

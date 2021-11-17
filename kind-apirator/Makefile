@@ -6,22 +6,13 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 init: ## Initialize Terraform configurations
-	terraform init
+	terraform init -upgrade=true
 
-up: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+up: init ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
 	terraform apply -auto-approve
 
-down: ## Uninstall all solution components and destroy the local Kubernetes cluster
-	terraform destroy -auto-approve
+down: clean ## Uninstall all solution components and destroy the local Kubernetes cluster
+	kind delete clusters apirator
 
-plan:
-	terraform plan
-
-clean:
+clean: ## Removing all Terraform generated config files
 	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* apirator-config
-
-template-manager:
-	helm template manager /home/tiagoangelo/wrkspc/github.com/ZupIT/apirator/apirator-manager/deployments/helm/apirator-manager -f ./values/manager.yaml -n apirator > manifests.yaml
-
-template-auth:
-	helm template auth /home/tiagoangelo/wrkspc/github.com/ZupIT/apirator/apirator-auth/deployments/helm/apirator-auth -f ./values/auth.yaml -n apirator > manifests.yaml

@@ -2,9 +2,12 @@ apiVersion: jaegertracing.io/v1
 kind: Jaeger
 metadata:
   name: jaeger
-  namespace: "${NAMESPACE}"
 spec:
   ingress:
     enabled: true
     hosts:
-      - tracing.local
+      - example.com
+    ingressClassName: nginx
+  storage:
+    type: memory
+  strategy: allinone

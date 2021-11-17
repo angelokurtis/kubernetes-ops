@@ -1,26 +1,40 @@
-resource "kustomization_resource" "jaeger" {
-  manifest = jsonencode(yamldecode(data.template_file.jaeger.rendered))
-
-  depends_on = [
-    helm_release.jaeger_operator
-  ]
+locals {
+  jaeger = {
+    namespace = "tracing"
+    query     = { host = "jaeger.lvh.me" }
+    collector = { host = "jaeger-collector.lvh.me" }
+  }
 }
 
-data "template_file" "jaeger" {
-  template = file("${path.module}/jaeger.yaml")
-  vars = {
-    NAMESPACE = kubernetes_namespace.tracing.metadata[0].name
-  }
+resource "kubernetes_namespace" "tracing" {
+  metadata { name = local.jaeger.namespace }
+}
+
+resource "helm_release" "jaeger_operator" {
+  name      = "jaeger-operator"
+  namespace = kubernetes_namespace.tracing.metadata[0].name
+
+  repository = "https://jaegertracing.github.io/helm-charts"
+  chart      = "jaeger-operator"
+  version    = "2.27.0"
+}
+
+resource "kustomization_resource" "jaeger" {
+  for_each = data.kustomization_overlay.jaeger.ids
+  manifest = data.kustomization_overlay.jaeger.manifests[each.value]
+
+  depends_on = [helm_release.jaeger_operator]
 }
 
 resource "kubernetes_ingress" "jaeger_collector" {
   metadata {
-    name = "jaeger-collector"
+    name      = "jaeger-collector"
     namespace = kubernetes_namespace.tracing.metadata[0].name
   }
   spec {
+    ingress_class_name = "nginx"
     rule {
-      host = "collector.local"
+      host = local.jaeger.collector.host
       http {
         path {
           backend {
@@ -32,7 +46,20 @@ resource "kubernetes_ingress" "jaeger_collector" {
     }
   }
 
-  depends_on = [
-    kustomization_resource.jaeger
-  ]
+  depends_on = [kustomization_resource.jaeger]
+}
+
+data "kustomization_overlay" "jaeger" {
+  resources = ["kustomize/jaeger"]
+  namespace = local.jaeger.namespace
+  patches {
+    patch  = yamlencode([
+      {
+        op    = "replace"
+        path  = "/spec/ingress/hosts/0"
+        value = local.jaeger.query.host
+      }
+    ])
+    target = { kind = "Jaeger" }
+  }
 }
