@@ -8,7 +8,7 @@ resource "kind_cluster" "keycloak" {
 
     node {
       role = "control-plane"
-      image = "kindest/node:v1.22.1"
+      image = "kindest/node:v1.22.4"
 
       kubeadm_config_patches = [
         yamlencode({

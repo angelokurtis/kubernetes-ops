@@ -12,7 +12,7 @@ resource "helm_release" "keycloak" {
 
   repository = "https://charts.bitnami.com/bitnami"
   chart = "keycloak"
-  version = "5.0.7"
+  version = "5.2.0"
 
   set {
     name = "nameOverride"
@@ -21,7 +21,6 @@ resource "helm_release" "keycloak" {
 
   values = [
     yamlencode({
-      image = { repository = "bitnami/keycloak", tag = local.keycloak.version }
       auth = {
         adminUser = local.keycloak.admin.user
         existingSecretPerPassword = {

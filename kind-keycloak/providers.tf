@@ -1,11 +1,10 @@
 terraform {
   required_providers {
-    kind = {
-      source = "kyma-incubator/kind"
-      version = "0.0.9"
-    }
+    kind       = { source = "kyma-incubator/kind", version = ">= 0.0" }
+    helm       = { source = "hashicorp/helm", version = ">= 2.3" }
+    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.5" }
   }
-  required_version = ">= 0.13"
+  required_version = ">= 1.0"
 }
 
 provider "kind" {}
