@@ -1,13 +1,13 @@
 resource "helm_release" "kibana" {
   name      = "kibana"
-  namespace = kubernetes_namespace.elastic.metadata[0].name
+  namespace = kubernetes_namespace.elk.metadata[0].name
 
   repository = "https://helm.elastic.co"
   chart      = "kibana"
   version    = "7.15.0"
 
   set {
-    name  = "nameOverride"
+    name  = "fullnameOverride"
     value = "kibana"
   }
 
@@ -25,4 +25,6 @@ resource "helm_release" "kibana" {
       }
     })
   ]
+
+  depends_on = [helm_release.elasticsearch]
 }

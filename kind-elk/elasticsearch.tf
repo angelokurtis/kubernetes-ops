@@ -1,6 +1,6 @@
 resource "helm_release" "elasticsearch" {
   name      = "elasticsearch"
-  namespace = kubernetes_namespace.elastic.metadata[0].name
+  namespace = kubernetes_namespace.elk.metadata[0].name
 
   repository = "https://helm.elastic.co"
   chart      = "elasticsearch"
@@ -13,10 +13,9 @@ resource "helm_release" "elasticsearch" {
 
   values = [
     yamlencode({
+      replicas            = 2
       # Permit co-located instances.
       antiAffinity        = "soft",
-      # Shrink default JVM heap.
-      esJavaOpts          = "-Xmx128m -Xms128m",
       # Allocate smaller chunks of memory per pod.
       resources           = {
         limits   = { cpu = "1000m", memory = "512M" }
@@ -32,6 +31,6 @@ resource "helm_release" "elasticsearch" {
   ]
 }
 
-resource "kubernetes_namespace" "elastic" {
-  metadata { name = "elastic" }
+resource "kubernetes_namespace" "elk" {
+  metadata { name = "elk" }
 }
