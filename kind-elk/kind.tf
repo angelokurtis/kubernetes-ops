@@ -1,5 +1,5 @@
 locals {
-  cluster_domain = "${join("", formatlist("%02x", split(".", "192.168.0.17")))}.nip.io"
+  cluster_domain = "${join("", formatlist("%02x", split(".", "192.168.0.18")))}.nip.io"
 }
 
 resource "kind_cluster" "elk" {
