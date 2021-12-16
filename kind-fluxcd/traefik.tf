@@ -22,7 +22,3 @@ resource "helm_release" "traefik" {
     })
   ]
 }
-
-resource "kubernetes_namespace" "traefik" {
-  metadata { name = var.traefik_namespace }
-}
