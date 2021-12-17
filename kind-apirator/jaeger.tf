@@ -17,13 +17,29 @@ resource "helm_release" "jaeger_operator" {
   repository = "https://jaegertracing.github.io/helm-charts"
   chart      = "jaeger-operator"
   version    = "2.27.0"
-}
 
-resource "kustomization_resource" "jaeger" {
-  for_each = data.kustomization_overlay.jaeger.ids
-  manifest = data.kustomization_overlay.jaeger.manifests[each.value]
+  set {
+    name  = "fullnameOverride"
+    value = "simplest"
+  }
 
-  depends_on = [helm_release.jaeger_operator]
+  values = [
+    yamlencode({
+      image  = { repository = "jaegertracing/jaeger-operator", tag = "1.29.1" }
+      jaeger = {
+        create = true
+        spec   = {
+          ingress  = {
+            enabled          = true
+            hosts            = [local.jaeger.query.host]
+            ingressClassName = "nginx"
+          }
+          storage  = { type = "memory" }
+          strategy = "allinone"
+        }
+      }
+    })
+  ]
 }
 
 resource "kubernetes_ingress" "jaeger_collector" {
@@ -38,7 +54,7 @@ resource "kubernetes_ingress" "jaeger_collector" {
       http {
         path {
           backend {
-            service_name = "jaeger-collector"
+            service_name = "simplest-jaeger-collector"
             service_port = "14268"
           }
         }
@@ -46,20 +62,5 @@ resource "kubernetes_ingress" "jaeger_collector" {
     }
   }
 
-  depends_on = [kustomization_resource.jaeger]
-}
-
-data "kustomization_overlay" "jaeger" {
-  resources = ["kustomize/jaeger"]
-  namespace = local.jaeger.namespace
-  patches {
-    patch  = yamlencode([
-      {
-        op    = "replace"
-        path  = "/spec/ingress/hosts/0"
-        value = local.jaeger.query.host
-      }
-    ])
-    target = { kind = "Jaeger" }
-  }
+  depends_on = [helm_release.jaeger_operator]
 }
