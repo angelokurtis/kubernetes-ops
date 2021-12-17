@@ -8,17 +8,18 @@ resource "helm_release" "traefik" {
 
   values = [
     yamlencode({
-      image     = { tag = "2.5.5" }
-      ports     = {
+      image        = { tag = "2.5.5" }
+      ports        = {
         traefik   = { expose = true, nodePort = 32090 }
         web       = { nodePort = 32080 }
         websecure = { nodePort = 32443 }
       }
-      providers = {
+      ingressClass = { enabled = true, isDefaultClass = true }
+      providers    = {
         kubernetesCRD     = { namespaces = ["default", kubernetes_namespace.traefik.metadata[0].name] }
         kubernetesIngress = { namespaces = ["default", kubernetes_namespace.traefik.metadata[0].name] }
       }
-      service   = { type = "NodePort" }
+      service      = { type = "NodePort" }
     })
   ]
 }
