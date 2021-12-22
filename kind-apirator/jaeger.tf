@@ -16,7 +16,7 @@ resource "helm_release" "jaeger_operator" {
 
   repository = "https://jaegertracing.github.io/helm-charts"
   chart      = "jaeger-operator"
-  version    = "2.27.0"
+  version    = "2.27.1"
 
   set {
     name  = "fullnameOverride"
