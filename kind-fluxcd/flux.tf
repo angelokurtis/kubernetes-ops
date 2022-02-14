@@ -1,5 +1,5 @@
 locals {
-  flux = { version = "v0.24.1" }
+  flux = { version = "v0.26.3" }
 }
 
 data "kustomization_overlay" "flux" {

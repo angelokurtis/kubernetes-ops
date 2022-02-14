@@ -4,12 +4,12 @@ resource "helm_release" "traefik" {
 
   repository = "https://helm.traefik.io/traefik"
   chart      = "traefik"
-  version    = "10.7.1"
+  version    = "10.14.1"
 
   values = [
     yamlencode({
-      image        = { tag = "2.5.5" }
-      ports        = {
+      image = { tag = "2.6" }
+      ports = {
         traefik   = { expose = true, nodePort = 32090 }
         web       = { nodePort = 32080 }
         websecure = { nodePort = 32443 }
@@ -19,7 +19,7 @@ resource "helm_release" "traefik" {
         kubernetesCRD     = { namespaces = ["default", kubernetes_namespace.traefik.metadata[0].name] }
         kubernetesIngress = { namespaces = ["default", kubernetes_namespace.traefik.metadata[0].name] }
       }
-      service      = { type = "NodePort" }
+      service = { type = "NodePort" }
     })
   ]
 }

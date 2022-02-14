@@ -1,7 +1,7 @@
 variable "flux_namespace" {
-  default = "flux-system"
+  default = "fluxcd"
 }
 
 variable "traefik_namespace" {
-  default = "traefik-system"
+  default = "traefik"
 }

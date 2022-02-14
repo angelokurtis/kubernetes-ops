@@ -16,7 +16,7 @@ resource "helm_release" "jaeger_operator" {
 
   repository = "https://jaegertracing.github.io/helm-charts"
   chart      = "jaeger-operator"
-  version    = "2.27.0"
+  version    = "2.27.1"
 
   set {
     name  = "fullnameOverride"
@@ -25,11 +25,11 @@ resource "helm_release" "jaeger_operator" {
 
   values = [
     yamlencode({
-      image  = { repository = "jaegertracing/jaeger-operator", tag = "1.29.1" }
+      image  = { repository = "jaegertracing/jaeger-operator", tag = "1.31" }
       jaeger = {
         create = true
         spec   = {
-          ingress  = {
+          ingress = {
             enabled          = true
             hosts            = [local.jaeger.query.host]
             ingressClassName = "traefik"
