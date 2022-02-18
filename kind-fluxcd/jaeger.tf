@@ -16,7 +16,7 @@ resource "helm_release" "jaeger_operator" {
 
   repository = "https://jaegertracing.github.io/helm-charts"
   chart      = "jaeger-operator"
-  version    = "2.27.1"
+  version    = "2.28.0"
 
   set {
     name  = "fullnameOverride"
@@ -25,7 +25,7 @@ resource "helm_release" "jaeger_operator" {
 
   values = [
     yamlencode({
-      image  = { repository = "jaegertracing/jaeger-operator", tag = "1.31" }
+      image  = { repository = "jaegertracing/jaeger-operator", tag = "1.30.0" }
       jaeger = {
         create = true
         spec   = {
