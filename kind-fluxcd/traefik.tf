@@ -8,7 +8,7 @@ resource "helm_release" "traefik" {
 
   values = [
     yamlencode({
-      image = { tag = "2.6" }
+      image = { repository = "traefik", tag = "2.6.1" }
       ports = {
         traefik   = { expose = true, nodePort = 32090 }
         web       = { nodePort = 32080 }
