@@ -13,3 +13,7 @@ variable "rabbitmq_namespace" {
 variable "postgresql_namespace" {
   default = "postgresql"
 }
+
+variable "redis_namespace" {
+  default = "redis"
+}
