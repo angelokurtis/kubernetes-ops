@@ -17,3 +17,4 @@ override.tf.json
 ### Generated project files ###
 charlescd*config
 tmp
+.tmp
