@@ -40,21 +40,6 @@ resource "kubernetes_secret" "userdata" {
   }
 }
 
-resource "kubectl_manifest" "bitnami_helm_repository" {
-  yaml_body = <<YAML
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: HelmRepository
-metadata:
-  name: bitnami
-  namespace: default
-spec:
-  interval: ${local.flux.default_interval}
-  url: https://charts.bitnami.com/bitnami
-YAML
-
-  depends_on = [kubectl_manifest.fluxcd]
-}
-
 resource "kubectl_manifest" "postgresql_helm_release" {
   yaml_body = <<YAML
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
