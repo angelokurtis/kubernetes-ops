@@ -33,5 +33,5 @@ resource "random_password" "rabbitmq" {
 }
 
 resource "kubernetes_namespace" "rabbitmq" {
-  metadata { name = "rabbitmq" }
+  metadata { name = var.rabbitmq_namespace }
 }

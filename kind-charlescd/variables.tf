@@ -5,3 +5,11 @@ variable "fluxcd_namespace" {
 variable "istio_namespace" {
   default = "istio"
 }
+
+variable "rabbitmq_namespace" {
+  default = "rabbitmq"
+}
+
+variable "postgresql_namespace" {
+  default = "postgresql"
+}
