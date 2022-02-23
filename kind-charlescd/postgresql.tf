@@ -68,5 +68,5 @@ YAML
 }
 
 resource "kubernetes_namespace" "postgresql" {
-  metadata { name = "postgresql" }
+  metadata { name = var.postgresql_namespace }
 }
