@@ -1,25 +1,30 @@
 terraform {
   required_providers {
-    kind          = { source = "kyma-incubator/kind", version = ">= 0.0" }
-    kubernetes    = { source = "hashicorp/kubernetes", version = ">= 2.8" }
-    helm          = { source = "hashicorp/helm", version = ">= 2.4" }
-    kustomization = { source = "kbst/kustomization", version = ">= 0.7" }
+    kind       = { source = "kyma-incubator/kind", version = ">= 0.0" }
+    flux       = { source = "fluxcd/flux", version = ">= 0.11" }
+    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.8" }
+    kubectl    = { source = "gavinbunney/kubectl", version = ">= 1.13" }
   }
   required_version = ">= 1.0"
 }
 
 provider "kind" {}
 
+provider "flux" {}
+
 provider "kubernetes" {
-  config_path = kind_cluster.flux.kubeconfig_path
+  host = kind_cluster.flux.endpoint
+
+  client_certificate     = kind_cluster.flux.client_certificate
+  client_key             = kind_cluster.flux.client_key
+  cluster_ca_certificate = kind_cluster.flux.cluster_ca_certificate
 }
 
-provider "helm" {
-  kubernetes {
-    config_path = kind_cluster.flux.kubeconfig_path
-  }
-}
+provider "kubectl" {
+  host = kind_cluster.flux.endpoint
 
-provider "kustomization" {
-  kubeconfig_path = kind_cluster.flux.kubeconfig_path
+  client_certificate     = kind_cluster.flux.client_certificate
+  client_key             = kind_cluster.flux.client_key
+  cluster_ca_certificate = kind_cluster.flux.cluster_ca_certificate
+  load_config_file       = false
 }
