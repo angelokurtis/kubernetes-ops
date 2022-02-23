@@ -7,7 +7,7 @@ locals {
     "charlescd_compass",
     "keycloak",
   ]
-  database  = {
+  database = {
   for db in local.databases : db => {
     database = "${db}_db"
     user     = db
@@ -23,34 +23,10 @@ resource "random_password" "databases" {
   special  = false
 }
 
-resource "helm_release" "postgresql" {
-  name      = "postgresql"
-  namespace = kubernetes_namespace.database.metadata[0].name
-
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "postgresql"
-  version    = "10.9.5"
-
-  set {
-    name  = "initdbScriptsSecret"
-    value = kubernetes_secret.userdata.metadata[0].name
-  }
-
-  set {
-    name  = "fullnameOverride"
-    value = "postgresql"
-  }
-
-  set {
-    name  = "image.tag"
-    value = "13"
-  }
-}
-
 resource "kubernetes_secret" "userdata" {
   metadata {
     name      = "userdata"
-    namespace = kubernetes_namespace.database.metadata[0].name
+    namespace = kubernetes_namespace.postgresql.metadata[0].name
   }
   data = {
     "userdata.sql" = <<-EOT
@@ -62,4 +38,50 @@ resource "kubernetes_secret" "userdata" {
       %{ endfor ~}
     EOT
   }
+}
+
+resource "kubectl_manifest" "bitnami_helm_repository" {
+  yaml_body = <<YAML
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: bitnami
+  namespace: default
+spec:
+  interval: ${local.flux.default_interval}
+  url: https://charts.bitnami.com/bitnami
+YAML
+
+  depends_on = [kubectl_manifest.fluxcd]
+}
+
+resource "kubectl_manifest" "postgresql_helm_release" {
+  yaml_body = <<YAML
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: postgresql
+  namespace: ${kubernetes_namespace.postgresql.metadata[0].name}
+spec:
+  interval: ${local.flux.default_interval}
+  chart:
+    spec:
+      chart: postgresql
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: default
+  values:
+    initdbScriptsSecret: "${kubernetes_secret.userdata.metadata[0].name}"
+    fullnameOverride: postgresql
+YAML
+
+  depends_on = [
+    kubectl_manifest.fluxcd,
+    kubectl_manifest.bitnami_helm_repository
+  ]
+}
+
+resource "kubernetes_namespace" "postgresql" {
+  metadata { name = "postgresql" }
 }
