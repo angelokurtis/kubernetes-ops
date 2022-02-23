@@ -1,4 +1,4 @@
-variable "flux_namespace" {
+variable "fluxcd_namespace" {
   default = "fluxcd"
 }
 
