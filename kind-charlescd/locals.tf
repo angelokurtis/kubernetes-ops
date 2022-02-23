@@ -4,4 +4,7 @@ locals {
     version          = "v0.27.1"
     default_interval = "60m"
   }
+  istio = {
+    version = "1.13.1"
+  }
 }
