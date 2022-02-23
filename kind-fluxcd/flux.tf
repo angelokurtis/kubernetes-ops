@@ -1,40 +1,35 @@
 locals {
-  flux = { version = "v0.27.0" }
-}
-
-data "kustomization_overlay" "flux" {
-  resources = [
-    "https://github.com/fluxcd/flux2/manifests/bases/source-controller?ref=${local.flux.version}",
-    "https://github.com/fluxcd/flux2/manifests/bases/kustomize-controller?ref=${local.flux.version}",
-    "https://github.com/fluxcd/flux2/manifests/bases/helm-controller?ref=${local.flux.version}",
-    "https://github.com/fluxcd/flux2/manifests/rbac?ref=${local.flux.version}",
-    "https://github.com/fluxcd/flux2/manifests/policies?ref=${local.flux.version}",
-  ]
-  namespace = var.flux_namespace
-  patches {
-    target = { apiVersion = "rbac.authorization.k8s.io/v1", kind = "ClusterRoleBinding", name = "cluster-reconciler" }
-    patch  = yamlencode([
-    for i in range(2) : { op = "replace", path = "/subjects/${i}/namespace", value = var.flux_namespace }
-    ])
-  }
-  patches {
-    target = { apiVersion = "rbac.authorization.k8s.io/v1", kind = "ClusterRoleBinding", name = "crd-controller" }
-    patch  = yamlencode([
-    for i in range(6) : { op = "replace", path = "/subjects/${i}/namespace", value = var.flux_namespace }
-    ])
+  flux = {
+    version          = "v0.27.1"
+    default_interval = "60m"
   }
 }
 
-resource "kustomization_resource" "flux" {
-  for_each = data.kustomization_overlay.flux.ids
-  manifest = data.kustomization_overlay.flux.manifests[each.value]
-
-  depends_on = [kubernetes_namespace.flux]
+data "flux_install" "main" {
+  version        = local.flux.version
+  target_path    = "fluxcd"
+  namespace      = var.fluxcd_namespace
+  network_policy = false
 }
 
-# used for troubleshooting
-# resource "local_file" "flux" {
-#   for_each = data.kustomization_overlay.flux.ids
-#   content  = yamlencode(jsondecode(data.kustomization_overlay.flux.manifests[each.value]))
-#   filename = "${path.module}/flux/${each.value}.yaml"
-# }
+data "kubectl_file_documents" "fluxcd" {
+  content = data.flux_install.main.content
+}
+
+resource "kubectl_manifest" "fluxcd" {
+  for_each  = data.kubectl_file_documents.fluxcd.manifests
+  yaml_body = each.value
+
+  depends_on = [kubernetes_namespace.fluxcd]
+}
+
+resource "kubernetes_namespace" "fluxcd" {
+  metadata {
+    name   = var.fluxcd_namespace
+    labels = {
+      "app.kubernetes.io/instance" = "fluxcd"
+      "app.kubernetes.io/part-of"  = "flux"
+      "app.kubernetes.io/version"  = local.flux.version
+    }
+  }
+}
