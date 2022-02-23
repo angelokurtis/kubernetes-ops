@@ -6,66 +6,92 @@ locals {
   }
 }
 
-resource "kubernetes_namespace" "tracing" {
-  metadata { name = local.jaeger.namespace }
+resource "kubectl_manifest" "jaeger_helm_repository" {
+  yaml_body = <<YAML
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: jaeger
+  namespace: ${kubernetes_namespace.jaeger.metadata[0].name}
+spec:
+  interval: ${local.flux.default_interval}
+  url: https://jaegertracing.github.io/helm-charts
+YAML
+
+  depends_on = [kubectl_manifest.fluxcd]
 }
 
-resource "helm_release" "jaeger_operator" {
-  name      = "jaeger-operator"
-  namespace = kubernetes_namespace.tracing.metadata[0].name
+resource "kubectl_manifest" "jaeger_operator_helm_release" {
+  yaml_body = <<YAML
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: jaeger-operator
+  namespace: ${kubernetes_namespace.jaeger.metadata[0].name}
+spec:
+  interval: ${local.flux.default_interval}
+  chart:
+    spec:
+      chart: jaeger-operator
+      sourceRef:
+        kind: HelmRepository
+        name: jaeger
+YAML
 
-  repository = "https://jaegertracing.github.io/helm-charts"
-  chart      = "jaeger-operator"
-  version    = "2.28.0"
-
-  set {
-    name  = "fullnameOverride"
-    value = "simplest"
-  }
-
-  values = [
-    yamlencode({
-      image  = { repository = "jaegertracing/jaeger-operator", tag = "1.30.0" }
-      jaeger = {
-        create = true
-        spec   = {
-          ingress = {
-            enabled          = true
-            hosts            = [local.jaeger.query.host]
-            ingressClassName = "traefik"
-          }
-          storage  = { type = "memory" }
-          strategy = "allinone"
-        }
-      }
-    })
+  depends_on = [
+    kubectl_manifest.fluxcd,
+    kubectl_manifest.jaeger_helm_repository
   ]
 }
 
-resource "kubernetes_ingress_v1" "jaeger_collector" {
-  metadata {
-    name      = "jaeger-collector"
-    namespace = kubernetes_namespace.tracing.metadata[0].name
-  }
+resource "kubectl_manifest" "jaeger" {
+  yaml_body = <<YAML
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: jaeger
+  namespace: ${kubernetes_namespace.jaeger.metadata[0].name}
+spec:
+  ingress:
+    enabled: true
+    hosts:
+      - ${local.jaeger.query.host}
+    ingressClassName: traefik
+  storage:
+    type: memory
+  strategy: allinone
+YAML
 
-  spec {
-    ingress_class_name = "traefik"
-    rule {
-      host = local.jaeger.collector.host
-      http {
-        path {
-          backend {
-            service {
-              name = "simplest-jaeger-collector"
-              port {
-                number = 14268
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  depends_on = [
+    kubectl_manifest.fluxcd,
+    kubectl_manifest.jaeger_operator_helm_release
+  ]
+}
 
-  depends_on = [helm_release.jaeger_operator]
+resource "kubectl_manifest" "jaeger_collector_ingress" {
+  yaml_body = <<YAML
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jaeger-collector
+  namespace: ${kubernetes_namespace.jaeger.metadata[0].name}
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: ${local.jaeger.collector.host}
+      http:
+        paths:
+          - backend:
+              service:
+                name: jaeger-collector
+                port:
+                  number: 14268
+            pathType: ImplementationSpecific
+YAML
+
+  depends_on = [kubectl_manifest.jaeger]
+}
+
+resource "kubernetes_namespace" "jaeger" {
+  metadata { name = var.jaeger_namespace }
 }

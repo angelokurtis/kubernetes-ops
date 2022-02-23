@@ -5,3 +5,7 @@ variable "fluxcd_namespace" {
 variable "traefik_namespace" {
   default = "traefik"
 }
+
+variable "jaeger_namespace" {
+  default = "jaeger"
+}
