@@ -1,29 +1,37 @@
-resource "helm_release" "rabbitmq" {
-  name      = "rabbitmq"
-  namespace = kubernetes_namespace.queue.metadata[0].name
+resource "kubectl_manifest" "rabbitmq_helm_release" {
+  yaml_body = <<YAML
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: rabbitmq
+  namespace: ${kubernetes_namespace.rabbitmq.metadata[0].name}
+spec:
+  interval: ${local.flux.default_interval}
+  chart:
+    spec:
+      chart: rabbitmq
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: default
+  values:
+    auth:
+      password: "${random_password.rabbitmq["password"].result}"
+      erlangCookie: "${random_password.rabbitmq["erlangCookie"].result}"
+YAML
 
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "rabbitmq"
-  version    = "8.22.0"
-
-  set {
-    name  = "auth.password"
-    value = random_password.rabbitmq["password"].result
-  }
-
-  set {
-    name  = "auth.erlangCookie"
-    value = random_password.rabbitmq["erlangCookie"].result
-  }
-
-  set {
-    name  = "image.tag"
-    value = "3.9"
-  }
+  depends_on = [
+    kubectl_manifest.fluxcd,
+    kubectl_manifest.bitnami_helm_repository
+  ]
 }
 
 resource "random_password" "rabbitmq" {
   for_each = toset(["password", "erlangCookie"])
   keepers  = { database = each.key }
   length   = 16
+}
+
+resource "kubernetes_namespace" "rabbitmq" {
+  metadata { name = "rabbitmq" }
 }
