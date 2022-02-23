@@ -1,7 +1,3 @@
-locals {
-  cluster_domain = "lvh.me"
-}
-
 resource "kind_cluster" "charlescd" {
   name           = "charlescd"
   wait_for_ready = true
@@ -12,23 +8,12 @@ resource "kind_cluster" "charlescd" {
 
     node {
       role  = "control-plane"
-      image = "kindest/node:v1.20.7"
+      image = "kindest/node@sha256:9d07ff05e4afefbba983fac311807b3c17a5f36e7061f6cb7e2ba756255b2be4" # v1.21.2
 
       kubeadm_config_patches = [
         yamlencode({
           "kind"             = "InitConfiguration"
           "nodeRegistration" = { "kubeletExtraArgs" = { "node-labels" = "ingress-ready=true" } }
-        }),
-        yamlencode({
-          "apiVersion" = "kubeadm.k8s.io/v1beta2"
-          "kind"       = "ClusterConfiguration"
-          "metadata"   = { "name" = "config" }
-          "apiServer"  = {
-            "extraArgs" = {
-              "service-account-issuer"           = "kubernetes.default.svc"
-              "service-account-signing-key-file" = "/etc/kubernetes/pki/sa.key"
-            }
-          }
         }),
       ]
 
