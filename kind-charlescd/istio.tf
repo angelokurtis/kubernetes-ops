@@ -77,7 +77,8 @@ YAML
 
   depends_on = [
     kubectl_manifest.fluxcd,
-    kubectl_manifest.istio_operator_helm_release
+    kubectl_manifest.istio_operator_helm_release,
+    kubernetes_job_v1.wait_istio_crds
   ]
 }
 
@@ -86,4 +87,67 @@ resource "kubernetes_namespace" "istio" {
     name   = var.istio_namespace
     labels = { istio-injection = "disabled" }
   }
+}
+
+resource "kubernetes_service_account_v1" "istio_kubectl" {
+  metadata {
+    name      = "kubectl"
+    namespace = kubernetes_namespace.istio.metadata[0].name
+  }
+}
+
+resource "kubernetes_role_v1" "istio_pod_reader" {
+  metadata {
+    name      = "istio-pod-reader"
+    namespace = kubernetes_namespace.istio.metadata[0].name
+  }
+  rule {
+    api_groups = ["helm.toolkit.fluxcd.io"]
+    resources  = ["helmreleases"]
+    verbs      = ["get", "list", "watch"]
+  }
+}
+
+resource "kubernetes_role_binding_v1" "kubectl_istio_pod_reader" {
+  metadata {
+    name      = "kubectl-istio-pod-reader"
+    namespace = kubernetes_namespace.istio.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role_v1.istio_pod_reader.metadata[0].name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.istio_kubectl.metadata[0].name
+    namespace = kubernetes_namespace.istio.metadata[0].name
+  }
+}
+
+resource "kubernetes_job_v1" "wait_istio_crds" {
+  metadata {
+    name      = "wait-istio-crds"
+    namespace = kubernetes_namespace.istio.metadata[0].name
+  }
+  spec {
+    template {
+      metadata {}
+      spec {
+        service_account_name = kubernetes_service_account_v1.istio_kubectl.metadata[0].name
+        container {
+          name  = "kubectl"
+          image = "bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
+          args  = ["wait", "--for=condition=Ready", "helmrelease/istio-operator"]
+        }
+        restart_policy = "Never"
+      }
+    }
+  }
+  wait_for_completion = true
+
+  depends_on = [
+    kubernetes_role_binding_v1.kubectl_istio_pod_reader,
+    kubectl_manifest.istio_operator_helm_release,
+  ]
 }

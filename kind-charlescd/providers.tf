@@ -28,3 +28,5 @@ provider "kubectl" {
   cluster_ca_certificate = kind_cluster.charlescd.cluster_ca_certificate
   load_config_file       = false
 }
+
+data "kubectl_server_version" "current" {}
