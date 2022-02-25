@@ -52,6 +52,7 @@ spec:
   chart:
     spec:
       chart: postgresql
+      version: ">=10.0.0 <11.0.0"
       sourceRef:
         kind: HelmRepository
         name: bitnami
