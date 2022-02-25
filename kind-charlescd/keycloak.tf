@@ -106,9 +106,9 @@ resource "kubernetes_role_v1" "postgresql_helmreleases_reader" {
   }
 }
 
-resource "kubernetes_role_binding_v1" "kubectl_keycloak_helmreleases_reader" {
+resource "kubernetes_role_binding_v1" "kubectl_postgresql_helmreleases_reader" {
   metadata {
-    name      = "kubectl-keycloak-helmreleases-reader"
+    name      = "kubectl-postgresql-helmreleases-reader"
     namespace = kubernetes_namespace.postgresql.metadata[0].name
   }
   role_ref {
@@ -148,7 +148,7 @@ resource "kubernetes_job_v1" "wait_postgresql" {
   wait_for_completion = true
 
   depends_on = [
-    kubernetes_role_binding_v1.kubectl_keycloak_helmreleases_reader,
+    kubernetes_role_binding_v1.kubectl_postgresql_helmreleases_reader,
     kubectl_manifest.postgresql_helm_release,
   ]
 }
