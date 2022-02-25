@@ -137,7 +137,8 @@ resource "kubernetes_job_v1" "wait_postgresql" {
           name  = "kubectl"
           image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
           args  = [
-            "wait", "--for=condition=Ready", "helmrelease/postgresql", "--timeout=5m",
+            "wait", "--for=condition=Ready", "helmrelease/postgresql",
+            "--timeout", local.default_timeouts,
             "-n", kubernetes_namespace.postgresql.metadata[0].name
           ]
         }
@@ -146,6 +147,11 @@ resource "kubernetes_job_v1" "wait_postgresql" {
     }
   }
   wait_for_completion = true
+
+  timeouts {
+    create = local.default_timeouts
+    update = local.default_timeouts
+  }
 
   depends_on = [
     kubernetes_role_binding_v1.kubectl_postgresql_helmreleases_reader,
