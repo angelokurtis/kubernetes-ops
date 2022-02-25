@@ -1,53 +1,53 @@
-locals {
-  keycloak = {
-    version = "15.0.2"
-    host    = "keycloak.${local.cluster_domain}"
-  }
-}
+resource "kubectl_manifest" "keycloak_helm_release" {
+  yaml_body = <<YAML
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: keycloak
+  namespace: ${kubernetes_namespace.keycloak.metadata[0].name}
+spec:
+  interval: ${local.flux.default_interval}
+  chart:
+    spec:
+      chart: keycloak
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: default
+  values:
+    auth:
+      adminUser: admin
+      existingSecretPerPassword:
+        adminPassword:
+          name: ${kubernetes_secret.keycloak_passwords.metadata[0].name}
+        databasePassword:
+          name: ${kubernetes_secret.keycloak_passwords.metadata[0].name}
+        managementPassword:
+          name: ${kubernetes_secret.keycloak_passwords.metadata[0].name}
+    externalDatabase:
+      existingSecret: ${kubernetes_secret.database_env_vars.metadata[0].name}
+    extraEnvVars:
+      - name: KEYCLOAK_LOGLEVEL
+        value: DEBUG
+      - name: ROOT_LOGLEVEL
+        value: DEBUG
+    ingress:
+      annotations:
+        "kubernetes.io/ingress.class": istio
+      enabled: true
+      hostname: "${local.keycloak.host}"
+      pathType: Prefix
+    postgresql:
+      enabled: false
+    service:
+      type: ClusterIP
+YAML
 
-resource "helm_release" "keycloak" {
-  name      = "keycloak"
-  namespace = kubernetes_namespace.iam.metadata[0].name
-
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "keycloak"
-  version    = "5.0.7"
-
-  set {
-    name  = "nameOverride"
-    value = "keycloak"
-  }
-
-  values = [
-    yamlencode({
-      image            = { repository = "bitnami/keycloak", tag = local.keycloak.version }
-      auth             = {
-        adminUser                 = "admin"
-        existingSecretPerPassword = {
-          adminPassword      = { name = kubernetes_secret.keycloak_passwords.metadata[0].name }
-          managementPassword = { name = kubernetes_secret.keycloak_passwords.metadata[0].name }
-          databasePassword   = { name = kubernetes_secret.keycloak_passwords.metadata[0].name }
-        }
-      }
-      ingress          = {
-        enabled     = true
-        hostname    = local.keycloak.host
-        pathType    = "Prefix"
-        annotations = {
-          "kubernetes.io/ingress.class" = "istio"
-        }
-      }
-      service          = { type = "ClusterIP" }
-      extraEnvVars     = [
-        { name = "KEYCLOAK_LOGLEVEL", value = "DEBUG" },
-        { name = "ROOT_LOGLEVEL", value = "DEBUG" }
-      ]
-      postgresql       = { enabled = false }
-      externalDatabase = { existingSecret = kubernetes_secret.database_env_vars.metadata[0].name }
-    })
+  depends_on = [
+    kubectl_manifest.fluxcd,
+    kubectl_manifest.bitnami_helm_repository,
+    kubectl_manifest.postgresql_helm_release,
   ]
-
-  depends_on = [helm_release.postgresql]
 }
 
 resource "random_password" "keycloak_admin" {
@@ -61,7 +61,7 @@ resource "random_password" "keycloak_management" {
 resource "kubernetes_secret" "keycloak_passwords" {
   metadata {
     name      = "keycloak-passwords"
-    namespace = kubernetes_namespace.iam.metadata[0].name
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
   data = {
     adminPassword      = random_password.keycloak_admin.result
@@ -73,16 +73,82 @@ resource "kubernetes_secret" "keycloak_passwords" {
 resource "kubernetes_secret" "database_env_vars" {
   metadata {
     name      = "database-env-vars"
-    namespace = kubernetes_namespace.iam.metadata[0].name
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
   data = {
-    KEYCLOAK_DATABASE_HOST = "postgresql.${kubernetes_namespace.database.metadata[0].name}.svc.cluster.local"
+    KEYCLOAK_DATABASE_HOST = "postgresql.${kubernetes_namespace.postgresql.metadata[0].name}.svc.cluster.local"
     KEYCLOAK_DATABASE_PORT = 5432
     KEYCLOAK_DATABASE_NAME = local.database["keycloak"]["database"]
     KEYCLOAK_DATABASE_USER = local.database["keycloak"]["user"]
   }
 }
 
-resource "kubernetes_namespace" "iam" {
-  metadata { name = "iam" }
+resource "kubernetes_namespace" "keycloak" {
+  metadata { name = var.keycloak_namespace }
+}
+
+resource "kubernetes_service_account_v1" "keycloak_kubectl" {
+  metadata {
+    name      = "kubectl"
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
+  }
+}
+
+resource "kubernetes_role_v1" "postgresql_helmreleases_reader" {
+  metadata {
+    name      = "postgresql-helmreleases-reader"
+    namespace = kubernetes_namespace.postgresql.metadata[0].name
+  }
+  rule {
+    api_groups = ["helm.toolkit.fluxcd.io"]
+    resources  = ["helmreleases"]
+    verbs      = ["get", "list", "watch"]
+  }
+}
+
+resource "kubernetes_role_binding_v1" "kubectl_keycloak_helmreleases_reader" {
+  metadata {
+    name      = "kubectl-keycloak-helmreleases-reader"
+    namespace = kubernetes_namespace.postgresql.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role_v1.postgresql_helmreleases_reader.metadata[0].name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.keycloak_kubectl.metadata[0].name
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
+  }
+}
+
+resource "kubernetes_job_v1" "wait_postgresql" {
+  metadata {
+    name      = "wait-postgresql"
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
+  }
+  spec {
+    template {
+      metadata {}
+      spec {
+        service_account_name = kubernetes_service_account_v1.keycloak_kubectl.metadata[0].name
+        container {
+          name  = "kubectl"
+          image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
+          args  = [
+            "wait", "--for=condition=Ready", "helmrelease/postgresql", "--timeout=5m",
+            "-n", kubernetes_namespace.postgresql.metadata[0].name
+          ]
+        }
+        restart_policy = "Never"
+      }
+    }
+  }
+  wait_for_completion = true
+
+  depends_on = [
+    kubernetes_role_binding_v1.kubectl_keycloak_helmreleases_reader,
+    kubectl_manifest.postgresql_helm_release,
+  ]
 }
