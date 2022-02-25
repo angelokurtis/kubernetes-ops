@@ -1,15 +1,24 @@
-resource "kubernetes_job" "keycloak_init" {
+resource "kubernetes_job_v1" "keycloak_init" {
   metadata {
     name      = "keycloak-init"
-    namespace = kubernetes_namespace.iam.metadata[0].name
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
   spec {
     template {
       metadata {}
       spec {
+        service_account_name = kubernetes_service_account_v1.keycloak_kubectl.metadata[0].name
+        init_container {
+          name  = "kubectl"
+          image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
+          args  = [
+            "wait", "--for=condition=Ready", "helmrelease/keycloak",
+            "--timeout", local.default_timeouts,
+          ]
+        }
         container {
           name              = "keycloak-admin-client"
-          image             = "kurtis/keycloak-admin-client:${local.keycloak.version}"
+          image             = "kurtis/keycloak-admin-client:15.0.2"
           image_pull_policy = "Always"
           volume_mount {
             mount_path = "/app/script"
@@ -34,17 +43,24 @@ resource "kubernetes_job" "keycloak_init" {
         restart_policy = "Never"
       }
     }
-    backoff_limit = 4
   }
   wait_for_completion = true
 
-  depends_on = [helm_release.keycloak]
+  timeouts {
+    create = local.default_timeouts
+    update = local.default_timeouts
+  }
+
+  depends_on = [
+    kubernetes_role_binding_v1.kubectl_keycloak_helmreleases_reader,
+    kubectl_manifest.keycloak_helm_release
+  ]
 }
 
 resource "kubernetes_config_map" "keycloak_scripts" {
   metadata {
     name      = "keycloak-scripts"
-    namespace = kubernetes_namespace.iam.metadata[0].name
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
   data = {
     "keycloak-init.js" = file("${path.cwd}/keycloak-init.js")
@@ -64,10 +80,10 @@ resource "random_password" "charlescd_user_password" {
 resource "kubernetes_secret" "keycloak_init_env_vars" {
   metadata {
     name      = "keycloak-init-env-vars"
-    namespace = kubernetes_namespace.iam.metadata[0].name
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
   data = {
-    BASE_URL      = "http://keycloak.${kubernetes_namespace.iam.metadata[0].name}.svc.cluster.local/auth"
+    BASE_URL      = "http://keycloak.${kubernetes_namespace.keycloak.metadata[0].name}.svc.cluster.local/auth"
     REALM_NAME    = "master"
     CLIENT_ID     = "admin-cli"
     USERNAME      = "admin"
@@ -75,5 +91,34 @@ resource "kubernetes_secret" "keycloak_init_env_vars" {
     GRANT_TYPE    = "password"
     CLIENT_SECRET = random_password.charlescd_client_secret.result
     USER_PASSWORD = random_password.charlescd_user_password.result
+  }
+}
+
+resource "kubernetes_role_v1" "keycloak_helmreleases_reader" {
+  metadata {
+    name      = "keycloak-helmreleases-reader"
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
+  }
+  rule {
+    api_groups = ["helm.toolkit.fluxcd.io"]
+    resources  = ["helmreleases"]
+    verbs      = ["get", "list", "watch"]
+  }
+}
+
+resource "kubernetes_role_binding_v1" "kubectl_keycloak_helmreleases_reader" {
+  metadata {
+    name      = "kubectl-keycloak-helmreleases-reader"
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role_v1.keycloak_helmreleases_reader.metadata[0].name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.keycloak_kubectl.metadata[0].name
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
 }
