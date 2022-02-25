@@ -96,9 +96,9 @@ resource "kubernetes_service_account_v1" "istio_kubectl" {
   }
 }
 
-resource "kubernetes_role_v1" "istio_pod_reader" {
+resource "kubernetes_role_v1" "istio_helmreleases_reader" {
   metadata {
-    name      = "istio-pod-reader"
+    name      = "istio-helmreleases-reader"
     namespace = kubernetes_namespace.istio.metadata[0].name
   }
   rule {
@@ -108,15 +108,15 @@ resource "kubernetes_role_v1" "istio_pod_reader" {
   }
 }
 
-resource "kubernetes_role_binding_v1" "kubectl_istio_pod_reader" {
+resource "kubernetes_role_binding_v1" "kubectl_istio_helmreleases_reader" {
   metadata {
-    name      = "kubectl-istio-pod-reader"
+    name      = "kubectl-istio-helmreleases-reader"
     namespace = kubernetes_namespace.istio.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Role"
-    name      = kubernetes_role_v1.istio_pod_reader.metadata[0].name
+    name      = kubernetes_role_v1.istio_helmreleases_reader.metadata[0].name
   }
   subject {
     kind      = "ServiceAccount"
@@ -137,7 +137,7 @@ resource "kubernetes_job_v1" "wait_istio_crds" {
         service_account_name = kubernetes_service_account_v1.istio_kubectl.metadata[0].name
         container {
           name  = "kubectl"
-          image = "bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
+          image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
           args  = ["wait", "--for=condition=Ready", "helmrelease/istio-operator", "--timeout=5m"]
         }
         restart_policy = "Never"
@@ -147,7 +147,7 @@ resource "kubernetes_job_v1" "wait_istio_crds" {
   wait_for_completion = true
 
   depends_on = [
-    kubernetes_role_binding_v1.kubectl_istio_pod_reader,
+    kubernetes_role_binding_v1.kubectl_istio_helmreleases_reader,
     kubectl_manifest.istio_operator_helm_release,
   ]
 }
