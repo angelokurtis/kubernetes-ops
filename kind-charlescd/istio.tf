@@ -138,7 +138,7 @@ resource "kubernetes_job_v1" "wait_istio_crds" {
         container {
           name  = "kubectl"
           image = "bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
-          args  = ["wait", "--for=condition=Ready", "helmrelease/istio-operator"]
+          args  = ["wait", "--for=condition=Ready", "helmrelease/istio-operator", "--timeout=5m"]
         }
         restart_policy = "Never"
       }
