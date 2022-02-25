@@ -11,4 +11,8 @@ locals {
   keycloak = {
     host = "keycloak.${local.domain}"
   }
+  charlescd = {
+    version = "1.0.1"
+    host    = "charlescd.${local.domain}"
+  }
 }

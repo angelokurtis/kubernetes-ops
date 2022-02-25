@@ -21,3 +21,7 @@ variable "redis_namespace" {
 variable "keycloak_namespace" {
   default = "keycloak"
 }
+
+variable "charlescd_namespace" {
+  default = "charlescd"
+}
