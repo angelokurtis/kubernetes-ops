@@ -17,3 +17,7 @@ variable "postgresql_namespace" {
 variable "redis_namespace" {
   default = "redis"
 }
+
+variable "keycloak_namespace" {
+  default = "keycloak"
+}
