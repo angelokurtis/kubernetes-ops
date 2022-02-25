@@ -138,13 +138,18 @@ resource "kubernetes_job_v1" "wait_istio_crds" {
         container {
           name  = "kubectl"
           image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
-          args  = ["wait", "--for=condition=Ready", "helmrelease/istio-operator", "--timeout=5m"]
+          args  = ["wait", "--for=condition=Ready", "helmrelease/istio-operator", "--timeout", local.default_timeouts]
         }
         restart_policy = "Never"
       }
     }
   }
   wait_for_completion = true
+
+  timeouts {
+    create = local.default_timeouts
+    update = local.default_timeouts
+  }
 
   depends_on = [
     kubernetes_role_binding_v1.kubectl_istio_helmreleases_reader,

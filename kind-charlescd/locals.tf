@@ -1,6 +1,7 @@
 locals {
-  domain = "lvh.me"
-  flux   = {
+  domain           = "lvh.me"
+  default_timeouts = "5m"
+  flux             = {
     version          = "v0.27.1"
     default_interval = "60m"
   }
