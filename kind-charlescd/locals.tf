@@ -7,4 +7,7 @@ locals {
   istio = {
     version = "1.13.1"
   }
+  keycloak = {
+    host = "keycloak.${local.domain}"
+  }
 }
