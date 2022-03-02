@@ -9,7 +9,7 @@ spec:
   interval: ${local.flux.default_interval}
   url: https://github.com/ZupIT/charlescd
   ref:
-    branch: "main"
+    branch: "bugfix/stable-envoy-version"
 YAML
 
   depends_on = [kubectl_manifest.fluxcd]
@@ -28,10 +28,10 @@ spec:
     CharlesApplications:
       butler:
         database:
-          host: postgresql.postgresql.svc.cluster.local
-          name: charlescd_butler_db
-          password: W9SOIlBfhHLk5dhy
-          user: charlescd_butler
+          host: "postgresql.${kubernetes_namespace.postgresql.metadata[0].name}.svc.cluster.local"
+          name: ${local.database["charlescd_butler"]["database"]}
+          user: "${local.database["charlescd_butler"]["user"]}"
+          password: "${local.database["charlescd_butler"]["password"]}"
         healthCheck:
           initialDelay: 5
         image:
