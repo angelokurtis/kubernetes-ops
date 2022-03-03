@@ -8,7 +8,7 @@ resource "kind_cluster" "rbac" {
 
     node {
       role = "control-plane"
-      image = "kindest/node:v1.21.2"
+      image = "kindest/node@sha256:0df8215895129c0d3221cda19847d1296c4f29ec93487339149333bd9d899e5a" // v1.23.3
 
       kubeadm_config_patches = [
         yamlencode({

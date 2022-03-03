@@ -1,23 +1,34 @@
 terraform {
   required_providers {
-    kind = {
-      source = "kyma-incubator/kind"
-      version = "0.0.9"
-    }
-    kustomization = {
-      source = "kbst/kustomization"
-      version = "0.5.0"
-    }
+    kind       = { source = "kyma-incubator/kind", version = ">= 0.0" }
+    flux       = { source = "fluxcd/flux", version = ">= 0.11" }
+    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.8" }
+    kubectl    = { source = "gavinbunney/kubectl", version = ">= 1.13" }
   }
-  required_version = ">= 0.14"
-}
-
-provider "helm" {
-  kubernetes { config_path = kind_cluster.rbac.kubeconfig_path }
+  required_version = ">= 1.0"
 }
 
 provider "kind" {}
 
-provider "kubernetes" { config_path = kind_cluster.rbac.kubeconfig_path }
+provider "flux" {}
 
-provider "kustomization" { kubeconfig_path = kind_cluster.rbac.kubeconfig_path }
+provider "kubernetes" {
+  host = kind_cluster.rbac.endpoint
+
+  client_certificate     = kind_cluster.rbac.client_certificate
+  client_key             = kind_cluster.rbac.client_key
+  cluster_ca_certificate = kind_cluster.rbac.cluster_ca_certificate
+}
+
+provider "kubectl" {
+  host = kind_cluster.rbac.endpoint
+
+  client_certificate     = kind_cluster.rbac.client_certificate
+  client_key             = kind_cluster.rbac.client_key
+  cluster_ca_certificate = kind_cluster.rbac.cluster_ca_certificate
+  load_config_file       = false
+}
+
+data "kubectl_server_version" "current" {
+  depends_on = [kind_cluster.rbac]
+}
