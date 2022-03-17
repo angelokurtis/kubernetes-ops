@@ -19,7 +19,7 @@ apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
   name: istio
-  namespace: ${kubernetes_namespace.istio.metadata[0].name}
+  namespace: default
 spec:
   interval: ${local.fluxcd.default_interval}
   url: https://github.com/istio/istio
