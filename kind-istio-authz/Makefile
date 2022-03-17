@@ -15,7 +15,7 @@ up: init ## Starts a Kubernetes cluster running local using Docker containers an
 	terraform apply -auto-approve -var-file="testing.tfvars"
 
 down: clean ## Uninstall all solution components and destroy the local Kubernetes cluster
-	kind delete clusters charlescd-operator
+	kind delete clusters istio-cluster
 
 clean: ## Removing all Terraform generated config files
-	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* charlescd-operator-config
+	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* istio-cluster-config
