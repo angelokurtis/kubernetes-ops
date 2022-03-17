@@ -18,6 +18,7 @@ spec:
       sourceRef:
         kind: GitRepository
         name: istio
+        namespace: default
 YAML
 
   depends_on = [
@@ -78,7 +79,7 @@ YAML
   depends_on = [
     kubectl_manifest.fluxcd,
     kubectl_manifest.istio_operator_helm_release,
-    kubernetes_job_v1.wait_istio_crds
+    kubernetes_job_v1.wait_istio_operator
   ]
 }
 
@@ -125,9 +126,9 @@ resource "kubernetes_role_binding_v1" "kubectl_istio_helmreleases_reader" {
   }
 }
 
-resource "kubernetes_job_v1" "wait_istio_crds" {
+resource "kubernetes_job_v1" "wait_istio_operator" {
   metadata {
-    name      = "wait-istio-crds"
+    name      = "wait-istio-operator"
     namespace = kubernetes_namespace.istio.metadata[0].name
   }
   spec {
@@ -138,7 +139,10 @@ resource "kubernetes_job_v1" "wait_istio_crds" {
         container {
           name  = "kubectl"
           image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
-          args  = ["wait", "--for=condition=Ready", "helmrelease/istio-operator", "--timeout", local.default_timeouts]
+          args  = [
+            "wait", "--for=condition=Ready", "helmrelease.helm.toolkit.fluxcd.io/istio-operator",
+            "--timeout", local.default_timeouts
+          ]
         }
         restart_policy = "Never"
       }
