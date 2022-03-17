@@ -1,7 +1,7 @@
 data "flux_install" "main" {
-  version        = "v${local.flux.version}"
+  version        = local.fluxcd.version
   target_path    = "fluxcd"
-  namespace      = local.flux.namespace
+  namespace      = local.fluxcd.namespace
   network_policy = false
 }
 
@@ -18,11 +18,11 @@ resource "kubectl_manifest" "fluxcd" {
 
 resource "kubernetes_namespace" "fluxcd" {
   metadata {
-    name   = local.flux.namespace
+    name   = local.fluxcd.namespace
     labels = {
       "app.kubernetes.io/instance" = "fluxcd"
       "app.kubernetes.io/part-of"  = "flux"
-      "app.kubernetes.io/version"  = "v${local.flux.version}"
+      "app.kubernetes.io/version"  = local.fluxcd.version
     }
   }
 }

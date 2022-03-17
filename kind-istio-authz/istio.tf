@@ -6,7 +6,7 @@ metadata:
   name: istio-operator
   namespace: ${kubernetes_namespace.istio.metadata[0].name}
 spec:
-  interval: ${local.flux.default_interval}
+  interval: ${local.fluxcd.default_interval}
   values:
     operatorNamespace: ${kubernetes_namespace.istio.metadata[0].name}
     watchedNamespaces: ${kubernetes_namespace.istio.metadata[0].name}
