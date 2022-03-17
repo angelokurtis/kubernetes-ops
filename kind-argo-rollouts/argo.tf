@@ -8,6 +8,7 @@ locals {
   }
   applications = [
     merge(local.default_application, local.ingress_nginx),
+    merge(local.default_application, local.argo_rollouts),
   ]
 }
 
