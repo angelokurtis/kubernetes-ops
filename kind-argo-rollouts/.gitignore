@@ -3,6 +3,7 @@ override.tf.json
 override.tf
 crash.log
 crash.*.log
+.tmp/
 .terraformrc
 *_override.tf.json
 *_override.tf

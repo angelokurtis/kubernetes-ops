@@ -1,3 +1,8 @@
+locals {
+  ingress_ip   = "127.0.0.1"
+  cluster_host = local.ingress_ip == "127.0.0.1" ? "lvh.me" : "${join("", formatlist("%02x", split(".", local.ingress_ip)))}.nip.io"
+}
+
 resource "kind_cluster" "argo_rollouts" {
   name           = "argo-rollouts"
   wait_for_ready = true
@@ -20,6 +25,18 @@ resource "kind_cluster" "argo_rollouts" {
       extra_mounts {
         container_path = "/var/lib/containerd"
         host_path      = "/var/lib/docker/volumes/${var.docker_volume}/_data"
+      }
+
+      extra_port_mappings {
+        container_port = 80
+        host_port      = 80
+        protocol       = "TCP"
+      }
+
+      extra_port_mappings {
+        container_port = 443
+        host_port      = 443
+        protocol       = "TCP"
       }
     }
   }

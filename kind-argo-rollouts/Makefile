@@ -8,6 +8,9 @@ help: ## This help.
 init: ## Initialize Terraform configurations
 	terraform init -upgrade=true
 
+plan: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+	terraform plan -var-file="testing.tfvars"
+
 up: init ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
 	terraform apply -auto-approve -var-file="testing.tfvars"
 
