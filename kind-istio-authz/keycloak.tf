@@ -10,6 +10,7 @@ spec:
   chart:
     spec:
       chart: keycloak
+      reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
         name: bitnami

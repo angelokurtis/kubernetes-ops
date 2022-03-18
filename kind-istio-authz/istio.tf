@@ -15,6 +15,7 @@ spec:
   chart:
     spec:
       chart: manifests/charts/istio-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository
         name: istio

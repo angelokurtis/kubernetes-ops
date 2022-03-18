@@ -47,6 +47,7 @@ spec:
   chart:
     spec:
       chart: postgresql
+      reconcileStrategy: ChartVersion
       version: ">=10.0.0 <11.0.0"
       sourceRef:
         kind: HelmRepository
