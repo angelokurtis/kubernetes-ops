@@ -29,3 +29,20 @@ YAML
 
   depends_on = [kubectl_manifest.fluxcd]
 }
+
+resource "kubectl_manifest" "football_bets_git_repository" {
+  yaml_body = <<YAML
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: football-bets
+  namespace: default
+spec:
+  interval: ${local.fluxcd.default_interval}
+  url: https://github.com/tiagoangelozup/football-bets
+  ref:
+    branch: "main"
+YAML
+
+  depends_on = [kubectl_manifest.fluxcd]
+}
