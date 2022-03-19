@@ -107,6 +107,13 @@ resource "kubernetes_role_v1" "keycloak_helmreleases_reader" {
   }
 }
 
+resource "kubernetes_service_account_v1" "keycloak_kubectl" {
+  metadata {
+    name      = "kubectl"
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
+  }
+}
+
 resource "kubernetes_role_binding_v1" "kubectl_keycloak_helmreleases_reader" {
   metadata {
     name      = "kubectl-keycloak-helmreleases-reader"
