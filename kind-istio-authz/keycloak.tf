@@ -6,6 +6,9 @@ metadata:
   name: keycloak
   namespace: ${kubernetes_namespace.keycloak.metadata[0].name}
 spec:
+  dependsOn:
+    - name: postgresql
+      namespace: ${kubernetes_namespace.postgresql.metadata[0].name}
   interval: ${local.fluxcd.default_interval}
   chart:
     spec:
