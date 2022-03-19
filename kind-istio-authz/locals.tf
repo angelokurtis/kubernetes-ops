@@ -5,6 +5,7 @@ locals {
   fluxcd           = {
     version          = "v0.27.4"
     default_interval = "60m"
+    default_timeout  = "5m"
     namespace        = "fluxcd"
   }
   istio = {

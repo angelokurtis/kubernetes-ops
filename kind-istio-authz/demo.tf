@@ -26,6 +26,6 @@ YAML
 resource "kubernetes_namespace" "demo" {
   metadata {
     name   = "demo"
-    labels = { istio-injection = "enabled" }
+    labels = { "istio.io/rev" = replace(local.istio.version, ".", "-") }
   }
 }
