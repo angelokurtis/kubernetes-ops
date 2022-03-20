@@ -35,12 +35,6 @@ spec:
         value: DEBUG
       - name: ROOT_LOGLEVEL
         value: DEBUG
-    ingress:
-      annotations:
-        "kubernetes.io/ingress.class": istio
-      enabled: true
-      hostname: "${local.keycloak.host}"
-      pathType: Prefix
     postgresql:
       enabled: false
     service:
@@ -85,6 +79,57 @@ resource "kubernetes_secret" "database_env_vars" {
     KEYCLOAK_DATABASE_NAME = local.database["keycloak"]["database"]
     KEYCLOAK_DATABASE_USER = local.database["keycloak"]["user"]
   }
+}
+
+resource "kubectl_manifest" "keycloak_gateway" {
+  yaml_body = <<YAML
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: keycloak
+  namespace: ${kubernetes_namespace.keycloak.metadata[0].name}
+spec:
+  selector:
+    istio: "ingressgateway"
+  servers:
+    - hosts:
+        - ${local.keycloak.host}
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+YAML
+
+  depends_on = [
+    kubectl_manifest.istio,
+    kubectl_manifest.kiali_helm_release
+  ]
+}
+
+resource "kubectl_manifest" "keycloak_virtual_service" {
+  yaml_body = <<YAML
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: keycloak
+  namespace: ${kubernetes_namespace.keycloak.metadata[0].name}
+spec:
+  gateways:
+    - keycloak
+  hosts:
+    - ${local.keycloak.host}
+  http:
+    - route:
+        - destination:
+            host: "keycloak.${kubernetes_namespace.keycloak.metadata[0].name}.svc.cluster.local"
+            port:
+              number: 80
+YAML
+
+  depends_on = [
+    kubectl_manifest.istio,
+    kubectl_manifest.keycloak_helm_release
+  ]
 }
 
 resource "kubernetes_namespace" "keycloak" {
