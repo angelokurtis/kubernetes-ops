@@ -11,6 +11,13 @@ locals {
   istio = {
     version   = "1.13.2"
     namespace = "istio"
+    addons    = {
+      gateway = "addons"
+      hosts   = [local.kiali.host]
+    }
+  }
+  kiali = {
+    host = "kiali.${local.cluster_host}"
   }
   keycloak = {
     host      = "keycloak.${local.cluster_host}"
