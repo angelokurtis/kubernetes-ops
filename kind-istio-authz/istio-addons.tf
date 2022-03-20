@@ -48,6 +48,9 @@ spec:
       ingress_enabled: false
       pod_annotations:
         "sidecar.istio.io/inject": "false"
+    external_services:
+      prometheus:
+        url: http://prometheus.${local.istio.namespace}:9090
     login_token:
       signing_key: "${random_password.kiali_signing_key.result}"
 YAML
@@ -88,3 +91,48 @@ resource "random_password" "kiali_signing_key" {
   length = 16
 }
 
+
+resource "kubectl_manifest" "prometheus_helm_release" {
+  yaml_body = <<YAML
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: prometheus
+  namespace: ${kubernetes_namespace.istio.metadata[0].name}
+spec:
+  interval: ${local.fluxcd.default_interval}
+  chart:
+    spec:
+      chart: prometheus
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus
+        namespace: default
+  values:
+    alertmanager:
+      enabled: false
+    kubeStateMetrics:
+      enabled: false
+    nodeExporter:
+      enabled: false
+    pushgateway:
+      enabled: false
+    server:
+      fullnameOverride: "prometheus"
+      global:
+        scrape_interval: "15s"
+      persistentVolume:
+        enabled: false
+      podAnnotations:
+        "sidecar.istio.io/inject": "false"
+      readinessProbeInitialDelay: 0
+      service:
+        servicePort: 9090
+YAML
+
+  depends_on = [
+    kubectl_manifest.fluxcd,
+    kubectl_manifest.prometheus_helm_repository
+  ]
+}

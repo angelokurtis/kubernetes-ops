@@ -69,3 +69,18 @@ YAML
 
   depends_on = [kubectl_manifest.fluxcd]
 }
+
+resource "kubectl_manifest" "prometheus_helm_repository" {
+  yaml_body = <<YAML
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: prometheus
+  namespace: default
+spec:
+  interval: ${local.fluxcd.default_interval}
+  url: https://prometheus-community.github.io/helm-charts
+YAML
+
+  depends_on = [kubectl_manifest.fluxcd]
+}
