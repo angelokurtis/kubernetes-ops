@@ -10,7 +10,7 @@ resource "kubernetes_job_v1" "keycloak_init" {
         service_account_name = kubernetes_service_account_v1.keycloak_kubectl.metadata[0].name
         init_container {
           name  = "kubectl"
-          image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
+          image = "docker.io/bitnami/kubectl:1.23"
           args  = [
             "wait", "--for=condition=Ready", "helmrelease/keycloak",
             "--timeout", local.default_timeouts,

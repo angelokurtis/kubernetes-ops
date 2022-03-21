@@ -17,7 +17,7 @@ spec:
 YAML
 
   depends_on = [
-    kubectl_manifest.istio,
+    kubernetes_job_v1.wait_istio,
     kubectl_manifest.kiali_helm_release
   ]
 }
@@ -82,7 +82,7 @@ spec:
 YAML
 
   depends_on = [
-    kubectl_manifest.istio,
+    kubernetes_job_v1.wait_istio,
     kubectl_manifest.kiali_helm_release
   ]
 }

@@ -1,31 +1,24 @@
-resource "kubernetes_service_account_v1" "istio_kubectl" {
+resource "kubernetes_role_v1" "istio_install_reader" {
   metadata {
-    name      = "kubectl"
-    namespace = kubernetes_namespace.istio.metadata[0].name
-  }
-}
-
-resource "kubernetes_role_v1" "istio_helmreleases_reader" {
-  metadata {
-    name      = "istio-helmreleases-reader"
+    name      = "istio-install-reader"
     namespace = kubernetes_namespace.istio.metadata[0].name
   }
   rule {
-    api_groups = ["helm.toolkit.fluxcd.io"]
-    resources  = ["helmreleases"]
+    api_groups = ["install.istio.io"]
+    resources  = ["istiooperators"]
     verbs      = ["get", "list", "watch"]
   }
 }
 
-resource "kubernetes_role_binding_v1" "kubectl_istio_helmreleases_reader" {
+resource "kubernetes_role_binding_v1" "kubectl_istio_install_reader" {
   metadata {
-    name      = "kubectl-istio-helmreleases-reader"
+    name      = "kubectl-istio-install-reader"
     namespace = kubernetes_namespace.istio.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Role"
-    name      = kubernetes_role_v1.istio_helmreleases_reader.metadata[0].name
+    name      = kubernetes_role_v1.istio_install_reader.metadata[0].name
   }
   subject {
     kind      = "ServiceAccount"
@@ -34,9 +27,9 @@ resource "kubernetes_role_binding_v1" "kubectl_istio_helmreleases_reader" {
   }
 }
 
-resource "kubernetes_job_v1" "wait_istio_operator" {
+resource "kubernetes_job_v1" "wait_istio" {
   metadata {
-    name      = "wait-istio-operator"
+    name      = "wait-istio"
     namespace = kubernetes_namespace.istio.metadata[0].name
   }
   spec {
@@ -48,7 +41,7 @@ resource "kubernetes_job_v1" "wait_istio_operator" {
           name  = "kubectl"
           image = "docker.io/bitnami/kubectl:1.23"
           args  = [
-            "wait", "--for=condition=Ready", "helmrelease.helm.toolkit.fluxcd.io/istio-operator",
+            "wait", "--for=jsonpath={.status.status}=HEALTHY", "istiooperator.install.istio.io/istio",
             "--timeout", local.default_timeouts
           ]
         }
@@ -64,7 +57,7 @@ resource "kubernetes_job_v1" "wait_istio_operator" {
   }
 
   depends_on = [
-    kubernetes_role_binding_v1.kubectl_istio_helmreleases_reader,
-    kubectl_manifest.istio_operator_helm_release,
+    kubernetes_role_binding_v1.kubectl_istio_install_reader,
+    kubectl_manifest.istio,
   ]
 }

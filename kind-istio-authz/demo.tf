@@ -19,7 +19,8 @@ YAML
 
   depends_on = [
     kubectl_manifest.fluxcd,
-    kubectl_manifest.football_bets_git_repository
+    kubectl_manifest.football_bets_git_repository,
+    kubernetes_job_v1.wait_istio,
   ]
 }
 
