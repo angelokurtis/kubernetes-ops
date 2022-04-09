@@ -6,13 +6,16 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 init: ## Initialize Terraform configurations
-	terraform init
+	terraform init -upgrade=true
+
+plan: init ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+	terraform plan -var-file="testing.tfvars"
 
 up: init ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
-	terraform apply -auto-approve
+	terraform apply -auto-approve -var-file="testing.tfvars"
 
-down: ## Uninstall all solution components and destroy the local Kubernetes cluster
-	terraform destroy -auto-approve
+down: clean ## Uninstall all solution components and destroy the local Kubernetes cluster
+	kind delete clusters keycloak-cluster
 
 clean: ## Removing all Terraform generated config files
-	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* keycloak-config
+	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* keycloak-cluster-config
