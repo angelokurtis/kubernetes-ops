@@ -40,7 +40,6 @@ resource "kubernetes_ingress_v1" "jaeger_collector" {
       host = "jaeger-collector.lvh.me"
       http {
         path {
-          path = "/*"
           backend {
             service {
               name = "simplest-jaeger-collector"
@@ -54,5 +53,8 @@ resource "kubernetes_ingress_v1" "jaeger_collector" {
     }
   }
 
-  depends_on = [helm_release.jaeger_operator]
+  depends_on = [
+    helm_release.jaeger_operator,
+    helm_release.ingress_nginx
+  ]
 }
