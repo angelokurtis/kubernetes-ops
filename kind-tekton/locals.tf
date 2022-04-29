@@ -7,4 +7,7 @@ locals {
     default_timeout  = "5m"
     namespace        = "fluxcd"
   }
+  tektoncd = {
+    operator = { version = "v0.57.0" }
+  }
 }
