@@ -13,18 +13,18 @@ YAML
   depends_on = [kubectl_manifest.fluxcd]
 }
 
-resource "kubectl_manifest" "tektoncd_operator_git_repository" {
+resource "kubectl_manifest" "tekton_operator_git_repository" {
   yaml_body = <<YAML
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: tektoncd-operator
+  name: tekton-operator
   namespace: ${kubernetes_namespace.fluxcd.metadata[0].name}
 spec:
   interval: ${local.fluxcd.default_interval}
   url: https://github.com/tektoncd/operator
   ref:
-    semver: "~${local.tektoncd.operator.version}"
+    semver: "~${local.tekton.operator.version}"
   ignore: |
     # exclude all
     /*
