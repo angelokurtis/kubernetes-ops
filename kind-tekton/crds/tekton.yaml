@@ -3,7 +3,916 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    kustomize.toolkit.fluxcd.io/name: tektoncd-operator
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+    triggers.tekton.dev/release: v0.19.1
+    version: v0.19.1
+  name: clusterinterceptors.triggers.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonTrigger
+      name: trigger
+      uid: 576cd0c5-b57a-4456-adf7-e87ccd58585e
+spec:
+  conversion:
+    strategy: None
+  group: triggers.tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-triggers
+    kind: ClusterInterceptor
+    listKind: ClusterInterceptorList
+    plural: clusterinterceptors
+    shortNames:
+      - ci
+    singular: clusterinterceptor
+  scope: Cluster
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+    pipeline.tekton.dev/release: v0.35.0
+    version: v0.35.0
+  name: clustertasks.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNqRENDQWpPZ0F3SUJBZ0lSQUpLRzYrQ3QvSGhlTlFBMkxEMzY2b1V3Q2dZSUtvWkl6ajBFQXdJd1JERVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmxiR2x1WlhNdApkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNQjRYRFRJeU1EUXlPVEU0TlRJeU4xb1hEVEl5TURVd05qRTROVEl5Ck4xb3dSREVVTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmwKYkdsdVpYTXRkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRApRZ0FFM01VTnpESmdVNmpaRnFkVFpzNTVPMHlkSVhaODREYjJWZGFJTWw3TVhyVktaUDJpYmVSYzZuYkRUbzVHCjMzYlpjQ1ZORk9sd2lRVjhQb0hWb0U0ZzRxT0NBUVF3Z2dFQU1BNEdBMVVkRHdFQi93UUVBd0lDaERBZEJnTlYKSFNVRUZqQVVCZ2dyQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFkQmdOVgpIUTRFRmdRVTZac252Z2FnM1RpMjB5bno5aTU0ZXgwWTkwc3dnWjRHQTFVZEVRU0JsakNCazRJWWRHVnJkRzl1CkxYQnBjR1ZzYVc1bGN5MTNaV0pvYjI5cmdoOTBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnIKZEc5dWdpTjBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnJkRzl1TG5OMlk0SXhkR1ZyZEc5dQpMWEJwY0dWc2FXNWxjeTEzWldKb2IyOXJMblJsYTNSdmJpNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJEQUtCZ2dxCmhrak9QUVFEQWdOSEFEQkVBaUJqN2lqOW1UZ0pXUnRFZHNTSDJ2YUNLQ3BKQmFBTDJsa2VrcWhic3c2VUZnSWcKVTRnVkxoSFU0WDU5ZTdiVG5TVmNLaHZ0aHFoeGQ0YmphVHI0QnorUGdmcz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+        service:
+          name: tekton-pipelines-webhook
+          namespace: tekton
+          path: /resource-conversion
+          port: 443
+      conversionReviewVersions:
+        - v1beta1
+  group: tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-pipelines
+    kind: ClusterTask
+    listKind: ClusterTaskList
+    plural: clustertasks
+    singular: clustertask
+  scope: Cluster
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+    triggers.tekton.dev/release: v0.19.1
+    version: v0.19.1
+  name: clustertriggerbindings.triggers.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonTrigger
+      name: trigger
+      uid: 576cd0c5-b57a-4456-adf7-e87ccd58585e
+spec:
+  conversion:
+    strategy: None
+  group: triggers.tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-triggers
+    kind: ClusterTriggerBinding
+    listKind: ClusterTriggerBindingList
+    plural: clustertriggerbindings
+    shortNames:
+      - ctb
+    singular: clustertriggerbinding
+  scope: Cluster
+  versions:
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+    pipeline.tekton.dev/release: v0.35.0
+    version: v0.35.0
+  name: conditions.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: None
+  group: tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-pipelines
+    kind: Condition
+    listKind: ConditionList
+    plural: conditions
+    singular: condition
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+    triggers.tekton.dev/release: v0.19.1
+    version: v0.19.1
+  name: eventlisteners.triggers.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonTrigger
+      name: trigger
+      uid: 576cd0c5-b57a-4456-adf7-e87ccd58585e
+spec:
+  conversion:
+    strategy: None
+  group: triggers.tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-triggers
+    kind: EventListener
+    listKind: EventListenerList
+    plural: eventlisteners
+    shortNames:
+      - el
+    singular: eventlistener
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .status.address.url
+          name: Address
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Available')].status
+          name: Available
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Available')].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+          name: Ready
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+          name: Reason
+          type: string
+      name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - additionalPrinterColumns:
+        - jsonPath: .status.address.url
+          name: Address
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Available')].status
+          name: Available
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Available')].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+          name: Ready
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+          name: Reason
+          type: string
+      name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-dashboard
+  name: extensions.dashboard.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonDashboard
+      name: dashboard
+      uid: e592693a-fa1f-4c9d-9ee2-d470e4ea31ba
+spec:
+  conversion:
+    strategy: None
+  group: dashboard.tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-dashboard
+    kind: Extension
+    listKind: ExtensionList
+    plural: extensions
+    shortNames:
+      - ext
+      - exts
+    singular: extension
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .spec.apiVersion
+          name: API version
+          type: string
+        - jsonPath: .spec.name
+          name: Kind
+          type: string
+        - jsonPath: .spec.displayname
+          name: Display name
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+    pipeline.tekton.dev/release: v0.35.0
+    version: v0.35.0
+  name: pipelineresources.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: None
+  group: tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-pipelines
+    kind: PipelineResource
+    listKind: PipelineResourceList
+    plural: pipelineresources
+    singular: pipelineresource
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+    pipeline.tekton.dev/release: v0.35.0
+    version: v0.35.0
+  name: pipelineruns.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNqRENDQWpPZ0F3SUJBZ0lSQUpLRzYrQ3QvSGhlTlFBMkxEMzY2b1V3Q2dZSUtvWkl6ajBFQXdJd1JERVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmxiR2x1WlhNdApkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNQjRYRFRJeU1EUXlPVEU0TlRJeU4xb1hEVEl5TURVd05qRTROVEl5Ck4xb3dSREVVTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmwKYkdsdVpYTXRkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRApRZ0FFM01VTnpESmdVNmpaRnFkVFpzNTVPMHlkSVhaODREYjJWZGFJTWw3TVhyVktaUDJpYmVSYzZuYkRUbzVHCjMzYlpjQ1ZORk9sd2lRVjhQb0hWb0U0ZzRxT0NBUVF3Z2dFQU1BNEdBMVVkRHdFQi93UUVBd0lDaERBZEJnTlYKSFNVRUZqQVVCZ2dyQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFkQmdOVgpIUTRFRmdRVTZac252Z2FnM1RpMjB5bno5aTU0ZXgwWTkwc3dnWjRHQTFVZEVRU0JsakNCazRJWWRHVnJkRzl1CkxYQnBjR1ZzYVc1bGN5MTNaV0pvYjI5cmdoOTBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnIKZEc5dWdpTjBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnJkRzl1TG5OMlk0SXhkR1ZyZEc5dQpMWEJwY0dWc2FXNWxjeTEzWldKb2IyOXJMblJsYTNSdmJpNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJEQUtCZ2dxCmhrak9QUVFEQWdOSEFEQkVBaUJqN2lqOW1UZ0pXUnRFZHNTSDJ2YUNLQ3BKQmFBTDJsa2VrcWhic3c2VUZnSWcKVTRnVkxoSFU0WDU5ZTdiVG5TVmNLaHZ0aHFoeGQ0YmphVHI0QnorUGdmcz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+        service:
+          name: tekton-pipelines-webhook
+          namespace: tekton
+          path: /resource-conversion
+          port: 443
+      conversionReviewVersions:
+        - v1beta1
+  group: tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-pipelines
+    kind: PipelineRun
+    listKind: PipelineRunList
+    plural: pipelineruns
+    shortNames:
+      - pr
+      - prs
+    singular: pipelinerun
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.startTime
+          name: StartTime
+          type: date
+        - jsonPath: .status.completionTime
+          name: CompletionTime
+          type: date
+      name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.startTime
+          name: StartTime
+          type: date
+        - jsonPath: .status.completionTime
+          name: CompletionTime
+          type: date
+      name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.startTime
+          name: StartTime
+          type: date
+        - jsonPath: .status.completionTime
+          name: CompletionTime
+          type: date
+      name: v1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: false
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+    pipeline.tekton.dev/release: v0.35.0
+    version: v0.35.0
+  name: pipelines.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNqRENDQWpPZ0F3SUJBZ0lSQUpLRzYrQ3QvSGhlTlFBMkxEMzY2b1V3Q2dZSUtvWkl6ajBFQXdJd1JERVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmxiR2x1WlhNdApkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNQjRYRFRJeU1EUXlPVEU0TlRJeU4xb1hEVEl5TURVd05qRTROVEl5Ck4xb3dSREVVTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmwKYkdsdVpYTXRkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRApRZ0FFM01VTnpESmdVNmpaRnFkVFpzNTVPMHlkSVhaODREYjJWZGFJTWw3TVhyVktaUDJpYmVSYzZuYkRUbzVHCjMzYlpjQ1ZORk9sd2lRVjhQb0hWb0U0ZzRxT0NBUVF3Z2dFQU1BNEdBMVVkRHdFQi93UUVBd0lDaERBZEJnTlYKSFNVRUZqQVVCZ2dyQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFkQmdOVgpIUTRFRmdRVTZac252Z2FnM1RpMjB5bno5aTU0ZXgwWTkwc3dnWjRHQTFVZEVRU0JsakNCazRJWWRHVnJkRzl1CkxYQnBjR1ZzYVc1bGN5MTNaV0pvYjI5cmdoOTBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnIKZEc5dWdpTjBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnJkRzl1TG5OMlk0SXhkR1ZyZEc5dQpMWEJwY0dWc2FXNWxjeTEzWldKb2IyOXJMblJsYTNSdmJpNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJEQUtCZ2dxCmhrak9QUVFEQWdOSEFEQkVBaUJqN2lqOW1UZ0pXUnRFZHNTSDJ2YUNLQ3BKQmFBTDJsa2VrcWhic3c2VUZnSWcKVTRnVkxoSFU0WDU5ZTdiVG5TVmNLaHZ0aHFoeGQ0YmphVHI0QnorUGdmcz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+        service:
+          name: tekton-pipelines-webhook
+          namespace: tekton
+          path: /resource-conversion
+          port: 443
+      conversionReviewVersions:
+        - v1beta1
+  group: tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-pipelines
+    kind: Pipeline
+    listKind: PipelineList
+    plural: pipelines
+    singular: pipeline
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - name: v1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: false
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    resolution.tekton.dev/release: devel
+  name: resolutionrequests.resolution.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: None
+  group: resolution.tekton.dev
+  names:
+    categories:
+      - all
+      - tekton
+    kind: ResolutionRequest
+    listKind: ResolutionRequestList
+    plural: resolutionrequests
+    singular: resolutionrequest
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=='Succeeded')].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Succeeded')].reason
+          name: Reason
+          type: string
+      name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          properties:
+            spec:
+              description: Spec holds the parameters for the request.
+              properties:
+                params:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              type: object
+            status:
+              description: Status receives the data of a completed request.
+              properties:
+                annotations:
+                  description: Annotations is additional Status fields for the Resource to save some additional State as well as convey more information to the user. This is roughly akin to Annotations on any k8s resource, just the reconciler conveying richer information outwards.
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                conditions:
+                  description: Conditions the latest available observations of a resource's current state.
+                  items:
+                    description: Conditions describe the success and completion state of the resource request.
+                    properties:
+                      lastTransitionTime:
+                        description: LastTransitionTime is the last time the condition transitioned from one status to another. We use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic differences (all other things held constant).
+                        format: date-time
+                        type: string
+                      message:
+                        description: A human readable message indicating details about the transition.
+                        type: string
+                      reason:
+                        description: The reason for the condition's last transition.
+                        type: string
+                      severity:
+                        description: Severity with which to treat failures of this type of condition. When this is not specified, it defaults to Error.
+                        type: string
+                      status:
+                        description: Status of the condition, one of True, False, Unknown.
+                        type: string
+                      type:
+                        description: Type of condition.
+                        type: string
+                    required:
+                      - status
+                      - type
+                    type: object
+                  type: array
+                data:
+                  description: The resolved contents of the requested resource in-lined as a string.
+                  type: string
+                observedGeneration:
+                  description: ObservedGeneration is the 'Generation' of the Service that was last processed by the controller.
+                  format: int64
+                  type: integer
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+    pipeline.tekton.dev/release: v0.35.0
+    version: v0.35.0
+  name: runs.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: None
+  group: tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-pipelines
+    kind: Run
+    listKind: RunList
+    plural: runs
+    singular: run
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.startTime
+          name: StartTime
+          type: date
+        - jsonPath: .status.completionTime
+          name: CompletionTime
+          type: date
+      name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.startTime
+          name: StartTime
+          type: date
+        - jsonPath: .status.completionTime
+          name: CompletionTime
+          type: date
+      name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: false
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+    pipeline.tekton.dev/release: v0.35.0
+    version: v0.35.0
+  name: taskruns.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNqRENDQWpPZ0F3SUJBZ0lSQUpLRzYrQ3QvSGhlTlFBMkxEMzY2b1V3Q2dZSUtvWkl6ajBFQXdJd1JERVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmxiR2x1WlhNdApkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNQjRYRFRJeU1EUXlPVEU0TlRJeU4xb1hEVEl5TURVd05qRTROVEl5Ck4xb3dSREVVTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmwKYkdsdVpYTXRkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRApRZ0FFM01VTnpESmdVNmpaRnFkVFpzNTVPMHlkSVhaODREYjJWZGFJTWw3TVhyVktaUDJpYmVSYzZuYkRUbzVHCjMzYlpjQ1ZORk9sd2lRVjhQb0hWb0U0ZzRxT0NBUVF3Z2dFQU1BNEdBMVVkRHdFQi93UUVBd0lDaERBZEJnTlYKSFNVRUZqQVVCZ2dyQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFkQmdOVgpIUTRFRmdRVTZac252Z2FnM1RpMjB5bno5aTU0ZXgwWTkwc3dnWjRHQTFVZEVRU0JsakNCazRJWWRHVnJkRzl1CkxYQnBjR1ZzYVc1bGN5MTNaV0pvYjI5cmdoOTBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnIKZEc5dWdpTjBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnJkRzl1TG5OMlk0SXhkR1ZyZEc5dQpMWEJwY0dWc2FXNWxjeTEzWldKb2IyOXJMblJsYTNSdmJpNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJEQUtCZ2dxCmhrak9QUVFEQWdOSEFEQkVBaUJqN2lqOW1UZ0pXUnRFZHNTSDJ2YUNLQ3BKQmFBTDJsa2VrcWhic3c2VUZnSWcKVTRnVkxoSFU0WDU5ZTdiVG5TVmNLaHZ0aHFoeGQ0YmphVHI0QnorUGdmcz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+        service:
+          name: tekton-pipelines-webhook
+          namespace: tekton
+          path: /resource-conversion
+          port: 443
+      conversionReviewVersions:
+        - v1beta1
+  group: tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-pipelines
+    kind: TaskRun
+    listKind: TaskRunList
+    plural: taskruns
+    shortNames:
+      - tr
+      - trs
+    singular: taskrun
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.startTime
+          name: StartTime
+          type: date
+        - jsonPath: .status.completionTime
+          name: CompletionTime
+          type: date
+      name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.startTime
+          name: StartTime
+          type: date
+        - jsonPath: .status.completionTime
+          name: CompletionTime
+          type: date
+      name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].status
+          name: Succeeded
+          type: string
+        - jsonPath: .status.conditions[?(@.type=="Succeeded")].reason
+          name: Reason
+          type: string
+        - jsonPath: .status.startTime
+          name: StartTime
+          type: date
+        - jsonPath: .status.completionTime
+          name: CompletionTime
+          type: date
+      name: v1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: false
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+    pipeline.tekton.dev/release: v0.35.0
+    version: v0.35.0
+  name: tasks.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonPipeline
+      name: pipeline
+      uid: cbbb8c13-2bbd-4f0e-b8e4-a0356517d051
+spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNqRENDQWpPZ0F3SUJBZ0lSQUpLRzYrQ3QvSGhlTlFBMkxEMzY2b1V3Q2dZSUtvWkl6ajBFQXdJd1JERVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmxiR2x1WlhNdApkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNQjRYRFRJeU1EUXlPVEU0TlRJeU4xb1hEVEl5TURVd05qRTROVEl5Ck4xb3dSREVVTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeExEQXFCZ05WQkFNVEkzUmxhM1J2Ymkxd2FYQmwKYkdsdVpYTXRkMlZpYUc5dmF5NTBaV3QwYjI0dWMzWmpNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRApRZ0FFM01VTnpESmdVNmpaRnFkVFpzNTVPMHlkSVhaODREYjJWZGFJTWw3TVhyVktaUDJpYmVSYzZuYkRUbzVHCjMzYlpjQ1ZORk9sd2lRVjhQb0hWb0U0ZzRxT0NBUVF3Z2dFQU1BNEdBMVVkRHdFQi93UUVBd0lDaERBZEJnTlYKSFNVRUZqQVVCZ2dyQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFkQmdOVgpIUTRFRmdRVTZac252Z2FnM1RpMjB5bno5aTU0ZXgwWTkwc3dnWjRHQTFVZEVRU0JsakNCazRJWWRHVnJkRzl1CkxYQnBjR1ZzYVc1bGN5MTNaV0pvYjI5cmdoOTBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnIKZEc5dWdpTjBaV3QwYjI0dGNHbHdaV3hwYm1WekxYZGxZbWh2YjJzdWRHVnJkRzl1TG5OMlk0SXhkR1ZyZEc5dQpMWEJwY0dWc2FXNWxjeTEzWldKb2IyOXJMblJsYTNSdmJpNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJEQUtCZ2dxCmhrak9QUVFEQWdOSEFEQkVBaUJqN2lqOW1UZ0pXUnRFZHNTSDJ2YUNLQ3BKQmFBTDJsa2VrcWhic3c2VUZnSWcKVTRnVkxoSFU0WDU5ZTdiVG5TVmNLaHZ0aHFoeGQ0YmphVHI0QnorUGdmcz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+        service:
+          name: tekton-pipelines-webhook
+          namespace: tekton
+          path: /resource-conversion
+          port: 443
+      conversionReviewVersions:
+        - v1beta1
+  group: tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-pipelines
+    kind: Task
+    listKind: TaskList
+    plural: tasks
+    singular: task
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - name: v1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: false
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    kustomize.toolkit.fluxcd.io/name: tekton-operator
     kustomize.toolkit.fluxcd.io/namespace: tekton-operator
     operator.tekton.dev/release: v0.57.0
     version: v0.57.0
@@ -45,7 +954,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    kustomize.toolkit.fluxcd.io/name: tektoncd-operator
+    kustomize.toolkit.fluxcd.io/name: tekton-operator
     kustomize.toolkit.fluxcd.io/namespace: tekton-operator
     operator.tekton.dev/release: v0.57.0
     version: v0.57.0
@@ -87,7 +996,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    kustomize.toolkit.fluxcd.io/name: tektoncd-operator
+    kustomize.toolkit.fluxcd.io/name: tekton-operator
     kustomize.toolkit.fluxcd.io/namespace: tekton-operator
     operator.tekton.dev/release: v0.57.0
     version: v0.57.0
@@ -129,7 +1038,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    kustomize.toolkit.fluxcd.io/name: tektoncd-operator
+    kustomize.toolkit.fluxcd.io/name: tekton-operator
     kustomize.toolkit.fluxcd.io/namespace: tekton-operator
     operator.tekton.dev/release: v0.57.0
     version: v0.57.0
@@ -177,7 +1086,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    kustomize.toolkit.fluxcd.io/name: tektoncd-operator
+    kustomize.toolkit.fluxcd.io/name: tekton-operator
     kustomize.toolkit.fluxcd.io/namespace: tekton-operator
     operator.tekton.dev/release: v0.57.0
     version: v0.57.0
@@ -216,7 +1125,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    kustomize.toolkit.fluxcd.io/name: tektoncd-operator
+    kustomize.toolkit.fluxcd.io/name: tekton-operator
     kustomize.toolkit.fluxcd.io/namespace: tekton-operator
     operator.tekton.dev/release: v0.57.0
     version: v0.57.0
@@ -258,7 +1167,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    kustomize.toolkit.fluxcd.io/name: tektoncd-operator
+    kustomize.toolkit.fluxcd.io/name: tekton-operator
     kustomize.toolkit.fluxcd.io/namespace: tekton-operator
     operator.tekton.dev/release: v0.57.0
     version: v0.57.0
@@ -357,7 +1266,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    kustomize.toolkit.fluxcd.io/name: tektoncd-operator
+    kustomize.toolkit.fluxcd.io/name: tekton-operator
     kustomize.toolkit.fluxcd.io/namespace: tekton-operator
     operator.tekton.dev/release: v0.57.0
     version: v0.57.0
@@ -391,6 +1300,162 @@ spec:
           x-kubernetes-preserve-unknown-fields: true
       served: true
       storage: true
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+    triggers.tekton.dev/release: v0.19.1
+    version: v0.19.1
+  name: triggerbindings.triggers.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonTrigger
+      name: trigger
+      uid: 576cd0c5-b57a-4456-adf7-e87ccd58585e
+spec:
+  conversion:
+    strategy: None
+  group: triggers.tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-triggers
+    kind: TriggerBinding
+    listKind: TriggerBindingList
+    plural: triggerbindings
+    shortNames:
+      - tb
+    singular: triggerbinding
+  scope: Namespaced
+  versions:
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+    triggers.tekton.dev/release: v0.19.1
+    version: v0.19.1
+  name: triggers.triggers.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonTrigger
+      name: trigger
+      uid: 576cd0c5-b57a-4456-adf7-e87ccd58585e
+spec:
+  conversion:
+    strategy: None
+  group: triggers.tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-triggers
+    kind: Trigger
+    listKind: TriggerList
+    plural: triggers
+    shortNames:
+      - tri
+    singular: trigger
+  scope: Namespaced
+  versions:
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+    triggers.tekton.dev/release: v0.19.1
+    version: v0.19.1
+  name: triggertemplates.triggers.tekton.dev
+  ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonTrigger
+      name: trigger
+      uid: 576cd0c5-b57a-4456-adf7-e87ccd58585e
+spec:
+  conversion:
+    strategy: None
+  group: triggers.tekton.dev
+  names:
+    categories:
+      - tekton
+      - tekton-triggers
+    kind: TriggerTemplate
+    listKind: TriggerTemplateList
+    plural: triggertemplates
+    shortNames:
+      - tt
+    singular: triggertemplate
+  scope: Namespaced
+  versions:
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
+      subresources:
+        status: {}
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: false
       subresources:
         status: {}
 

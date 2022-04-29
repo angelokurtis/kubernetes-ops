@@ -66,6 +66,25 @@ YAML
   ]
 }
 
+resource "kubectl_manifest" "tekton_config" {
+  yaml_body = <<YAML
+apiVersion: operator.tekton.dev/v1alpha1
+kind: TektonConfig
+metadata:
+  name: config
+  namespace: ${kubernetes_namespace.tekton_operator.metadata[0].name}
+spec:
+  targetNamespace: tekton
+  profile: all
+  dashboard:
+    readonly: true
+YAML
+
+  depends_on = [
+    kubernetes_job_v1.wait_tekton_operator
+  ]
+}
+
 resource "kubernetes_namespace" "tekton_operator" {
   metadata { name = "tekton-operator" }
   lifecycle {
