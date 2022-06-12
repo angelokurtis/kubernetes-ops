@@ -1,10 +1,3 @@
-locals {
-  flux = {
-    version          = "v0.27.1"
-    default_interval = "60m"
-  }
-}
-
 data "flux_install" "main" {
   version        = local.flux.version
   target_path    = "fluxcd"

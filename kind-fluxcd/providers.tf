@@ -1,9 +1,9 @@
 terraform {
   required_providers {
-    kind       = { source = "kyma-incubator/kind", version = ">= 0.0" }
-    flux       = { source = "fluxcd/flux", version = ">= 0.11" }
-    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.8" }
-    kubectl    = { source = "gavinbunney/kubectl", version = ">= 1.13" }
+    kind       = { source = "tehcyx/kind", version = ">= 0.0.12, < 0.1.0" }
+    flux       = { source = "fluxcd/flux", version = ">= 0.15.1, < 0.16.0" }
+    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.11.0, < 2.12.0" }
+    kubectl    = { source = "gavinbunney/kubectl", version = ">= 1.14.0, < 1.15.0" }
   }
   required_version = ">= 1.0"
 }

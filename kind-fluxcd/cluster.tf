@@ -1,6 +1,5 @@
 resource "kind_cluster" "flux" {
-  name           = "flux"
-  wait_for_ready = true
+  name = "flux"
 
   kind_config {
     kind        = "Cluster"
@@ -8,14 +7,19 @@ resource "kind_cluster" "flux" {
 
     node {
       role  = "control-plane"
-      image = "kindest/node@sha256:0df8215895129c0d3221cda19847d1296c4f29ec93487339149333bd9d899e5a" # v1.23.3
+      image = "kindest/node:${local.kind.version}"
 
       kubeadm_config_patches = [
         yamlencode({
-          "kind"             = "InitConfiguration"
-          "nodeRegistration" = { "kubeletExtraArgs" = { "node-labels" = "ingress-ready=true" } }
-        }),
+          kind             = "InitConfiguration"
+          nodeRegistration = { kubeletExtraArgs = { "node-labels" = "ingress-ready=true" } }
+        })
       ]
+
+      extra_mounts {
+        container_path = "/var/lib/containerd"
+        host_path      = "/var/lib/docker/volumes/${var.docker_volume}/_data"
+      }
 
       extra_port_mappings {
         container_port = 32080

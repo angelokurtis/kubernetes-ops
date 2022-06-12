@@ -1,11 +1,3 @@
-locals {
-  jaeger = {
-    namespace = "tracing"
-    query     = { host = "jaeger.lvh.me" }
-    collector = { host = "jaeger-collector.lvh.me" }
-  }
-}
-
 resource "kubectl_manifest" "jaeger_helm_repository" {
   yaml_body = <<YAML
 apiVersion: source.toolkit.fluxcd.io/v1beta1
