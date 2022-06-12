@@ -28,6 +28,9 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jaeger
+  dependsOn:
+    - name: cert-manager
+      namespace: ${kubernetes_namespace.cert_manager.metadata[0].name}
 YAML
 
   depends_on = [

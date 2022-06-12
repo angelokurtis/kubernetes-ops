@@ -20,3 +20,7 @@ variable "traefik_namespace" {
 variable "jaeger_namespace" {
   default = "jaeger"
 }
+
+variable "cert_manager_namespace" {
+  default = "cert-manager"
+}
