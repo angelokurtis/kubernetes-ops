@@ -28,6 +28,9 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jaeger
+  values:
+    rbac:
+      clusterRole: true
   dependsOn:
     - name: cert-manager
       namespace: ${kubernetes_namespace.cert_manager.metadata[0].name}
@@ -55,6 +58,8 @@ spec:
   storage:
     type: memory
   strategy: allinone
+  allInOne:
+    image: jaegertracing/all-in-one:1.35.1
 YAML
 
   depends_on = [
