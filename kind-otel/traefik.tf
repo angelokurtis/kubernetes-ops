@@ -12,7 +12,7 @@ spec:
   url: https://helm.traefik.io/traefik
 YAML
 
-  depends_on = [kubectl_manifest.fluxcd]
+  depends_on = [kubectl_manifest.fluxcd_two]
 }
 
 resource "kubectl_manifest" "traefik_helm_release" {
@@ -58,7 +58,7 @@ spec:
 YAML
 
   depends_on = [
-    kubectl_manifest.fluxcd,
+    kubectl_manifest.fluxcd_two,
     kubectl_manifest.traefik_helm_repository
   ]
 }

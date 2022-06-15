@@ -23,7 +23,8 @@ up: init ## Starts a Kubernetes cluster running local using Docker containers an
 
 .PHONY: down
 down: clean ## Uninstall all solution components and destroy the local Kubernetes cluster
-	kind delete clusters flux
+	kind delete clusters cluster-one
+	kind delete clusters cluster-two
 
 .PHONY: clean
 clean: ## Removing all Terraform generated config files
