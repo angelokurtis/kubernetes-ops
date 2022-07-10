@@ -3,7 +3,7 @@ locals {
   default_timeouts = "5m"
   kind             = { version = "v1.23.6" }
   flux             = {
-    version          = "v0.31.1"
+    version          = "v0.31.3"
     default_interval = "10s"
     default_timeout  = "5m"
   }
