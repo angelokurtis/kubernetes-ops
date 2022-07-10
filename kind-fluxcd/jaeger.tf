@@ -59,7 +59,7 @@ spec:
     type: memory
   strategy: allinone
   allInOne:
-    image: jaegertracing/all-in-one:1.35.2
+    image: jaegertracing/all-in-one:1.36.0
 YAML
 
   depends_on = [
