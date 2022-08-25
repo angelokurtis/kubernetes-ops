@@ -14,11 +14,11 @@ init: ## Initialize Terraform configurations
 	terraform init -upgrade=true
 
 .PHONY: plan
-plan: init ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+plan: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
 	terraform plan
 
 .PHONY: up
-up: init ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+up: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
 	terraform apply -auto-approve
 
 .PHONY: down

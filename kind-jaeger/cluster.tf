@@ -8,7 +8,7 @@ resource "kind_cluster" "jaeger" {
 
     node {
       role  = "control-plane"
-    image = "kindest/node:v1.23.6"
+      image = "kindest/node:v1.21.12"
 
       kubeadm_config_patches = [
         yamlencode({

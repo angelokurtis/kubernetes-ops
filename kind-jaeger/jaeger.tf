@@ -1,60 +1,24 @@
-resource "kubernetes_namespace" "jaeger" {
-  metadata { name = "jaeger" }
-}
-
-resource "helm_release" "jaeger_operator" {
-  name      = "jaeger-operator"
-  namespace = kubernetes_namespace.jaeger.metadata[0].name
-
-  repository = "https://jaegertracing.github.io/helm-charts"
-  chart      = "jaeger-operator"
-  version    = "2.28.0"
-
-  values = [
-    <<YAML
-    fullnameOverride: simplest
-    jaeger:
-      create: true
-      spec:
-        ingress:
-          enabled: true
-          hosts:
-          - jaeger.lvh.me
-          ingressClassName: nginx
-        storage:
-          type: memory
-        strategy: allinone
-    YAML
-  ]
-}
-
-resource "kubernetes_ingress_v1" "jaeger_collector" {
-  wait_for_load_balancer = true
-  metadata {
-    name      = "jaeger-collector"
-    namespace = kubernetes_namespace.jaeger.metadata[0].name
-  }
-  spec {
-    ingress_class_name = "nginx"
-    rule {
-      host = "jaeger-collector.lvh.me"
-      http {
-        path {
-          backend {
-            service {
-              name = "simplest-jaeger-collector"
-              port {
-                number = 14268
-              }
-            }
-          }
+locals {
+  jaeger = {
+    namespace       = kubernetes_namespace_v1.jaeger.metadata[0].name
+    chart           = "jaeger-operator"
+    helm_repository = kubectl_manifest.helm_repository["jaegertracing"]
+    dependsOn       = [{ name = "cert-manager", namespace = kubernetes_namespace_v1.cert_manager.metadata[0].name }]
+    values          = {
+      fullnameOverride = "jaeger-operator"
+      rbac             = { clusterRole = true }
+      jaeger           = {
+        create = true
+        spec   = {
+          ingress  = { enabled = true, hosts = ["jaeger.lvh.me"], ingressClassName = "nginx" }
+          storage  = { type = "memory" }
+          strategy = "allinone"
         }
       }
     }
   }
+}
 
-  depends_on = [
-    helm_release.jaeger_operator,
-    helm_release.ingress_nginx
-  ]
+resource "kubernetes_namespace_v1" "jaeger" {
+  metadata { name = "jaeger" }
 }
