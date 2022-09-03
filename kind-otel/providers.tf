@@ -1,55 +1,41 @@
 terraform {
   required_providers {
-    kind       = { source = "tehcyx/kind", version = ">= 0.0.12, < 0.1.0" }
-    flux       = { source = "fluxcd/flux", version = ">= 0.15.1, < 0.16.0" }
-    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.11.0, < 2.12.0" }
+    flux       = { source = "fluxcd/flux", version = ">= 0.16.0, < 0.17.0" }
+    helm       = { source = "hashicorp/helm", version = ">= 2.6.0, < 2.7.0" }
+    kind       = { source = "tehcyx/kind", version = ">= 0.0.13, < 0.1.0" }
     kubectl    = { source = "gavinbunney/kubectl", version = ">= 1.14.0, < 1.15.0" }
+    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.12.1, < 2.13.0" }
   }
   required_version = ">= 1.0"
 }
 
-provider "kind" {}
-
 provider "flux" {}
 
-provider "kubernetes" {
-  alias = "cluster_one"
+provider "helm" {
+  kubernetes {
+    host = kind_cluster.otel.endpoint
 
-  host = kind_cluster.one.endpoint
-
-  client_certificate     = kind_cluster.one.client_certificate
-  client_key             = kind_cluster.one.client_key
-  cluster_ca_certificate = kind_cluster.one.cluster_ca_certificate
+    client_certificate     = kind_cluster.otel.client_certificate
+    client_key             = kind_cluster.otel.client_key
+    cluster_ca_certificate = kind_cluster.otel.cluster_ca_certificate
+  }
 }
 
-provider "kubernetes" {
-  alias = "cluster_two"
-
-  host = kind_cluster.two.endpoint
-
-  client_certificate     = kind_cluster.two.client_certificate
-  client_key             = kind_cluster.two.client_key
-  cluster_ca_certificate = kind_cluster.two.cluster_ca_certificate
-}
+provider "kind" {}
 
 provider "kubectl" {
-  alias = "cluster_one"
+  host = kind_cluster.otel.endpoint
 
-  host = kind_cluster.one.endpoint
-
-  client_certificate     = kind_cluster.one.client_certificate
-  client_key             = kind_cluster.one.client_key
-  cluster_ca_certificate = kind_cluster.one.cluster_ca_certificate
+  client_certificate     = kind_cluster.otel.client_certificate
+  client_key             = kind_cluster.otel.client_key
+  cluster_ca_certificate = kind_cluster.otel.cluster_ca_certificate
   load_config_file       = false
 }
 
-provider "kubectl" {
-  alias = "cluster_two"
+provider "kubernetes" {
+  host = kind_cluster.otel.endpoint
 
-  host = kind_cluster.two.endpoint
-
-  client_certificate     = kind_cluster.two.client_certificate
-  client_key             = kind_cluster.two.client_key
-  cluster_ca_certificate = kind_cluster.two.cluster_ca_certificate
-  load_config_file       = false
+  client_certificate     = kind_cluster.otel.client_certificate
+  client_key             = kind_cluster.otel.client_key
+  cluster_ca_certificate = kind_cluster.otel.cluster_ca_certificate
 }

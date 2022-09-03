@@ -14,18 +14,17 @@ init: ## Initialize Terraform configurations
 	terraform init -upgrade=true
 
 .PHONY: plan
-plan: init ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+plan: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
 	terraform plan
 
-.PHONY: up
-up: init ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+.PHONY: apply
+apply: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
 	terraform apply -auto-approve
 
 .PHONY: down
 down: clean ## Uninstall all solution components and destroy the local Kubernetes cluster
-	kind delete clusters cluster-one
-	kind delete clusters cluster-two
+	kind delete cluster --name otel
 
 .PHONY: clean
 clean: ## Removing all Terraform generated config files
-	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* flux-config
+	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* otel-config
