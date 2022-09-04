@@ -2,8 +2,6 @@ locals {
   jaeger = {
     allInOne = {
       enabled = true
-      image   = "jaegertracing/all-in-one"
-      tag     = "1.37.0"
       ingress = { enabled = false }
     }
 
