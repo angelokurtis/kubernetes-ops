@@ -1,16 +1,26 @@
 locals {
   helm_releases = {
+    cert-manager = {
+      namespace       = kubernetes_namespace_v1.cert_manager.metadata[0].name,
+      helm_repository = "jetstack",
+      values          = local.cert_manager,
+    }
     jaeger = {
-      namespace      = kubernetes_namespace_v1.jaeger.metadata[0].name
-      chart          = "charts/jaeger"
-      git_repository = "jaeger-helm-charts"
-      values         = local.jaeger
+      namespace      = kubernetes_namespace_v1.jaeger.metadata[0].name,
+      chart          = "charts/jaeger",
+      git_repository = "jaeger-helm-charts",
+      values         = local.jaeger,
     }
     nginx = {
-      namespace       = kubernetes_namespace_v1.nginx.metadata[0].name
-      chart           = "ingress-nginx"
-      helm_repository = "ingress-nginx"
-      values          = local.nginx
+      namespace       = kubernetes_namespace_v1.nginx.metadata[0].name,
+      chart           = "ingress-nginx",
+      helm_repository = "ingress-nginx",
+      values          = local.nginx,
+    }
+    opentelemetry-operator = {
+      namespace       = kubernetes_namespace_v1.opentelemetry.metadata[0].name,
+      helm_repository = "opentelemetry",
+      values          = local.nginx,
     }
   }
 }
