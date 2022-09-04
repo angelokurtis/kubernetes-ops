@@ -13,6 +13,12 @@ help: ## This help.
 init: ## Initialize Terraform configurations
 	terraform init -upgrade=true
 
+.PHONY: quickstart
+quickstart: init ## Initialize Terraform configurations
+	terraform apply -auto-approve -target=kind_cluster.otel
+	scripts/loadimages.sh
+	terraform apply -auto-approve
+
 .PHONY: plan
 plan: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
 	terraform plan
