@@ -6,10 +6,9 @@ locals {
       values          = local.cert_manager,
     }
     jaeger = {
-      namespace      = kubernetes_namespace_v1.jaeger.metadata[0].name,
-      chart          = "charts/jaeger",
-      git_repository = "jaeger-helm-charts",
-      values         = local.jaeger,
+      namespace       = kubernetes_namespace_v1.jaeger.metadata[0].name,
+      helm_repository = "jaegertracing",
+      values          = local.jaeger,
     }
     nginx = {
       namespace       = kubernetes_namespace_v1.nginx.metadata[0].name,
