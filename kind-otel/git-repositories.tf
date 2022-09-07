@@ -1,9 +1,5 @@
 locals {
-  git_repositories = {
-    jaeger-helm-charts = {
-      repository = "https://github.com/angelokurtis/jaeger-helm-charts", ref = { branch = "otlp-enabled-on-allinone" }
-    }
-  }
+  git_repositories = {}
 }
 
 resource "kubectl_manifest" "git_repository" {
