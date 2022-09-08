@@ -1,0 +1,63 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+  # receiver that's just a dummy and never used; added to pass validation requiring at least one receiver in a pipeline.
+  otlp/spanmetrics:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:12345"
+
+processors:
+  batch:
+    send_batch_size: 10000
+    timeout: 1s
+
+  spanmetrics:
+    metrics_exporter: otlp/spanmetrics
+    dimensions:
+      - name: http.method
+      - name: http.status_code
+
+exporters:
+  otlp/jaeger:
+    endpoint: $JAEGER_OTLP_ENDPOINT
+    tls:
+      insecure: true
+
+  otlp/spanmetrics:
+    endpoint: "localhost:4317"
+    tls:
+      insecure: true
+
+  prometheusremotewrite:
+    endpoint: http://$PROMETHEUS_PUSHGATEWAY_ENDPOINT/api/v1/write
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+
+service:
+  telemetry:
+    logs:
+      level: "debug"
+
+  extensions: [ health_check ]
+
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      processors: [ spanmetrics ]
+      exporters: [ otlp/jaeger ]
+
+    metrics/spanmetrics:
+      receivers: [ otlp/spanmetrics ]
+      exporters: [ otlp/spanmetrics ]
+
+    metrics:
+      receivers: [ otlp ]
+      exporters: [ prometheusremotewrite ]
