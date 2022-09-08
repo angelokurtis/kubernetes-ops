@@ -1,8 +1,18 @@
 locals {
   jaeger = {
     allInOne = {
-      enabled = true
-      ingress = { enabled = false }
+      enabled  = true
+      ingress  = { enabled = false }
+      extraEnv = [
+        {
+          name  = "METRICS_STORAGE_TYPE",
+          value = "prometheus"
+        },
+        {
+          name  = "PROMETHEUS_SERVER_URL",
+          value = "http://prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local"
+        }
+      ]
     }
 
     collector = { enabled = false }
