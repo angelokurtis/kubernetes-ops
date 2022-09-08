@@ -22,6 +22,11 @@ locals {
       dependsOn       = [{ name = "cert-manager", namespace = kubernetes_namespace_v1.cert_manager.metadata[0].name }]
       values          = local.opentelemetry_operator,
     }
+    prometheus = {
+      namespace       = kubernetes_namespace_v1.prometheus.metadata[0].name,
+      helm_repository = "prometheus-community"
+      values          = local.prometheus,
+    }
   }
 }
 
