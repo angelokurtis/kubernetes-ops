@@ -23,6 +23,14 @@ processors:
       - name: http.method
       - name: http.status_code
 
+  filter/spanmetrics:
+    metrics:
+      exclude:
+        match_type: expr
+        expressions:
+          - MetricName == "latency" && Label("span.kind") != "SPAN_KIND_SERVER"
+          - MetricName == "calls_total" && Label("span.kind") != "SPAN_KIND_SERVER"
+
 exporters:
   otlp/jaeger:
     endpoint: $JAEGER_OTLP_ENDPOINT
@@ -36,16 +44,20 @@ exporters:
 
   prometheusremotewrite:
     endpoint: http://$PROMETHEUS_PUSHGATEWAY_ENDPOINT/api/v1/write
+    external_labels:
+      job: opentelemetry-collectors
+      instance: $POD_NAME
+
+  logging:
+    loglevel: debug
+    sampling_initial: 2
+    sampling_thereafter: 500
 
 extensions:
   health_check:
     endpoint: "0.0.0.0:13133"
 
 service:
-  telemetry:
-    logs:
-      level: "debug"
-
   extensions: [ health_check ]
 
   pipelines:
@@ -60,4 +72,5 @@ service:
 
     metrics:
       receivers: [ otlp ]
-      exporters: [ prometheusremotewrite ]
+      processors: [ filter/spanmetrics ]
+      exporters: [ logging, prometheusremotewrite ]

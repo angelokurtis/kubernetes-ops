@@ -5,7 +5,7 @@ resource "kubectl_manifest" "otelcol" {
     kind       = "OpenTelemetryCollector"
     metadata   = { name = "default", namespace = kubernetes_namespace_v1.opentelemetry.metadata[0].name }
     spec       = {
-      image    = "docker.io/kurtis/otel-collector:v1.0.5"
+      image    = "kurtis/otel-collector:v1.0.6"
       mode     = "statefulset"
       replicas = 1
       ports    = [{ name = "prometheus", port = 8889, targetPort = 8889 }]
@@ -17,6 +17,10 @@ resource "kubectl_manifest" "otelcol" {
         {
           name  = "PROMETHEUS_PUSHGATEWAY_ENDPOINT",
           value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
+        },
+        {
+          name      = "POD_NAME",
+          valueFrom = { fieldRef = { fieldPath = "metadata.name" } }
         }
       ]
       config = file("opentelemetry-collector.yaml")
