@@ -23,7 +23,7 @@ resource "kubectl_manifest" "otelcol" {
           valueFrom = { fieldRef = { fieldPath = "metadata.name" } }
         }
       ]
-      config = file("opentelemetry-collector.yaml")
+      config = file("opentelemetry-collector/spanmetrics.yaml")
     }
   })
 
