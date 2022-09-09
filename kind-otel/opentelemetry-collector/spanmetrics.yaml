@@ -12,6 +12,10 @@ receivers:
       grpc:
         endpoint: "0.0.0.0:12345"
 
+  jaeger:
+    protocols:
+      grpc:
+
 processors:
   batch:
     send_batch_size: 10000
@@ -62,7 +66,7 @@ service:
 
   pipelines:
     traces:
-      receivers: [ otlp ]
+      receivers: [ otlp, jaeger ]
       processors: [ spanmetrics ]
       exporters: [ otlp/jaeger ]
 
