@@ -1,5 +1,10 @@
 locals {
   helm_releases = {
+    grafana = {
+      namespace       = kubernetes_namespace_v1.grafana.metadata[0].name,
+      helm_repository = "grafana",
+      values          = local.grafana,
+    }
     cert-manager = {
       namespace       = kubernetes_namespace_v1.cert_manager.metadata[0].name,
       helm_repository = "jetstack",

@@ -1,5 +1,6 @@
 locals {
   helm_repositories = {
+    grafana              = { repository = "https://grafana.github.io/helm-charts" }
     ingress-nginx        = { repository = "https://kubernetes.github.io/ingress-nginx" }
     jaegertracing        = { repository = "https://jaegertracing.github.io/helm-charts" }
     jetstack             = { repository = "https://charts.jetstack.io" }
