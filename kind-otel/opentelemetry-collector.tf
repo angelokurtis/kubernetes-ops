@@ -5,7 +5,7 @@ resource "kubectl_manifest" "otelcol" {
     kind       = "OpenTelemetryCollector"
     metadata   = { name = "default", namespace = kubernetes_namespace_v1.opentelemetry.metadata[0].name }
     spec       = {
-      image    = "kurtis/otel-collector:v1.0.6"
+      image    = "kurtis/otel-collector:v1.0.7"
       mode     = "statefulset"
       replicas = 1
       ports    = [{ name = "prometheus", port = 8889, targetPort = 8889 }]
@@ -23,7 +23,7 @@ resource "kubectl_manifest" "otelcol" {
           valueFrom = { fieldRef = { fieldPath = "metadata.name" } }
         }
       ]
-      config = file("opentelemetry-collector/spanmetrics.yaml")
+      config = file("opentelemetry-collector/tracepolicies.yaml")
     }
   })
 
