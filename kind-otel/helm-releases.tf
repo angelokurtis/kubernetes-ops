@@ -1,19 +1,32 @@
 locals {
   helm_releases = {
-    grafana = {
-      namespace       = kubernetes_namespace_v1.grafana.metadata[0].name,
-      helm_repository = "grafana",
-      values          = local.grafana,
-    }
     cert-manager = {
       namespace       = kubernetes_namespace_v1.cert_manager.metadata[0].name,
       helm_repository = "jetstack",
       values          = local.cert_manager,
     }
+    goldilocks = {
+      namespace       = kubernetes_namespace_v1.goldilocks.metadata[0].name,
+      helm_repository = "fairwinds-stable",
+      dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
+      values          = local.goldilocks,
+    }
+    grafana = {
+      namespace       = kubernetes_namespace_v1.grafana.metadata[0].name,
+      helm_repository = "grafana",
+      dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
+      values          = local.grafana,
+    }
     jaeger = {
       namespace       = kubernetes_namespace_v1.jaeger.metadata[0].name,
       helm_repository = "jaegertracing",
+      dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
       values          = local.jaeger,
+    }
+    metrics-server = {
+      namespace       = kubernetes_namespace_v1.metrics_server.metadata[0].name,
+      helm_repository = "metrics-server",
+      values          = local.metrics_server,
     }
     nginx = {
       namespace       = kubernetes_namespace_v1.nginx.metadata[0].name,
@@ -24,13 +37,19 @@ locals {
     opentelemetry-operator = {
       namespace       = kubernetes_namespace_v1.opentelemetry.metadata[0].name,
       helm_repository = "opentelemetry",
-      dependsOn       = [{ name = "cert-manager", namespace = kubernetes_namespace_v1.cert_manager.metadata[0].name }]
+      dependsOn       = [{ name = "cert-manager", namespace = kubernetes_namespace_v1.cert_manager.metadata[0].name }],
       values          = local.opentelemetry_operator,
     }
     prometheus = {
       namespace       = kubernetes_namespace_v1.prometheus.metadata[0].name,
-      helm_repository = "prometheus-community"
+      helm_repository = "prometheus-community",
+      dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
       values          = local.prometheus,
+    }
+    vertical-pod-autoscaler = {
+      namespace       = kubernetes_namespace_v1.vertical_pod_autoscaler.metadata[0].name,
+      helm_repository = "cowboysysop",
+      values          = local.vertical_pod_autoscaler,
     }
   }
 }

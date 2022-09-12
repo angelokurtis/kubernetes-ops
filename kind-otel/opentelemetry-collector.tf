@@ -18,10 +18,6 @@ resource "kubectl_manifest" "otelcol" {
           name  = "PROMETHEUS_PUSHGATEWAY_ENDPOINT",
           value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
         },
-        {
-          name      = "POD_NAME",
-          valueFrom = { fieldRef = { fieldPath = "metadata.name" } }
-        }
       ]
       config = file("opentelemetry-collector/tracepolicies.yaml")
     }

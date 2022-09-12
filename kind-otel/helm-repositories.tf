@@ -1,9 +1,12 @@
 locals {
   helm_repositories = {
+    cowboysysop          = { repository = "https://cowboysysop.github.io/charts" }
+    fairwinds-stable     = { repository = "https://charts.fairwinds.com/stable" }
     grafana              = { repository = "https://grafana.github.io/helm-charts" }
     ingress-nginx        = { repository = "https://kubernetes.github.io/ingress-nginx" }
     jaegertracing        = { repository = "https://jaegertracing.github.io/helm-charts" }
     jetstack             = { repository = "https://charts.jetstack.io" }
+    metrics-server       = { repository = "https://kubernetes-sigs.github.io/metrics-server/" }
     opentelemetry        = { repository = "https://open-telemetry.github.io/opentelemetry-helm-charts" }
     prometheus-community = { repository = "https://prometheus-community.github.io/helm-charts" }
   }
