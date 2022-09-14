@@ -2,7 +2,7 @@ locals {
   grafana = {
     image = {
       repository = "grafana/grafana"
-      tag        = "9.1.4"
+      tag        = "9.1.5"
     }
     ingress       = { enabled = true, hosts = ["grafana.${local.cluster_host}"], ingressClassName = "nginx" }
     "grafana.ini" = {
@@ -24,6 +24,11 @@ locals {
             isDefault = true
           }
         ]
+      }
+    }
+    dashboards = {
+      default = {
+        vpa-recommendations = { gnetId = 14588, datasource = "prometheus" }
       }
     }
   }
