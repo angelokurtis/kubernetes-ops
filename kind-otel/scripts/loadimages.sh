@@ -18,12 +18,11 @@ loadImage ghcr.io/fluxcd/helm-controller:v0.24.0
 loadImage ghcr.io/fluxcd/source-controller:v0.29.0
 loadImage us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.4.0
 loadImage grafana/grafana:9.1.5
-loadImage curlimages/curl:7.73.0
-loadImage jaegertracing/all-in-one:1.37.0
+loadImage jaegertracing/all-in-one:1.38.0
 loadImage k8s.gcr.io/metrics-server/metrics-server:v0.6.1
 loadImage registry.k8s.io/ingress-nginx/controller:v1.3.1@sha256:54f7fe2c6c5a9db9a0ebf1131797109bb7a4d91f56b9b362bde2abd237dd1974
 loadImage kurtis/otel-collector:v1.0.7
-loadImage ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator:0.59.0
+loadImage ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator:0.60.0
 loadImage gcr.io/kubebuilder/kube-rbac-proxy:v0.11.0
 loadImage registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.5.0
 loadImage quay.io/prometheus/node-exporter:v1.3.1

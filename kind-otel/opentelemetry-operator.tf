@@ -3,7 +3,7 @@ locals {
     manager = {
       image = {
         repository = "ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator"
-        tag        = "0.59.0"
+        tag        = "0.60.0"
       }
     }
   }
