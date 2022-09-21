@@ -7,7 +7,7 @@ locals {
       }
       collectorImage = {
         repository = "kurtis/otel-collector"
-        tag        = "v1.0.7"
+        tag        = "v1.0.8"
       }
     }
   }

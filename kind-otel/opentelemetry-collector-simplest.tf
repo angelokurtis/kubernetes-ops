@@ -3,7 +3,7 @@ resource "kubectl_manifest" "opentelemetry_collector_simplest" {
   yaml_body         = yamlencode({
     apiVersion = "opentelemetry.io/v1alpha1"
     kind       = "OpenTelemetryCollector"
-    metadata   = { name = "simplest", namespace = kubernetes_namespace_v1.opentelemetry.metadata[0].name }
+    metadata   = { name = "tailsampling", namespace = kubernetes_namespace_v1.opentelemetry.metadata[0].name }
     spec       = {
       mode = "deployment"
       env  = [
@@ -12,7 +12,8 @@ resource "kubectl_manifest" "opentelemetry_collector_simplest" {
           value = "jaeger-collector.${kubernetes_namespace_v1.jaeger.metadata[0].name}.svc.cluster.local:4317"
         },
       ]
-      config = file("opentelemetry-collector/simplest.yaml")
+      config   = file("opentelemetry-collector/tailsampling.yaml")
+      replicas = 20
     }
   })
 

@@ -18,7 +18,7 @@ resource "kubectl_manifest" "opentelemetry_collector_default" {
           value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
         },
       ]
-      config = file("opentelemetry-collector/tracepolicies.yaml")
+      config = file("opentelemetry-collector/default.yaml")
     }
   })
 

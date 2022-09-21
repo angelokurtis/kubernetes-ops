@@ -1,0 +1,38 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+processors:
+  tail_sampling:
+    decision_wait: 3s
+    num_traces: 100
+    expected_new_traces_per_sec: 10
+    policies: [
+      {
+        name: ignore-health-check-requests,
+        type: string_attribute,
+        string_attribute: { key: http.user_agent, values: [ kube-probe/* ], enabled_regex_matching: true, invert_match: true }
+      },
+      {
+        name: sampling-1%,
+        type: probabilistic,
+        probabilistic: { sampling_percentage: 1 }
+      },
+    ]
+  attributes:
+    actions:
+      - key: collector.pod.name
+        value: $POD_NAME
+        action: insert
+exporters:
+  otlp/jaeger:
+    endpoint: $JAEGER_OTLP_ENDPOINT
+    tls:
+      insecure: true
+service:
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      processors: [ tail_sampling, attributes ]
+      exporters: [ otlp/jaeger ]

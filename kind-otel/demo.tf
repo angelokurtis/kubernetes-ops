@@ -12,7 +12,11 @@ locals {
               "checksum/auto-instrumentation" = sha256(kubectl_manifest.auto_instrumentation.yaml_body)
             }
           },
-          { op = "replace", path = "/spec/replicas", value = 3 }
+          { op = "replace", path = "/spec/replicas", value = 3 },
+          {
+            op    = "add", path = "/spec/template/spec/containers/0/env",
+            value = [{ name = "LOGGING_PATTERN_LEVEL", value = "trace_id=%mdc{trace_id} span_id=%mdc{span_id} %5p" }]
+          }
         ])
       }
     ]
@@ -28,9 +32,15 @@ resource "kubectl_manifest" "auto_instrumentation" {
     spec       = {
       sampler  = { type = "always_on" }
       exporter = {
-        endpoint = "http://simplest-collector.${kubernetes_namespace_v1.opentelemetry.metadata[0].name}.svc.cluster.local:4317"
+        endpoint = "http://loadbalancing-collector.${kubernetes_namespace_v1.opentelemetry.metadata[0].name}.svc.cluster.local:4317"
       }
       java = { image = "ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.18.0" }
+      env  = [
+        { name = "OTEL_TRACES_EXPORTER", value = "otlp" },
+        { name = "OTEL_METRICS_EXPORTER", value = "none" },
+        { name = "OTEL_LOGS_EXPORTER", value = "none" },
+        { name = "OTEL_EXPERIMENTAL_EXPORTER_OTLP_RETRY_ENABLED", value = "true" }
+      ]
     }
   })
 

@@ -28,7 +28,7 @@ loadImage k8s.gcr.io/metrics-server/metrics-server:v0.6.1
 loadImage registry.k8s.io/ingress-nginx/controller:v1.3.1@sha256:54f7fe2c6c5a9db9a0ebf1131797109bb7a4d91f56b9b362bde2abd237dd1974
 loadImage ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator:0.60.0
 loadImage gcr.io/kubebuilder/kube-rbac-proxy:v0.11.0
-loadImage kurtis/otel-collector:v1.0.7
+loadImage kurtis/otel-collector:v1.0.8
 loadImage registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.5.0
 loadImage quay.io/prometheus/node-exporter:v1.3.1
 loadImage jimmidyson/configmap-reload:v0.7.1
