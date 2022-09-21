@@ -12,7 +12,7 @@ data "flux_install" "main" {
   target_path    = "fluxcd"
   namespace      = local.fluxcd.namespace
   network_policy = false
-  components     = ["source-controller", "helm-controller"]
+  components     = ["source-controller", "kustomize-controller", "helm-controller"]
 }
 
 data "kubectl_file_documents" "fluxcd" {

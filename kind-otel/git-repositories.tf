@@ -1,5 +1,10 @@
 locals {
-  git_repositories = {}
+  git_repositories = {
+    football-bets = {
+      repository = "https://github.com/angelokurtis/football-bets"
+      ref        = { branch = "multiverse/java-spring" }
+    }
+  }
 }
 
 resource "kubectl_manifest" "git_repository" {
