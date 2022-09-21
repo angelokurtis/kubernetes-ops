@@ -4,6 +4,7 @@ locals {
       namespace      = kubernetes_namespace_v1.demo.metadata[0].name,
       git_repository = "football-bets",
       path           = "manifests/base"
+      patches        = local.bets.kustomization_patches
     }
   }
 }
@@ -27,6 +28,7 @@ resource "kubectl_manifest" "kustomization" {
       }
       targetNamespace = each.value.namespace
       images          = try(each.value.images, [])
+      patches         = try(each.value.patches, [])
       dependsOn       = try(each.value.dependsOn, [])
     }
   })

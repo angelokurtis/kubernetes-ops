@@ -1,3 +1,42 @@
+locals {
+  bets = {
+    kustomization_patches = [
+      {
+        target = { kind = "Deployment" }
+        patch  = jsonencode([
+          {
+            op    = "add"
+            path  = "/spec/template/metadata/annotations"
+            value = {
+              "instrumentation.opentelemetry.io/inject-java" : "true"
+              "checksum/auto-instrumentation" = sha256(kubectl_manifest.auto_instrumentation.yaml_body)
+            }
+          },
+          { op = "replace", path = "/spec/replicas", value = 3 }
+        ])
+      }
+    ]
+  }
+}
+
+resource "kubectl_manifest" "auto_instrumentation" {
+  server_side_apply = true
+  yaml_body         = yamlencode({
+    apiVersion = "opentelemetry.io/v1alpha1"
+    kind       = "Instrumentation"
+    metadata   = { name = "auto-instrumentation", namespace = kubernetes_namespace_v1.demo.metadata[0].name }
+    spec       = {
+      sampler  = { type = "always_on" }
+      exporter = {
+        endpoint = "http://simplest-collector.${kubernetes_namespace_v1.opentelemetry.metadata[0].name}.svc.cluster.local:4317"
+      }
+      java = { image = "ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.18.0" }
+    }
+  })
+
+  depends_on = [kubectl_manifest.fluxcd]
+}
+
 resource "kubernetes_ingress_v1" "demo" {
   metadata {
     name      = "demo"
