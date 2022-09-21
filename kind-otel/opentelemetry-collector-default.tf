@@ -1,11 +1,10 @@
-resource "kubectl_manifest" "otelcol" {
+resource "kubectl_manifest" "opentelemetry_collector_default" {
   server_side_apply = true
   yaml_body         = yamlencode({
     apiVersion = "opentelemetry.io/v1alpha1"
     kind       = "OpenTelemetryCollector"
     metadata   = { name = "default", namespace = kubernetes_namespace_v1.opentelemetry.metadata[0].name }
     spec       = {
-      image    = "kurtis/otel-collector:v1.0.7"
       mode     = "statefulset"
       replicas = 1
       ports    = [{ name = "prometheus", port = 8889, targetPort = 8889 }]
