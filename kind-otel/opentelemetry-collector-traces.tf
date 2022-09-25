@@ -14,6 +14,7 @@ resource "kubectl_manifest" "opentelemetry_collector_traces" {
           value = "${kubectl_manifest.opentelemetry_collector_traces_backend.name}-collector-headless.${kubectl_manifest.opentelemetry_collector_traces_backend.namespace}.svc.cluster.local"
         },
       ]
+      podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }
     }
   })
 
@@ -36,6 +37,7 @@ resource "kubectl_manifest" "opentelemetry_collector_traces_backend" {
           value = "jaeger-collector.${kubernetes_namespace_v1.jaeger.metadata[0].name}.svc.cluster.local:4317"
         },
       ]
+      podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }
     }
   })
 
