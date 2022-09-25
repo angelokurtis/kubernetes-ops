@@ -14,14 +14,16 @@ exporters:
           insecure: true
     resolver:
       dns:
-        hostname: tailsampling-collector-headless
+        hostname: $RESOLVER_DNS_HOSTNAME
         port: 4317
 
 service:
   telemetry:
+    metrics:
+      address: ":8888"
     logs:
       level: "debug"
   pipelines:
     traces:
       receivers: [ otlp ]
-      exporters: [ loadbalancing ]
+      exporters: [ logging, loadbalancing ]

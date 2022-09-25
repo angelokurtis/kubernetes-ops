@@ -30,14 +30,13 @@ resource "kubectl_manifest" "auto_instrumentation" {
     kind       = "Instrumentation"
     metadata   = { name = "auto-instrumentation", namespace = kubernetes_namespace_v1.demo.metadata[0].name }
     spec       = {
-      sampler  = { type = "always_on" }
-      exporter = {
-        endpoint = "http://loadbalancing-collector.${kubernetes_namespace_v1.opentelemetry.metadata[0].name}.svc.cluster.local:4317"
-      }
-      java = { image = "ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.18.0" }
-      env  = [
+      sampler = { type = "always_on" }
+      java    = { image = "ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.18.0" }
+      env     = [
+        { name = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_traces.name}-collector.${kubectl_manifest.opentelemetry_collector_traces_backend.namespace}.svc.cluster.local:4317" },
+        { name = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_traces_backend.namespace}.svc.cluster.local:4317" },
         { name = "OTEL_TRACES_EXPORTER", value = "otlp" },
-        { name = "OTEL_METRICS_EXPORTER", value = "none" },
+        { name = "OTEL_METRICS_EXPORTER", value = "otlp" },
         { name = "OTEL_LOGS_EXPORTER", value = "none" },
         { name = "OTEL_EXPERIMENTAL_EXPORTER_OTLP_RETRY_ENABLED", value = "true" }
       ]

@@ -3,6 +3,7 @@ receivers:
     protocols:
       grpc:
       http:
+
 processors:
   tail_sampling:
     decision_wait: 3s
@@ -15,9 +16,9 @@ processors:
         string_attribute: { key: http.user_agent, values: [ kube-probe/* ], enabled_regex_matching: true, invert_match: true }
       },
       {
-        name: sampling-1%,
+        name: sampling-50%,
         type: probabilistic,
-        probabilistic: { sampling_percentage: 1 }
+        probabilistic: { sampling_percentage: 50 }
       },
     ]
   attributes:
@@ -25,14 +26,21 @@ processors:
       - key: collector.pod.name
         value: $POD_NAME
         action: insert
+
 exporters:
+  logging:
+    loglevel: debug
   otlp/jaeger:
     endpoint: $JAEGER_OTLP_ENDPOINT
     tls:
       insecure: true
+
 service:
+  telemetry:
+    logs:
+      level: debug
   pipelines:
     traces:
       receivers: [ otlp ]
       processors: [ tail_sampling, attributes ]
-      exporters: [ otlp/jaeger ]
+      exporters: [ logging, otlp/jaeger ]

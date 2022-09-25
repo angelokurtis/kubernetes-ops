@@ -1,0 +1,25 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  logging:
+    loglevel: debug
+  prometheusremotewrite:
+    endpoint: http://$PROMETHEUS_PUSHGATEWAY_ENDPOINT/api/v1/write
+    external_labels:
+      job: opentelemetry-collectors
+      instance: $POD_NAME
+
+service:
+  telemetry:
+    metrics:
+      address: ":8888"
+    logs:
+      level: debug
+  pipelines:
+    metrics:
+      receivers: [ otlp ]
+      exporters: [ logging, prometheusremotewrite ]

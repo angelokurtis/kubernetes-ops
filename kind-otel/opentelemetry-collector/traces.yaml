@@ -1,0 +1,24 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  logging:
+    loglevel: debug
+  otlp/jaeger:
+    endpoint: $JAEGER_OTLP_ENDPOINT
+    tls:
+      insecure: true
+
+service:
+  telemetry:
+    metrics:
+      address: ":8888"
+    logs:
+      level: debug
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      exporters: [ logging, otlp/jaeger ]
