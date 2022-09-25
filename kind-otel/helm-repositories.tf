@@ -1,7 +1,5 @@
 locals {
   helm_repositories = {
-    cowboysysop          = { repository = "https://cowboysysop.github.io/charts" }
-    fairwinds-stable     = { repository = "https://charts.fairwinds.com/stable" }
     grafana              = { repository = "https://grafana.github.io/helm-charts" }
     ingress-nginx        = { repository = "https://kubernetes.github.io/ingress-nginx" }
     jaegertracing        = { repository = "https://jaegertracing.github.io/helm-charts" }

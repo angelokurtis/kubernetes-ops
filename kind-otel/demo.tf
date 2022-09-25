@@ -8,11 +8,11 @@ locals {
             op    = "add"
             path  = "/spec/template/metadata/annotations"
             value = {
-              "instrumentation.opentelemetry.io/inject-java" : "true"
-              "checksum/auto-instrumentation" = sha256(kubectl_manifest.auto_instrumentation.yaml_body)
+              "instrumentation.opentelemetry.io/inject-java" = "true"
+              "checksum/auto-instrumentation"                = sha256(kubectl_manifest.auto_instrumentation.yaml_body)
             }
           },
-          { op = "replace", path = "/spec/replicas", value = 3 },
+          { op = "replace", path = "/spec/replicas", value = 2 },
           {
             op    = "add", path = "/spec/template/spec/containers/0/env",
             value = [{ name = "LOGGING_PATTERN_LEVEL", value = "trace_id=%mdc{trace_id} span_id=%mdc{span_id} %5p" }]
@@ -44,7 +44,7 @@ resource "kubectl_manifest" "auto_instrumentation" {
     }
   })
 
-  depends_on = [kubectl_manifest.fluxcd]
+  depends_on = [kubectl_manifest.fluxcd, kubernetes_job_v1.wait_helm_release["opentelemetry-operator"]]
 }
 
 resource "kubernetes_ingress_v1" "demo" {

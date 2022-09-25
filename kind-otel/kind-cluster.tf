@@ -1,6 +1,6 @@
 locals {
   cluster_host = var.load_balancer_address == "127.0.0.1" ? "lvh.me" : "${join("", formatlist("%02x", split(".", var.load_balancer_address)))}.nip.io"
-  kind         = { version = "v1.23.10" }
+  kind         = { version = "v1.23.12" }
 }
 
 resource "kind_cluster" "otel" {

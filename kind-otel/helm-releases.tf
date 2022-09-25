@@ -5,12 +5,6 @@ locals {
       helm_repository = "jetstack",
       values          = local.cert_manager,
     }
-    goldilocks = {
-      namespace       = kubernetes_namespace_v1.goldilocks.metadata[0].name,
-      helm_repository = "fairwinds-stable",
-      dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
-      values          = local.goldilocks,
-    }
     grafana = {
       namespace       = kubernetes_namespace_v1.grafana.metadata[0].name,
       helm_repository = "grafana",
@@ -45,11 +39,6 @@ locals {
       helm_repository = "prometheus-community",
       dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
       values          = local.prometheus,
-    }
-    vertical-pod-autoscaler = {
-      namespace       = kubernetes_namespace_v1.vertical_pod_autoscaler.metadata[0].name,
-      helm_repository = "cowboysysop",
-      values          = local.vertical_pod_autoscaler,
     }
   }
 }

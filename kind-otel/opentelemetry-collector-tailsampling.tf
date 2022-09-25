@@ -1,4 +1,4 @@
-resource "kubectl_manifest" "opentelemetry_collector_simplest" {
+resource "kubectl_manifest" "opentelemetry_collector_tailsampling" {
   server_side_apply = true
   yaml_body         = yamlencode({
     apiVersion = "opentelemetry.io/v1alpha1"
@@ -13,7 +13,7 @@ resource "kubectl_manifest" "opentelemetry_collector_simplest" {
         },
       ]
       config   = file("opentelemetry-collector/tailsampling.yaml")
-      replicas = 20
+      replicas = 2
     }
   })
 
