@@ -61,7 +61,7 @@ resource "kubernetes_config_map_v1" "grafana_dashboards" {
     namespace = kubernetes_namespace_v1.grafana.metadata[0].name
   }
   binary_data = {
-    "vpa-recommendations.json" = filebase64("dashboards/vpa-recommendations.json")
+    "kubernetes-pod-metrics.json" = filebase64("dashboards/kubernetes-pod-metrics.json")
   }
 }
 
