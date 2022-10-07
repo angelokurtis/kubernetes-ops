@@ -3,7 +3,7 @@ locals {
     allInOne = {
       enabled  = true
       image    = "jaegertracing/all-in-one"
-      tag      = "1.38.0"
+      tag      = "1.38.1"
       ingress  = { enabled = false }
       extraEnv = [
         {
