@@ -1,0 +1,29 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  logging:
+    loglevel: debug
+  loadbalancing:
+    protocol:
+      otlp:
+        tls:
+          insecure: true
+    resolver:
+      dns:
+        hostname: $RESOLVER_DNS_HOSTNAME
+        port: 4317
+
+service:
+  telemetry:
+    metrics:
+      address: ":8888"
+    logs:
+      level: "debug"
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      exporters: [ logging, loadbalancing ]

@@ -17,11 +17,6 @@ locals {
       dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
       values          = local.jaeger,
     }
-    metrics-server = {
-      namespace       = kubernetes_namespace_v1.metrics_server.metadata[0].name,
-      helm_repository = "metrics-server",
-      values          = local.metrics_server,
-    }
     nginx = {
       namespace       = kubernetes_namespace_v1.nginx.metadata[0].name,
       chart           = "ingress-nginx",

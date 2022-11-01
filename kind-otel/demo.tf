@@ -8,6 +8,8 @@ locals {
             op    = "add"
             path  = "/spec/template/metadata/annotations"
             value = {
+#              "prometheus.io/port": "8080"
+#              "prometheus.io/scrape": "true"
               "instrumentation.opentelemetry.io/inject-java" = "true"
               "checksum/auto-instrumentation"                = sha256(kubectl_manifest.auto_instrumentation.yaml_body)
             }
@@ -31,9 +33,9 @@ resource "kubectl_manifest" "auto_instrumentation" {
     metadata   = { name = "auto-instrumentation", namespace = kubernetes_namespace_v1.demo.metadata[0].name }
     spec       = {
       sampler = { type = "always_on" }
-      java    = { image = "ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.18.0" }
+      java    = { image = "ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.19.1" }
       env     = [
-        { name = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_traces.name}-collector.${kubectl_manifest.opentelemetry_collector_traces_backend.namespace}.svc.cluster.local:4317" },
+        { name = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_traces.name}-collector.${kubectl_manifest.opentelemetry_collector_traces.namespace}.svc.cluster.local:4317" },
         { name = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_traces_backend.namespace}.svc.cluster.local:4317" },
         { name = "OTEL_TRACES_EXPORTER", value = "otlp" },
         { name = "OTEL_METRICS_EXPORTER", value = "otlp" },
