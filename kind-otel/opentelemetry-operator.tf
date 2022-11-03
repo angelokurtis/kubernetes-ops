@@ -1,7 +1,7 @@
 locals {
   opentelemetry_operator = {
     manager = {
-      collectorImage = { repository = "otel/opentelemetry-collector-contrib" }
+      collectorImage = { repository = "otel/opentelemetry-collector-contrib", tag = "0.63.1" }
     }
   }
 }

@@ -13,6 +13,10 @@ resource "kubectl_manifest" "opentelemetry_collector_traces_backend" {
           name  = "JAEGER_OTLP_ENDPOINT",
           value = "jaeger-collector.${kubernetes_namespace_v1.jaeger.metadata[0].name}.svc.cluster.local:4317"
         },
+        {
+          name  = "SPANMETRICS_OTLP_ENDPOINT"
+          value = "${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}.svc.cluster.local:4317"
+        },
       ]
       podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }
     }

@@ -4,6 +4,12 @@ receivers:
       grpc:
       http:
 
+  # receiver that's just a dummy and never used; added to pass validation requiring at least one receiver in a pipeline.
+  otlp/spanmetrics:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:12345"
+
 processors:
   tail_sampling:
     decision_wait: 3s
@@ -26,6 +32,11 @@ processors:
       - key: collector.pod.name
         value: $POD_NAME
         action: insert
+  spanmetrics:
+    metrics_exporter: otlp/spanmetrics
+    dimensions:
+      - name: http.method
+      - name: http.status_code
 
 exporters:
   logging:
@@ -34,13 +45,21 @@ exporters:
     endpoint: $JAEGER_OTLP_ENDPOINT
     tls:
       insecure: true
+  otlp/spanmetrics:
+    endpoint: $SPANMETRICS_OTLP_ENDPOINT
+    tls:
+      insecure: true
 
 service:
   telemetry:
     logs:
       level: debug
+      disable_stacktrace: true
   pipelines:
     traces:
       receivers: [ otlp ]
-      processors: [ tail_sampling, attributes ]
+      processors: [ spanmetrics, tail_sampling, attributes ]
       exporters: [ logging, otlp/jaeger ]
+    metrics/spanmetrics:
+      receivers: [ otlp/spanmetrics ]
+      exporters: [ otlp/spanmetrics ]
