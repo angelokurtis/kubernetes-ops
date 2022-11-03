@@ -29,7 +29,7 @@ processors:
     ]
   attributes:
     actions:
-      - key: collector.pod.name
+      - key: instance
         value: $POD_NAME
         action: insert
   spanmetrics:
@@ -37,6 +37,7 @@ processors:
     dimensions:
       - name: http.method
       - name: http.status_code
+      - name: instance
 
 exporters:
   logging:
@@ -58,7 +59,7 @@ service:
   pipelines:
     traces:
       receivers: [ otlp ]
-      processors: [ spanmetrics, tail_sampling, attributes ]
+      processors: [ attributes, spanmetrics, tail_sampling ]
       exporters: [ logging, otlp/jaeger ]
     metrics/spanmetrics:
       receivers: [ otlp/spanmetrics ]
