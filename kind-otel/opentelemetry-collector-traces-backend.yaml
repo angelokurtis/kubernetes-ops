@@ -10,7 +10,41 @@ receivers:
       grpc:
         endpoint: "0.0.0.0:12345"
 
+exporters:
+  logging:
+    loglevel: debug
+
+  otlp/jaeger:
+    endpoint: $JAEGER_OTLP_ENDPOINT
+    tls:
+      insecure: true
+
+  otlp/spanmetrics:
+    endpoint: "localhost:4317"
+    tls:
+      insecure: true
+
+  prometheus:
+    endpoint: "0.0.0.0:9090"
+    metric_expiration: 70s
+
 processors:
+  batch:
+    send_batch_size: 10000
+    timeout: 1s
+
+  attributes:
+    actions:
+      - key: instance
+        value: $POD_NAME
+        action: insert
+
+  spanmetrics:
+    metrics_exporter: otlp/spanmetrics
+    dimensions:
+      - name: http.method
+      - name: http.status_code
+
   tail_sampling:
     decision_wait: 3s
     num_traces: 100
@@ -27,40 +61,33 @@ processors:
         probabilistic: { sampling_percentage: 50 }
       },
     ]
-  attributes:
-    actions:
-      - key: instance
-        value: $POD_NAME
-        action: insert
-  spanmetrics:
-    metrics_exporter: otlp/spanmetrics
-    dimensions:
-      - name: http.method
-      - name: http.status_code
-      - name: instance
 
-exporters:
-  logging:
-    loglevel: debug
-  otlp/jaeger:
-    endpoint: $JAEGER_OTLP_ENDPOINT
-    tls:
-      insecure: true
-  otlp/spanmetrics:
-    endpoint: $SPANMETRICS_OTLP_ENDPOINT
-    tls:
-      insecure: true
+  filter/spanmetrics:
+    metrics:
+      include:
+        match_type: expr
+        expressions:
+          - MetricName == "latency" && Label("span.kind") == "SPAN_KIND_SERVER"
+          - MetricName == "calls_total" && Label("span.kind") == "SPAN_KIND_SERVER"
 
 service:
   telemetry:
     logs:
       level: debug
       disable_stacktrace: true
+
   pipelines:
     traces:
       receivers: [ otlp ]
-      processors: [ attributes, spanmetrics, tail_sampling ]
+      processors: [ batch, attributes, spanmetrics, tail_sampling ]
       exporters: [ logging, otlp/jaeger ]
+
     metrics/spanmetrics:
       receivers: [ otlp/spanmetrics ]
+      processors: [ batch ]
       exporters: [ otlp/spanmetrics ]
+
+    metrics:
+      receivers: [ otlp ]
+      processors: [ batch, filter/spanmetrics ]
+      exporters: [ logging, prometheus ]

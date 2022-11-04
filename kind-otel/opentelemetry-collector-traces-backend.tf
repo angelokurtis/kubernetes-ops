@@ -18,7 +18,8 @@ resource "kubectl_manifest" "opentelemetry_collector_traces_backend" {
           value = "${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}.svc.cluster.local:4317"
         },
       ]
-      podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }
+      ports          = [{ name = "spanmetrics", port = 9090 }]
+      podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "9090" }
     }
   })
 
