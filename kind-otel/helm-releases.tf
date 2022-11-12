@@ -8,20 +8,20 @@ locals {
     grafana = {
       namespace       = kubernetes_namespace_v1.grafana.metadata[0].name,
       helm_repository = "grafana",
-      dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
+      dependsOn       = [{ name = "haproxy", namespace = kubernetes_namespace_v1.haproxy.metadata[0].name }],
       values          = local.grafana,
     }
     jaeger = {
       namespace       = kubernetes_namespace_v1.jaeger.metadata[0].name,
       helm_repository = "jaegertracing",
-      dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
+      dependsOn       = [{ name = "haproxy", namespace = kubernetes_namespace_v1.haproxy.metadata[0].name }],
       values          = local.jaeger,
     }
-    nginx = {
-      namespace       = kubernetes_namespace_v1.nginx.metadata[0].name,
-      chart           = "ingress-nginx",
-      helm_repository = "ingress-nginx",
-      values          = local.nginx,
+    haproxy = {
+      namespace       = kubernetes_namespace_v1.haproxy.metadata[0].name,
+      chart           = "haproxy-ingress",
+      helm_repository = "haproxy-ingress",
+      values          = local.haproxy,
     }
     opentelemetry-operator = {
       namespace       = kubernetes_namespace_v1.opentelemetry.metadata[0].name,
@@ -32,7 +32,7 @@ locals {
     prometheus = {
       namespace       = kubernetes_namespace_v1.prometheus.metadata[0].name,
       helm_repository = "prometheus-community",
-      dependsOn       = [{ name = "nginx", namespace = kubernetes_namespace_v1.nginx.metadata[0].name }],
+      dependsOn       = [{ name = "haproxy", namespace = kubernetes_namespace_v1.haproxy.metadata[0].name }],
       values          = local.prometheus,
     }
   }

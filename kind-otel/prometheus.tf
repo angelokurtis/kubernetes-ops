@@ -9,7 +9,7 @@ locals {
     server           = {
       image      = { repository = "quay.io/prometheus/prometheus", tag = "v2.40.1" }
       extraFlags = ["web.enable-remote-write-receiver"]
-      ingress    = { enabled = true, hosts = ["prometheus.${local.cluster_host}"], ingressClassName = "nginx" }
+      ingress    = { enabled = true, hosts = ["prometheus.${local.cluster_host}"], ingressClassName = "haproxy" }
     }
   }
 }

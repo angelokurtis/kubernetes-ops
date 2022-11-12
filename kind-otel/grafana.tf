@@ -1,7 +1,7 @@
 locals {
   grafana = {
     image         = { repository = "grafana/grafana", tag = "9.2.4" }
-    ingress       = { enabled = true, hosts = ["grafana.${local.cluster_host}"], ingressClassName = "nginx" }
+    ingress       = { enabled = true, hosts = ["grafana.${local.cluster_host}"], ingressClassName = "haproxy" }
     admin         = { existingSecret = kubernetes_secret_v1.grafana_credentials.metadata[0].name }
     "grafana.ini" = {
       "auth.anonymous" = {
