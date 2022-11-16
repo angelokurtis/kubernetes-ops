@@ -19,4 +19,4 @@ service:
   pipelines:
     metrics:
       receivers: [ otlp ]
-      exporters: [ logging, prometheusremotewrite ]
+      exporters: [ prometheusremotewrite ]

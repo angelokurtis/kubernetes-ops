@@ -14,7 +14,6 @@ resource "kubectl_manifest" "opentelemetry_collector_traces" {
           value = "${kubectl_manifest.opentelemetry_collector_traces_backend.name}-collector-headless.${kubectl_manifest.opentelemetry_collector_traces_backend.namespace}.svc.cluster.local"
         },
       ]
-      podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }
     }
   })
 

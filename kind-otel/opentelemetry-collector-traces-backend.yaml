@@ -4,6 +4,28 @@ receivers:
       grpc:
       http:
 
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "otelcol-traces-backend"
+          scrape_interval: 15s
+          static_configs:
+            - targets: [ "${POD_IP}:8888" ]
+
+        - job_name: "spanmetrics"
+          scrape_interval: 15s
+          static_configs:
+            - targets: [ "${POD_IP}:9090" ]
+          metric_relabel_configs:
+            - source_labels: [ span_kind ]
+              regex: SPAN_KIND_SERVER
+              action: keep
+            - source_labels: [ http_user_agent ]
+              regex: kube-probe/.*
+              action: drop
+            - regex: http_user_agent
+              action: labeldrop
+
   # receiver that's just a dummy and never used; added to pass validation requiring at least one receiver in a pipeline.
   otlp/spanmetrics:
     protocols:
@@ -19,12 +41,12 @@ exporters:
     tls:
       insecure: true
 
-  otlp/spanmetrics:
-    endpoint: "localhost:4317"
+  otlp/metrics:
+    endpoint: $METRICS_OTLP_ENDPOINT
     tls:
       insecure: true
 
-  prometheus:
+  prometheus/spanmetrics:
     endpoint: "0.0.0.0:9090"
     metric_expiration: 70s
 
@@ -33,17 +55,12 @@ processors:
     send_batch_size: 10000
     timeout: 1s
 
-  attributes:
-    actions:
-      - key: instance
-        value: $POD_NAME
-        action: insert
-
   spanmetrics:
-    metrics_exporter: otlp/spanmetrics
+    metrics_exporter: prometheus/spanmetrics
     dimensions:
       - name: http.method
       - name: http.status_code
+      - name: http.user_agent
 
   tail_sampling:
     decision_wait: 3s
@@ -62,14 +79,6 @@ processors:
       },
     ]
 
-  filter/spanmetrics:
-    metrics:
-      include:
-        match_type: expr
-        expressions:
-          - MetricName == "latency" && Label("span.kind") == "SPAN_KIND_SERVER"
-          - MetricName == "calls_total" && Label("span.kind") == "SPAN_KIND_SERVER"
-
 service:
   telemetry:
     logs:
@@ -79,15 +88,14 @@ service:
   pipelines:
     traces:
       receivers: [ otlp ]
-      processors: [ batch, attributes, spanmetrics, tail_sampling ]
-      exporters: [ logging, otlp/jaeger ]
+      processors: [ batch, spanmetrics, tail_sampling ]
+      exporters: [ otlp/jaeger ]
 
     metrics/spanmetrics:
       receivers: [ otlp/spanmetrics ]
-      processors: [ batch ]
-      exporters: [ otlp/spanmetrics ]
+      exporters: [ prometheus/spanmetrics ]
 
     metrics:
-      receivers: [ otlp ]
-      processors: [ batch, filter/spanmetrics ]
-      exporters: [ logging, prometheus ]
+      receivers: [ prometheus ]
+      processors: [ batch ]
+      exporters: [ otlp/metrics ]

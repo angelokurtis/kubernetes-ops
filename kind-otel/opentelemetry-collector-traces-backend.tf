@@ -14,12 +14,14 @@ resource "kubectl_manifest" "opentelemetry_collector_traces_backend" {
           value = "jaeger-collector.${kubernetes_namespace_v1.jaeger.metadata[0].name}.svc.cluster.local:4317"
         },
         {
-          name  = "SPANMETRICS_OTLP_ENDPOINT"
+          name  = "METRICS_OTLP_ENDPOINT"
           value = "${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}.svc.cluster.local:4317"
         },
+        {
+          name      = "POD_IP"
+          valueFrom = { fieldRef = { fieldPath = "status.podIP" } }
+        },
       ]
-      ports          = [{ name = "spanmetrics", port = 9090 }]
-      podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "9090" }
     }
   })
 

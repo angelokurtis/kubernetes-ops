@@ -26,4 +26,4 @@ service:
   pipelines:
     traces:
       receivers: [ otlp ]
-      exporters: [ logging, loadbalancing ]
+      exporters: [ loadbalancing ]

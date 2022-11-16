@@ -14,7 +14,6 @@ resource "kubectl_manifest" "opentelemetry_collector_metrics" {
           value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
         },
       ]
-      podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }
     }
   })
 
