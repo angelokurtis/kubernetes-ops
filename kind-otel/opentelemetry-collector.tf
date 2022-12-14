@@ -17,6 +17,10 @@ resource "kubectl_manifest" "opentelemetry_collector" {
           name  = "PROMETHEUS_PUSHGATEWAY_ENDPOINT",
           value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
         },
+        {
+          name      = "POD_IP"
+          valueFrom = { fieldRef = { fieldPath = "status.podIP" } }
+        },
       ]
     }
   })

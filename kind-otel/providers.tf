@@ -5,7 +5,6 @@ terraform {
     kind       = { source = "tehcyx/kind", version = ">= 0.0.15, < 0.1.0" }
     kubectl    = { source = "gavinbunney/kubectl", version = ">= 1.14.0, < 2.0.0" }
     kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.15.0, < 3.0.0" }
-    local      = { source = "hashicorp/local", version = ">= 2.2.3, < 3.0.0" }
   }
   required_version = ">= 1.0"
 }
