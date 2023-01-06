@@ -1,6 +1,6 @@
 locals {
   grafana = {
-    image         = { repository = "grafana/grafana", tag = "9.2.4" }
+    image         = { repository = "grafana/grafana", tag = "9.3.2" }
     ingress       = { enabled = true, hosts = ["grafana.${local.cluster_host}"], ingressClassName = "nginx" }
     admin         = { existingSecret = kubernetes_secret_v1.grafana_credentials.metadata[0].name }
     "grafana.ini" = {
