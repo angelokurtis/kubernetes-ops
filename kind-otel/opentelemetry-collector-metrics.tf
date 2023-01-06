@@ -11,7 +11,7 @@ resource "kubectl_manifest" "opentelemetry_collector_metrics" {
       env      = [
         {
           name  = "PROMETHEUS_PUSHGATEWAY_ENDPOINT",
-          value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
+          value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}:80"
         },
       ]
       podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }

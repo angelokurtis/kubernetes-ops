@@ -11,7 +11,7 @@ resource "kubectl_manifest" "opentelemetry_collector_traces" {
       env      = [
         {
           name  = "RESOLVER_DNS_HOSTNAME",
-          value = "${kubectl_manifest.opentelemetry_collector_traces_backend.name}-collector-headless.${kubectl_manifest.opentelemetry_collector_traces_backend.namespace}.svc.cluster.local"
+          value = "${kubectl_manifest.opentelemetry_collector_traces_backend.name}-collector-headless.${kubectl_manifest.opentelemetry_collector_traces_backend.namespace}"
         },
       ]
       podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }

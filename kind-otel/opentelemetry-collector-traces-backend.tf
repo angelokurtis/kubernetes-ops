@@ -11,11 +11,11 @@ resource "kubectl_manifest" "opentelemetry_collector_traces_backend" {
       env      = [
         {
           name  = "JAEGER_OTLP_ENDPOINT",
-          value = "jaeger-collector.${kubernetes_namespace_v1.jaeger.metadata[0].name}.svc.cluster.local:4317"
+          value = "jaeger-collector.${kubernetes_namespace_v1.jaeger.metadata[0].name}:4317"
         },
         {
           name  = "SPANMETRICS_OTLP_ENDPOINT"
-          value = "${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}.svc.cluster.local:4317"
+          value = "${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}:4317"
         },
       ]
       ports          = [{ name = "spanmetrics", port = 9090 }]

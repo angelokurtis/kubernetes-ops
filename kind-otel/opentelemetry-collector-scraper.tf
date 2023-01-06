@@ -10,7 +10,7 @@ resource "kubectl_manifest" "opentelemetry_collector_scraper" {
       env    = [
         {
           name  = "PROMETHEUS_PUSHGATEWAY_ENDPOINT",
-          value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
+          value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}:80"
         },
         {
           name      = "KUBE_NODE_NAME",

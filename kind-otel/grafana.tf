@@ -17,7 +17,7 @@ locals {
           {
             name      = "Prometheus"
             type      = "prometheus"
-            url       = "http://prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
+            url       = "http://prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}:80"
             access    = "proxy"
             isDefault = true
           }

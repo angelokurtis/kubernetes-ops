@@ -35,8 +35,8 @@ resource "kubectl_manifest" "auto_instrumentation" {
       sampler = { type = "always_on" }
       java    = { image = "ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.19.1" }
       env     = [
-        { name = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_traces.name}-collector.${kubectl_manifest.opentelemetry_collector_traces.namespace}.svc.cluster.local:4317" },
-        { name = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}.svc.cluster.local:4317" },
+        { name = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_traces.name}-collector.${kubectl_manifest.opentelemetry_collector_traces.namespace}:4317" },
+        { name = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}:4317" },
         { name = "OTEL_TRACES_EXPORTER", value = "otlp" },
         { name = "OTEL_METRICS_EXPORTER", value = "otlp" },
         { name = "OTEL_LOGS_EXPORTER", value = "none" },

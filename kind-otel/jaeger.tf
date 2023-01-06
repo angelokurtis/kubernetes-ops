@@ -12,7 +12,7 @@ locals {
         },
         {
           name  = "PROMETHEUS_SERVER_URL",
-          value = "http://prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local"
+          value = "http://prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}"
         }
       ]
     }
