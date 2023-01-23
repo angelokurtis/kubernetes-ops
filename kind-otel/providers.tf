@@ -1,6 +1,6 @@
 terraform {
   required_providers {
-    flux       = { source = "fluxcd/flux", version = ">= 0.22.2, < 1.0.0" }
+    flux       = { source = "fluxcd/flux", version = ">= 0.22.3, < 1.0.0" }
     helm       = { source = "hashicorp/helm", version = ">= 2.8.0, < 3.0.0" }
     kind       = { source = "tehcyx/kind", version = ">= 0.0.16, < 0.1.0" }
     kubectl    = { source = "gavinbunney/kubectl", version = ">= 1.14.0, < 2.0.0" }
