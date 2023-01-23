@@ -1,6 +1,6 @@
 locals {
   fluxcd = {
-    version          = "v0.38.2"
+    version          = "v0.38.3"
     namespace        = "fluxcd"
     default_interval = "60s"
     default_timeout  = "5m"
