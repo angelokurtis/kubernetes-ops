@@ -14,7 +14,7 @@ resource "kubectl_manifest" "opentelemetry_collector_traces_backend" {
           value = "jaeger-collector.${kubernetes_namespace_v1.jaeger.metadata[0].name}:4317"
         },
         {
-          name  = "SPANMETRICS_OTLP_ENDPOINT"
+          name  = "METRICS_OTLP_ENDPOINT",
           value = "${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}:4317"
         },
       ]

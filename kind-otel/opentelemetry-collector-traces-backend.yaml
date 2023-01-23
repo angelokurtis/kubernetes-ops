@@ -10,6 +10,18 @@ receivers:
       grpc:
         endpoint: "0.0.0.0:12345"
 
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: otelcol-traces-backend
+          scrape_interval: 30s
+          static_configs:
+            - targets: [ "${POD_NAME}:8888" ]
+        - job_name: spanmetrics
+          scrape_interval: 30s
+          static_configs:
+            - targets: [ "${POD_NAME}:9090" ]
+
 exporters:
   logging:
     loglevel: debug
@@ -19,31 +31,63 @@ exporters:
     tls:
       insecure: true
 
-  otlp/spanmetrics:
-    endpoint: "localhost:4317"
+  otlp/metrics:
+    endpoint: $METRICS_OTLP_ENDPOINT
     tls:
       insecure: true
 
-  prometheus:
+  prometheus/spanmetrics:
     endpoint: "0.0.0.0:9090"
-    metric_expiration: 70s
+    metric_expiration: 45s
 
 processors:
   batch:
     send_batch_size: 10000
     timeout: 1s
 
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 50
+    spike_limit_percentage: 30
+
   attributes:
     actions:
-      - key: instance
+      - key: k8s.pod.name
         value: $POD_NAME
         action: insert
 
+  transform:
+    trace_statements:
+      - context: span
+        statements:
+          - set(attributes["http.user_agent"], attributes["http.request.header.user-agent"]) where attributes["http.request.header.user-agent"] != nil
+          - set(attributes["http.user_agent"], attributes["request.header.user-agent"]) where attributes["request.header.user-agent"] != nil
+          - delete_key(attributes, "http.request.header.user-agent")
+          - delete_key(attributes, "request.header.user-agent")
+
+  filter/spanmetrics:
+    spans:
+      include:
+        match_type: strict
+        span_kinds:
+          - SPAN_KIND_CONSUMER
+          - SPAN_KIND_SERVER
+      exclude:
+        match_type: regexp
+        attributes:
+          - Key: http.user_agent
+            Value: kube-probe/.*|Prometheus/.*|Gravitee.io/.*|ELB-HealthChecker/.*
+
+  filter/all:
+    traces:
+      span:
+        - 'IsMatch(name, ".*") == true'
+
   spanmetrics:
-    metrics_exporter: otlp/spanmetrics
     dimensions:
       - name: http.method
       - name: http.status_code
+    metrics_exporter: prometheus/spanmetrics
 
   tail_sampling:
     decision_wait: 3s
@@ -51,24 +95,16 @@ processors:
     expected_new_traces_per_sec: 10
     policies: [
       {
-        name: ignore-health-check-requests,
+        name: ignore-http-user-agent,
         type: string_attribute,
-        string_attribute: { key: http.user_agent, values: [ kube-probe/* ], enabled_regex_matching: true, invert_match: true }
+        string_attribute: { key: http.user_agent, values: [ kube-probe/.*, Prometheus/.*, Gravitee.io/.*, ELB-HealthChecker/.* ], enabled_regex_matching: true, invert_match: true }
       },
       {
-        name: sampling-50%,
+        name: sampling-100%,
         type: probabilistic,
-        probabilistic: { sampling_percentage: 50 }
+        probabilistic: { sampling_percentage: 100 }
       },
     ]
-
-  filter/spanmetrics:
-    metrics:
-      include:
-        match_type: expr
-        expressions:
-          - MetricName == "latency" && Label("span.kind") == "SPAN_KIND_SERVER"
-          - MetricName == "calls_total" && Label("span.kind") == "SPAN_KIND_SERVER"
 
 service:
   telemetry:
@@ -77,17 +113,34 @@ service:
       disable_stacktrace: true
 
   pipelines:
-    traces:
+    traces/spanmetrics:
       receivers: [ otlp ]
-      processors: [ batch, attributes, spanmetrics, tail_sampling ]
-      exporters: [ logging, otlp/jaeger ]
+      processors:
+        - memory_limiter
+        - batch
+        - transform
+        - filter/spanmetrics
+        - spanmetrics
+        - filter/all
+      exporters: [ logging ]
 
     metrics/spanmetrics:
       receivers: [ otlp/spanmetrics ]
-      processors: [ batch ]
-      exporters: [ otlp/spanmetrics ]
+      exporters: [ prometheus/spanmetrics ]
+
+    traces:
+      receivers: [ otlp ]
+      processors:
+        - memory_limiter
+        - transform
+        - tail_sampling
+        - batch
+        - attributes
+      exporters: [ otlp/jaeger ]
 
     metrics:
-      receivers: [ otlp ]
-      processors: [ batch, filter/spanmetrics ]
-      exporters: [ logging, prometheus ]
+      receivers: [ prometheus ]
+      processors:
+        - memory_limiter
+        - batch
+      exporters: [ otlp/metrics ]
