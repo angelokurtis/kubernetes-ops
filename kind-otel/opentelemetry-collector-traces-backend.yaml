@@ -4,12 +4,6 @@ receivers:
       grpc:
       http:
 
-  # receiver that's just a dummy and never used; added to pass validation requiring at least one receiver in a pipeline.
-  otlp/spanmetrics:
-    protocols:
-      grpc:
-        endpoint: "0.0.0.0:12345"
-
   prometheus:
     config:
       scrape_configs:
@@ -17,10 +11,6 @@ receivers:
           scrape_interval: 30s
           static_configs:
             - targets: [ "${POD_NAME}:8888" ]
-        - job_name: spanmetrics
-          scrape_interval: 30s
-          static_configs:
-            - targets: [ "${POD_NAME}:9090" ]
 
 exporters:
   logging:
@@ -36,10 +26,6 @@ exporters:
     tls:
       insecure: true
 
-  prometheus/spanmetrics:
-    endpoint: "0.0.0.0:9090"
-    metric_expiration: 45s
-
 processors:
   batch:
     send_batch_size: 10000
@@ -52,7 +38,7 @@ processors:
 
   attributes:
     actions:
-      - key: k8s.pod.name
+      - key: otelcol
         value: $POD_NAME
         action: insert
 
@@ -60,6 +46,7 @@ processors:
     trace_statements:
       - context: span
         statements:
+          - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
           - set(attributes["http.user_agent"], attributes["http.request.header.user-agent"]) where attributes["http.request.header.user-agent"] != nil
           - set(attributes["http.user_agent"], attributes["request.header.user-agent"]) where attributes["request.header.user-agent"] != nil
           - delete_key(attributes, "http.request.header.user-agent")
@@ -87,7 +74,10 @@ processors:
     dimensions:
       - name: http.method
       - name: http.status_code
-    metrics_exporter: prometheus/spanmetrics
+      - name: k8s.pod.name
+      - name: otelcol
+    metrics_exporter: otlp/metrics
+    metrics_flush_interval: 1m
 
   tail_sampling:
     decision_wait: 3s
@@ -118,24 +108,21 @@ service:
       processors:
         - memory_limiter
         - batch
+        - attributes
         - transform
         - filter/spanmetrics
         - spanmetrics
         - filter/all
       exporters: [ logging ]
 
-    metrics/spanmetrics:
-      receivers: [ otlp/spanmetrics ]
-      exporters: [ prometheus/spanmetrics ]
-
     traces:
       receivers: [ otlp ]
       processors:
         - memory_limiter
+        - attributes
         - transform
         - tail_sampling
         - batch
-        - attributes
       exporters: [ otlp/jaeger ]
 
     metrics:
