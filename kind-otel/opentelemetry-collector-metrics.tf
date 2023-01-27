@@ -15,6 +15,7 @@ resource "kubectl_manifest" "opentelemetry_collector_metrics" {
         },
       ]
       podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }
+      serviceAccount = "otelcol-metrics"
     }
   })
 

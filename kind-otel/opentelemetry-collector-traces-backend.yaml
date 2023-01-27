@@ -36,17 +36,10 @@ processors:
     limit_percentage: 50
     spike_limit_percentage: 30
 
-  attributes:
-    actions:
-      - key: otelcol
-        value: $POD_NAME
-        action: insert
-
   transform:
     trace_statements:
       - context: span
         statements:
-          - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
           - set(attributes["http.user_agent"], attributes["http.request.header.user-agent"]) where attributes["http.request.header.user-agent"] != nil
           - set(attributes["http.user_agent"], attributes["request.header.user-agent"]) where attributes["request.header.user-agent"] != nil
           - delete_key(attributes, "http.request.header.user-agent")
@@ -74,8 +67,6 @@ processors:
     dimensions:
       - name: http.method
       - name: http.status_code
-      - name: k8s.pod.name
-      - name: otelcol
     metrics_exporter: otlp/metrics
     metrics_flush_interval: 1m
 
@@ -108,7 +99,6 @@ service:
       processors:
         - memory_limiter
         - batch
-        - attributes
         - transform
         - filter/spanmetrics
         - spanmetrics
@@ -119,7 +109,6 @@ service:
       receivers: [ otlp ]
       processors:
         - memory_limiter
-        - attributes
         - transform
         - tail_sampling
         - batch

@@ -10,6 +10,15 @@ exporters:
   prometheusremotewrite:
     endpoint: http://$PROMETHEUS_PUSHGATEWAY_ENDPOINT/api/v1/write
 
+processors:
+  k8sattributes:
+
+  transform:
+    metric_statements:
+      - context: datapoint
+        statements:
+          - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+
 service:
   telemetry:
     metrics:
@@ -19,4 +28,5 @@ service:
   pipelines:
     metrics:
       receivers: [ otlp ]
+      processors: [ k8sattributes, transform ]
       exporters: [ logging, prometheusremotewrite ]

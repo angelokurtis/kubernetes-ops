@@ -4,6 +4,9 @@ receivers:
       grpc:
       http:
 
+processors:
+  k8sattributes:
+
 exporters:
   logging:
     loglevel: debug
@@ -26,4 +29,5 @@ service:
   pipelines:
     traces:
       receivers: [ otlp ]
+      processors: [ k8sattributes ]
       exporters: [ logging, loadbalancing ]

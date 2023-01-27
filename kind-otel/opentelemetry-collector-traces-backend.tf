@@ -20,6 +20,7 @@ resource "kubectl_manifest" "opentelemetry_collector_traces_backend" {
       ]
       ports          = [{ name = "spanmetrics", port = 9090 }]
       podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "9090" }
+      serviceAccount = "otelcol-traces-backend"
     }
   })
 
