@@ -1,6 +1,6 @@
 locals {
   grafana = {
-    image         = { repository = "grafana/grafana", tag = "9.3.2" }
+    image         = { repository = "grafana/grafana", tag = "9.3.4" }
     ingress       = { enabled = true, hosts = ["grafana.${local.cluster_host}"], ingressClassName = "haproxy" }
     admin         = { existingSecret = kubernetes_secret_v1.grafana_credentials.metadata[0].name }
     "grafana.ini" = {
@@ -17,7 +17,7 @@ locals {
           {
             name      = "Prometheus"
             type      = "prometheus"
-            url       = "http://prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
+            url       = "http://prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}:80"
             access    = "proxy"
             isDefault = true
           }
