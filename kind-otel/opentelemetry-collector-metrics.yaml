@@ -17,7 +17,7 @@ processors:
     metric_statements:
       - context: datapoint
         statements:
-          - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+          - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"]) where attributes["k8s.pod.name"] == nil
 
 service:
   telemetry:
