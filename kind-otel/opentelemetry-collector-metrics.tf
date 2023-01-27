@@ -1,44 +1,37 @@
-resource "kubectl_manifest" "opentelemetry_collector" {
+resource "kubectl_manifest" "opentelemetry_collector_metrics" {
   server_side_apply = true
   yaml_body         = yamlencode({
     apiVersion = "opentelemetry.io/v1alpha1"
     kind       = "OpenTelemetryCollector"
-    metadata   = { name = "default", namespace = kubernetes_namespace_v1.opentelemetry.metadata[0].name }
+    metadata   = { name = "metrics", namespace = kubernetes_namespace_v1.opentelemetry.metadata[0].name }
     spec       = {
-      config   = file("${path.cwd}/opentelemetry-collector.yaml")
+      config   = file("${path.cwd}/opentelemetry-collector-metrics.yaml")
       mode     = "deployment"
-      replicas = 1
+      replicas = 3
       env      = [
         {
-          name  = "JAEGER_OTLP_ENDPOINT",
-          value = "jaeger-collector.${kubernetes_namespace_v1.jaeger.metadata[0].name}.svc.cluster.local:4317"
-        },
-        {
           name  = "PROMETHEUS_PUSHGATEWAY_ENDPOINT",
-          value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}.svc.cluster.local:80"
-        },
-        {
-          name      = "POD_IP"
-          valueFrom = { fieldRef = { fieldPath = "status.podIP" } }
+          value = "prometheus-server.${kubernetes_namespace_v1.prometheus.metadata[0].name}:80"
         },
       ]
+      podAnnotations = { "prometheus.io/scrape" = "true", "prometheus.io/port" = "8888" }
     }
   })
 
   depends_on = [kubectl_manifest.fluxcd, kubernetes_job_v1.wait_helm_release["opentelemetry-operator"]]
 }
 
-resource "kubernetes_ingress_v1" "opentelemetry_collector" {
+resource "kubernetes_ingress_v1" "opentelemetry_collector_metrics" {
   metadata {
-    name        = "opentelemetry-collector"
+    name        = "opentelemetry-collector-metrics"
     namespace   = kubernetes_namespace_v1.opentelemetry.metadata[0].name
-    labels      = { app = "opentelemetry-collector" }
+    labels      = { app = "opentelemetry-collector-metrics" }
     annotations = { "haproxy-ingress.github.io/backend-protocol" = "grpc" }
   }
   spec {
     ingress_class_name = "haproxy"
     rule {
-      host = "otel.lvh.me"
+      host = "metrics.otel.lvh.me"
       http {
         path {
           path      = "/"
@@ -46,7 +39,7 @@ resource "kubernetes_ingress_v1" "opentelemetry_collector" {
 
           backend {
             service {
-              name = "default-collector"
+              name = "${kubectl_manifest.opentelemetry_collector_metrics.name}-collector"
               port {
                 number = 4317
               }
@@ -57,4 +50,3 @@ resource "kubernetes_ingress_v1" "opentelemetry_collector" {
     }
   }
 }
-
