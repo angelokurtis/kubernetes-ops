@@ -1,5 +1,11 @@
 locals {
   helm_releases = {
+    kminion = {
+      git_repository = "kminion"
+      chart          = "charts/kminion"
+      namespace      = kubernetes_namespace_v1.kminion.metadata[0].name,
+      values         = local.kminion,
+    }
     strimzi-kafka-operator = {
       helm_repository = "strimzi",
       namespace       = kubernetes_namespace_v1.kafka_operator.metadata[0].name,

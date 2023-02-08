@@ -4,6 +4,10 @@ locals {
       repository = "https://github.com/provectus/kafka-ui"
       ref        = { tag = "v0.5.0" }
     }
+    kminion = {
+      repository = "https://github.com/redpanda-data/kminion"
+      ref        = { tag = "v2.2.1" }
+    }
   }
 }
 
