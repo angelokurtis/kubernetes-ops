@@ -4,6 +4,7 @@ locals {
       git_repository = "kminion"
       chart          = "charts/kminion"
       namespace      = kubernetes_namespace_v1.kminion.metadata[0].name,
+      dependsOn      = [{ name = "strimzi-kafka-operator", namespace = kubernetes_namespace_v1.kafka_operator.metadata[0].name }],
       values         = local.kminion,
     }
     strimzi-kafka-operator = {
@@ -28,6 +29,12 @@ locals {
       helm_repository = "prometheus-community",
       dependsOn       = [{ name = "haproxy", namespace = kubernetes_namespace_v1.haproxy.metadata[0].name }],
       values          = local.prometheus,
+    }
+    grafana = {
+      namespace       = kubernetes_namespace_v1.grafana.metadata[0].name,
+      helm_repository = "grafana",
+      dependsOn       = [{ name = "haproxy", namespace = kubernetes_namespace_v1.haproxy.metadata[0].name }],
+      values          = local.grafana,
     }
   }
 }

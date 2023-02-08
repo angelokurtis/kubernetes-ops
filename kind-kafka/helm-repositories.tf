@@ -3,6 +3,7 @@ locals {
     haproxy-ingress      = { repository = "https://haproxy-ingress.github.io/charts" }
     prometheus-community = { repository = "https://prometheus-community.github.io/helm-charts" }
     strimzi              = { repository = "https://strimzi.io/charts/" }
+    grafana              = { repository = "https://grafana.github.io/helm-charts" }
   }
 }
 
