@@ -11,7 +11,7 @@ loadImage(){
 }
 
 loadImage docker.io/bitnami/kubectl:1.25
-loadImage docker.io/provectuslabs/kafka-ui:027d9b4653e2f3ea13d4de6a0b2bd568106ffb40
+loadImage docker.io/provectuslabs/kafka-ui:v0.5.0
 loadImage ghcr.io/fluxcd/helm-controller:v0.29.0
 loadImage ghcr.io/fluxcd/kustomize-controller:v0.33.0
 loadImage ghcr.io/fluxcd/source-controller:v0.34.0

@@ -14,7 +14,7 @@ locals {
     }
     image = {
       repository = "provectuslabs/kafka-ui"
-      tag        = "027d9b4653e2f3ea13d4de6a0b2bd568106ffb40"
+      tag        = "v0.5.0"
     }
   }
 }
