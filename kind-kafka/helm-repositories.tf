@@ -4,6 +4,7 @@ locals {
     prometheus-community = { repository = "https://prometheus-community.github.io/helm-charts" }
     strimzi              = { repository = "https://strimzi.io/charts/" }
     grafana              = { repository = "https://grafana.github.io/helm-charts" }
+    bitnami              = { repository = "https://charts.bitnami.com/bitnami" }
   }
 }
 
