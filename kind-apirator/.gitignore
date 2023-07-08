@@ -16,3 +16,6 @@ override.tf.json
 
 ### Generated project files ###
 apirator*config
+
+### Environment Configurations ###
+.env

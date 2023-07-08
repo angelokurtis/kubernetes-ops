@@ -1,9 +1,8 @@
 terraform {
   required_providers {
-    kind          = { source = "kyma-incubator/kind", version = ">= 0.0" }
-    kubernetes    = { source = "hashicorp/kubernetes", version = ">= 2.7" }
-    helm          = { source = "hashicorp/helm", version = ">= 2.4" }
-    kustomization = { source = "kbst/kustomization", version = ">= 0.7" }
+    kind       = { source = "tehcyx/kind", version = ">= 0.2.0, < 0.3.0" }
+    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.21.1, < 4.0.0" }
+    helm       = { source = "hashicorp/helm", version = ">= 2.10.1, < 3.0.0" }
   }
   required_version = ">= 1.0"
 }
@@ -11,15 +10,19 @@ terraform {
 provider "kind" {}
 
 provider "kubernetes" {
-  config_path = kind_cluster.apirator.kubeconfig_path
+  host = kind_cluster.apirator.endpoint
+
+  client_certificate     = kind_cluster.apirator.client_certificate
+  client_key             = kind_cluster.apirator.client_key
+  cluster_ca_certificate = kind_cluster.apirator.cluster_ca_certificate
 }
 
 provider "helm" {
   kubernetes {
-    config_path = kind_cluster.apirator.kubeconfig_path
-  }
-}
+    host = kind_cluster.apirator.endpoint
 
-provider "kustomization" {
-  kubeconfig_path = kind_cluster.apirator.kubeconfig_path
+    client_certificate     = kind_cluster.apirator.client_certificate
+    client_key             = kind_cluster.apirator.client_key
+    cluster_ca_certificate = kind_cluster.apirator.cluster_ca_certificate
+  }
 }
