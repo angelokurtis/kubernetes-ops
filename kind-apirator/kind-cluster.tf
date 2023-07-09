@@ -42,3 +42,7 @@ resource "kind_cluster" "apirator" {
     }
   }
 }
+
+data "kubectl_server_version" "current" {
+  depends_on = [kind_cluster.apirator]
+}

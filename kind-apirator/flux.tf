@@ -1,6 +1,5 @@
 locals {
-  wait_timeouts = "10m"
-  flux_crds     = [
+  flux_crds = [
     "crd/alerts.notification.toolkit.fluxcd.io",
     "crd/buckets.source.toolkit.fluxcd.io",
     "crd/gitrepositories.source.toolkit.fluxcd.io",
@@ -36,10 +35,9 @@ resource "kubernetes_job_v1" "wait_flux_crd" {
       spec {
         service_account_name = kubernetes_service_account_v1.wait_flux_crd.metadata[0].name
         container {
-          name    = "kubectl"
-          image   = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
-          command = ["/bin/sh", "-c"]
-          args    = flatten(["wait", "--for=condition=Ready", local.flux_crds, "--timeout", local.wait_timeouts])
+          name  = "kubectl"
+          image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
+          args  = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
         }
         restart_policy = "Never"
       }
@@ -48,13 +46,13 @@ resource "kubernetes_job_v1" "wait_flux_crd" {
   wait_for_completion = true
 
   timeouts {
-    create = local.wait_timeouts
-    update = local.wait_timeouts
+    create = "10m"
+    update = "10m"
   }
 
   depends_on = [
     helm_release.flux,
-    kubernetes_role_binding_v1.wait_flux_crd,
+    kubernetes_cluster_role_binding_v1.crd_readers,
   ]
 }
 
@@ -65,27 +63,6 @@ resource "kubernetes_service_account_v1" "wait_flux_crd" {
   }
 }
 
-resource "kubernetes_role_binding_v1" "wait_flux_crd" {
-  metadata {
-    name      = "wait-flux-crd"
-    namespace = kubernetes_namespace.flux.metadata[0].name
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.crd_reader.metadata[0].name
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account_v1.wait_flux_crd.metadata[0].name
-    namespace = kubernetes_service_account_v1.wait_flux_crd.metadata[0].namespace
-  }
-}
-
 resource "kubernetes_namespace" "flux" {
   metadata { name = "flux" }
-}
-
-data "kubectl_server_version" "current" {
-  depends_on = [kind_cluster.apirator]
 }
