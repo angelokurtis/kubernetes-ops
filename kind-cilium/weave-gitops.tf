@@ -57,7 +57,7 @@ resource "kubernetes_config_map_v1" "gitops_server" {
         enabled   = true
         hosts     = [
           {
-            host  = "gitops.lvh.me"
+            host  = "gitops.${local.cluster_host}"
             paths = [{ path = "/", pathType = "ImplementationSpecific" }]
           },
         ]
