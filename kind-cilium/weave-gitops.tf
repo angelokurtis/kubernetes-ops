@@ -10,6 +10,11 @@ resource "kubectl_manifest" "git_repository_weave_gitops" {
       url: https://github.com/weaveworks/weave-gitops
       ref:
         semver: ^0.28.0
+      ignore: |
+        # exclude all
+        /*
+        # include charts dir
+        !/charts
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
