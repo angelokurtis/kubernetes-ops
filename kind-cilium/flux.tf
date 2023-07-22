@@ -1,6 +1,5 @@
 locals {
-  wait_timeouts = "10m"
-  flux_crds     = [
+  flux_crds = [
     "customresourcedefinition.apiextensions.k8s.io/alerts.notification.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/buckets.source.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/gitrepositories.source.toolkit.fluxcd.io",
@@ -18,11 +17,12 @@ locals {
 }
 
 resource "helm_release" "flux" {
-  repository       = "https://fluxcd-community.github.io/helm-charts"
-  chart            = "flux2"
-  name             = "flux"
-  namespace        = kubernetes_namespace.flux.metadata[0].name
-  create_namespace = true
+  repository = "https://fluxcd-community.github.io/helm-charts"
+  chart      = "flux2"
+
+  name      = "flux"
+  version   = "2.9.0"
+  namespace = kubernetes_namespace.flux.metadata[0].name
 }
 
 resource "kubernetes_job_v1" "wait_flux_crd" {
@@ -39,7 +39,7 @@ resource "kubernetes_job_v1" "wait_flux_crd" {
           name    = "kubectl"
           image   = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
           command = ["/bin/sh", "-c"]
-          args    = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", local.wait_timeouts])
+          args    = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
         }
         restart_policy = "Never"
       }
@@ -48,8 +48,8 @@ resource "kubernetes_job_v1" "wait_flux_crd" {
   wait_for_completion = true
 
   timeouts {
-    create = local.wait_timeouts
-    update = local.wait_timeouts
+    create = "10m"
+    update = "10m"
   }
 
   depends_on = [
