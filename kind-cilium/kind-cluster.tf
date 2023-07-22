@@ -10,6 +10,10 @@ resource "kind_cluster" "cilium" {
     kind        = "Cluster"
     api_version = "kind.x-k8s.io/v1alpha4"
 
+    networking {
+      disable_default_cni = true
+    }
+
     node {
       role  = "control-plane"
       image = "kindest/node:${local.kind.version}"
