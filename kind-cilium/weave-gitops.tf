@@ -58,12 +58,12 @@ resource "kubernetes_config_map_v1" "gitops_server" {
         passwordHash = "$2a$12$7CuWwmxV.JpdUcR.99nWtuH4662RLgcNUoP2XZolBkExz.1MJsQiK"
       }
       ingress = {
-        className = "nginx"
+        className = "cilium"
         enabled   = true
         hosts     = [
           {
             host  = "gitops.${local.cluster_host}"
-            paths = [{ path = "/", pathType = "ImplementationSpecific" }]
+            paths = [{ path = "/", pathType = "Prefix" }]
           },
         ]
       }

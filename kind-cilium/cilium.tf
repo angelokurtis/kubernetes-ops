@@ -21,8 +21,20 @@ resource "helm_release" "cilium" {
 
   values = [
     yamlencode({
-      image = { pullPolicy = "IfNotPresent" }
-      ipam  = { mode = "kubernetes" }
+      image                = { pullPolicy = "IfNotPresent" }
+      ipam                 = { mode = "kubernetes" }
+      kubeProxyReplacement = "strict"
+      ingressController    = {
+        enabled          = true
+        enforceHttps     = false
+        loadbalancerMode = "shared"
+        service          = {
+          insecureNodePort = 30080
+          secureNodePort   = 30443
+          type             = "NodePort"
+          loadBalancerIP   = "127.0.0.1"
+        }
+      }
     })
   ]
 }
