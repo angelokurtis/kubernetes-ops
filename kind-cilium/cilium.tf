@@ -14,15 +14,21 @@ locals {
 resource "helm_release" "cilium" {
   repository = "https://helm.cilium.io"
   chart      = "cilium"
+  version    = "1.13.4"
 
   name      = "cilium"
-  version   = "1.13.4"
   namespace = kubernetes_namespace.cilium.metadata[0].name
 
   values = [
     yamlencode({
-      image                = { pullPolicy = "IfNotPresent" }
-      ipam                 = { mode = "kubernetes" }
+      cluster         = { name = "kind-${kind_cluster.cilium.name}" }
+      ipam            = { mode = "kubernetes" }
+      operator        = { replicas = 1 }
+      serviceAccounts = {
+        cilium   = { name = "cilium" }
+        operator = { name = "cilium-operator" }
+      }
+      tunnel               = "vxlan"
       kubeProxyReplacement = "strict"
       ingressController    = {
         enabled          = true
