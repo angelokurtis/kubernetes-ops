@@ -55,7 +55,7 @@ resource "kubernetes_config_map_v1" "gitops_server" {
       adminUser     = {
         create       = true
         username     = "admin"
-        passwordHash = "$2a$12$7CuWwmxV.JpdUcR.99nWtuH4662RLgcNUoP2XZolBkExz.1MJsQiK"
+        passwordHash = bcrypt("admin")
       }
       ingress = {
         className = "cilium"
