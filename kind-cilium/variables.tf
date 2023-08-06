@@ -1,7 +1,7 @@
-variable "docker_volume" {
-  type        = string
-  description = "Docker volume for kind Image caching"
-  default     = null
+variable "image_caching" {
+  type        = bool
+  description = "Use Docker volume for kind Image caching"
+  default     = false
 }
 
 variable "load_balancer_address" {

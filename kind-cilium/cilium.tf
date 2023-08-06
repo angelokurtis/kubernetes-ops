@@ -14,7 +14,7 @@ locals {
 resource "helm_release" "cilium" {
   repository = "https://helm.cilium.io"
   chart      = "cilium"
-  version    = "1.13.4"
+  version    = "1.14.0"
 
   name      = "cilium"
   namespace = kubernetes_namespace.cilium.metadata[0].name
@@ -28,18 +28,10 @@ resource "helm_release" "cilium" {
         cilium   = { name = "cilium" }
         operator = { name = "cilium-operator" }
       }
-      tunnel               = "vxlan"
-      kubeProxyReplacement = "strict"
-      ingressController    = {
-        enabled          = true
-        enforceHttps     = false
-        loadbalancerMode = "shared"
-        service          = {
-          insecureNodePort = 30080
-          secureNodePort   = 30443
-          type             = "NodePort"
-          loadBalancerIP   = "127.0.0.1"
-        }
+      tunnel = "vxlan"
+      hubble = {
+        relay = { enabled = true }
+        ui    = { enabled = true }
       }
     })
   ]
@@ -74,6 +66,7 @@ resource "kubernetes_job_v1" "wait_cilium_crd" {
 
   depends_on = [
     kubernetes_role_binding_v1.wait_cilium_crd,
+    helm_release.cilium,
   ]
 }
 
