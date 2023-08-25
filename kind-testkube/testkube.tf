@@ -45,6 +45,22 @@ resource "kubernetes_config_map_v1" "testkube" {
   }
   data = {
     "values.yaml" = yamlencode({
+      testkube-api = {
+        uiIngress = {
+          className = "nginx"
+          enabled   = true
+          path      = "/results/(v\\d/.*)"
+          hosts     = ["testkube.${local.cluster_host}"]
+        }
+      }
+      testkube-dashboard = {
+        ingress = {
+          className = "nginx"
+          enabled   = true
+          hosts     = ["testkube.${local.cluster_host}"]
+        }
+        apiServerEndpoint = "testkube.${local.cluster_host}"
+      }
     })
   }
 }
