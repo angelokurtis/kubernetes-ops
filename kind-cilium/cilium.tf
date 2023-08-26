@@ -14,7 +14,7 @@ locals {
 resource "helm_release" "cilium" {
   repository = "https://helm.cilium.io"
   chart      = "cilium"
-  version    = "1.14.0"
+  version    = "1.14.1"
 
   name      = "cilium"
   namespace = kubernetes_namespace.cilium.metadata[0].name
