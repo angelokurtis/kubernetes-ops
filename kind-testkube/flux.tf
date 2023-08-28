@@ -36,10 +36,9 @@ resource "kubernetes_job_v1" "wait_flux_crd" {
       spec {
         service_account_name = kubernetes_service_account_v1.wait_flux_crd.metadata[0].name
         container {
-          name    = "kubectl"
-          image   = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
-          command = ["/bin/sh", "-c"]
-          args    = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
+          name  = "kubectl"
+          image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
+          args  = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
         }
         restart_policy = "Never"
       }
@@ -53,7 +52,8 @@ resource "kubernetes_job_v1" "wait_flux_crd" {
   }
 
   depends_on = [
-    kubernetes_role_binding_v1.wait_flux_crd,
+    helm_release.flux,
+    kubernetes_cluster_role_binding_v1.wait_flux_crd,
   ]
 }
 
@@ -64,10 +64,9 @@ resource "kubernetes_service_account_v1" "wait_flux_crd" {
   }
 }
 
-resource "kubernetes_role_binding_v1" "wait_flux_crd" {
+resource "kubernetes_cluster_role_binding_v1" "wait_flux_crd" {
   metadata {
-    name      = "wait-flux-crd"
-    namespace = kubernetes_namespace.flux.metadata[0].name
+    name = "wait-flux-crd"
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
