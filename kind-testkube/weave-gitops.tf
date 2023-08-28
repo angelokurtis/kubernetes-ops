@@ -39,6 +39,9 @@ resource "kubectl_manifest" "helm_release_gitops_server" {
         - kind: ConfigMap
           name: ${kubernetes_config_map_v1.gitops_server.metadata[0].name}
       interval: 60s
+      dependsOn:
+        - name: nginx
+          namespace: ${kubernetes_namespace.nginx.metadata[0].name}
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
