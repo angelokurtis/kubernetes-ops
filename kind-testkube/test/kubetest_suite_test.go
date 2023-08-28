@@ -7,18 +7,14 @@ import (
 	"testing"
 )
 
-var baseURL string
+var host string
 
 func init() {
-	flag.StringVar(&baseURL, "base-url", "", "Url of the server to test")
+	flag.StringVar(&host, "host", "testkube-api-server:8088", "Host of the server to test")
 }
 
 func TestKubetest(t *testing.T) {
 	RegisterFailHandler(Fail)
-
-	if baseURL == "" {
-		baseURL = "google.com"
-	}
 
 	RunSpecs(t, "Kubetest Suite")
 }
