@@ -3,6 +3,7 @@ package kubetest_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"io"
 	"net/http"
 	"net/url"
 )
@@ -16,6 +17,8 @@ var _ = Describe("Try TestKube API for a 200", func() {
 		}).String())
 		Expect(requestErr).To(BeNil())
 		Expect(resp.StatusCode).To(Equal(200))
-		Expect(resp.Body).To(Equal("OK 👋!"))
+		body, readErr := io.ReadAll(resp.Body)
+		Expect(readErr).To(BeNil())
+		Expect(string(body)).To(Equal("OK 👋!"))
 	})
 })
