@@ -37,6 +37,7 @@ resource "kubernetes_config_map_v1" "rabbitmq" {
         path             = "/"
         pathType         = "ImplementationSpecific"
       }
+      service = { type = "NodePort" }
     })
   }
 }
