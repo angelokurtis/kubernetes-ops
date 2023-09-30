@@ -16,16 +16,16 @@ resource "kubectl_manifest" "helm_release_rabbitmq" {
             namespace: ${kubernetes_namespace.flux.metadata[0].name}
       valuesFrom:
         - kind: ConfigMap
-          name: ${kubernetes_config_map_v1.rabbitmq.metadata[0].name}
+          name: ${kubernetes_config_map_v1.rabbitmq_values.metadata[0].name}
       interval: 60s
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
-resource "kubernetes_config_map_v1" "rabbitmq" {
+resource "kubernetes_config_map_v1" "rabbitmq_values" {
   metadata {
-    name      = "rabbitmq"
+    name      = "rabbitmq-values"
     namespace = kubernetes_namespace.rabbitmq.metadata[0].name
   }
   data = {
@@ -37,6 +37,7 @@ resource "kubernetes_config_map_v1" "rabbitmq" {
         path             = "/"
         pathType         = "ImplementationSpecific"
       }
+      metrics = { enabled = true }
       service = { type = "NodePort" }
     })
   }
