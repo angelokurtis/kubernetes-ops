@@ -37,8 +37,10 @@ resource "kubernetes_config_map_v1" "rabbitmq_values" {
         path             = "/"
         pathType         = "ImplementationSpecific"
       }
-      metrics = { enabled = true }
-      service = { type = "NodePort" }
+      metrics          = { enabled = true }
+      service          = { type = "NodePort" }
+      communityPlugins = "https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v3.12.0/rabbitmq_delayed_message_exchange-3.12.0.ez"
+      extraPlugins     = "rabbitmq_delayed_message_exchange"
     })
   }
 }
