@@ -31,16 +31,16 @@ resource "kubectl_manifest" "helm_release_nginx" {
             namespace: ${kubernetes_namespace.flux.metadata[0].name}
       valuesFrom:
         - kind: ConfigMap
-          name: ${kubernetes_config_map_v1.nginx.metadata[0].name}
+          name: ${kubernetes_config_map_v1.nginx_helm_values.metadata[0].name}
       interval: 60s
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
-resource "kubernetes_config_map_v1" "nginx" {
+resource "kubernetes_config_map_v1" "nginx_helm_values" {
   metadata {
-    name      = "nginx"
+    name      = "nginx-helm-values"
     namespace = kubernetes_namespace.nginx.metadata[0].name
   }
   data = {

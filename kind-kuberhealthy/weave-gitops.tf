@@ -37,7 +37,7 @@ resource "kubectl_manifest" "helm_release_gitops_server" {
             namespace: ${kubernetes_namespace.flux.metadata[0].name}
       valuesFrom:
         - kind: ConfigMap
-          name: ${kubernetes_config_map_v1.gitops_server.metadata[0].name}
+          name: ${kubernetes_config_map_v1.gitops_server_helm_values.metadata[0].name}
       interval: 60s
       dependsOn:
         - name: nginx
@@ -47,9 +47,9 @@ resource "kubectl_manifest" "helm_release_gitops_server" {
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
-resource "kubernetes_config_map_v1" "gitops_server" {
+resource "kubernetes_config_map_v1" "gitops_server_helm_values" {
   metadata {
-    name      = "gitops-server"
+    name      = "gitops-server-helm-values"
     namespace = kubernetes_namespace.weave_gitops.metadata[0].name
   }
   data = {
