@@ -10,7 +10,7 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 .PHONY: up
-up: init apply
+up: init apply ## Alias for 'make init' followed by 'make apply'.
 
 .PHONY: init
 init: ## Initialize Terraform configurations
