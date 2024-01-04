@@ -1,6 +1,6 @@
 locals {
   cluster_host = var.load_balancer_address == "127.0.0.1" ? "lvh.me" : "${join("", formatlist("%02x", split(".", var.load_balancer_address)))}.nip.io"
-  kind         = { version = "v1.24.7" }
+  kind         = { version = "v1.27.3" }
 }
 
 resource "kind_cluster" "otel" {
@@ -41,4 +41,8 @@ resource "kind_cluster" "otel" {
       }
     }
   }
+}
+
+data "kubectl_server_version" "current" {
+  depends_on = [kind_cluster.otel]
 }
