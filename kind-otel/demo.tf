@@ -1,57 +1,59 @@
-locals {
-  bets = {
-    kustomization_patches = [
-      {
-        target = { kind = "Deployment" }
-        patch  = jsonencode([
-          {
-            op    = "add"
-            path  = "/spec/template/metadata/annotations"
-            value = {
-#              "prometheus.io/port": "8080"
-#              "prometheus.io/scrape": "true"
-              "instrumentation.opentelemetry.io/inject-java" = "true"
-              "checksum/auto-instrumentation"                = sha256(kubectl_manifest.auto_instrumentation.yaml_body)
-            }
-          },
-          { op = "replace", path = "/spec/replicas", value = 2 },
-          {
-            op    = "add", path = "/spec/template/spec/containers/0/env",
-            value = [{ name = "LOGGING_PATTERN_LEVEL", value = "trace_id=%mdc{trace_id} span_id=%mdc{span_id} %5p" }]
-          }
-        ])
-      }
-    ]
-  }
+resource "kubectl_manifest" "kustomization_football_bets" {
+  yaml_body = <<-YAML
+    apiVersion: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    metadata:
+      name: football-bets
+      namespace: ${kubernetes_namespace.demo.metadata[0].name}
+    spec:
+      interval: 60s
+      prune: true
+      targetNamespace: ${kubernetes_namespace.demo.metadata[0].name}
+      path: "./manifests/base/"
+      sourceRef:
+        kind: GitRepository
+        name: football-bets
+        namespace: ${kubernetes_namespace.flux.metadata[0].name}
+      healthChecks:
+        - kind: Deployment
+          name: bets
+          namespace: ${kubernetes_namespace.demo.metadata[0].name}
+        - kind: Deployment
+          name: championships
+          namespace: ${kubernetes_namespace.demo.metadata[0].name}
+        - kind: Deployment
+          name: matches
+          namespace: ${kubernetes_namespace.demo.metadata[0].name}
+        - kind: Deployment
+          name: teams
+          namespace: ${kubernetes_namespace.demo.metadata[0].name}
+      timeout: 5m
+  YAML
+
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
-resource "kubectl_manifest" "auto_instrumentation" {
-  server_side_apply = true
-  yaml_body         = yamlencode({
-    apiVersion = "opentelemetry.io/v1alpha1"
-    kind       = "Instrumentation"
-    metadata   = { name = "auto-instrumentation", namespace = kubernetes_namespace_v1.demo.metadata[0].name }
-    spec       = {
-      sampler = { type = "always_on" }
-      java    = { image = "ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.19.1" }
-      env     = [
-        { name = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_traces.name}-collector.${kubectl_manifest.opentelemetry_collector_traces.namespace}:4317" },
-        { name = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", value = "http://${kubectl_manifest.opentelemetry_collector_metrics.name}-collector.${kubectl_manifest.opentelemetry_collector_metrics.namespace}:4317" },
-        { name = "OTEL_TRACES_EXPORTER", value = "otlp" },
-        { name = "OTEL_METRICS_EXPORTER", value = "otlp" },
-        { name = "OTEL_LOGS_EXPORTER", value = "none" },
-        { name = "OTEL_EXPERIMENTAL_EXPORTER_OTLP_RETRY_ENABLED", value = "true" }
-      ]
-    }
-  })
+resource "kubectl_manifest" "git_repository_football_bets" {
+  yaml_body = <<-YAML
+    apiVersion: source.toolkit.fluxcd.io/v1
+    kind: GitRepository
+    metadata:
+      name: football-bets
+      namespace: ${kubernetes_namespace.flux.metadata[0].name}
+    spec:
+      interval: 60s
+      url: https://github.com/angelokurtis/football-bets
+      ref:
+        branch: multiverse/java-spring
+  YAML
 
-  depends_on = [kubectl_manifest.fluxcd, kubernetes_job_v1.wait_helm_release["opentelemetry-operator"]]
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
 resource "kubernetes_ingress_v1" "demo" {
   metadata {
     name      = "demo"
-    namespace = kubernetes_namespace_v1.demo.metadata[0].name
+    namespace = kubernetes_namespace.demo.metadata[0].name
   }
   spec {
     ingress_class_name = "nginx"
@@ -107,6 +109,6 @@ resource "kubernetes_ingress_v1" "demo" {
   }
 }
 
-resource "kubernetes_namespace_v1" "demo" {
+resource "kubernetes_namespace" "demo" {
   metadata { name = "demo" }
 }
