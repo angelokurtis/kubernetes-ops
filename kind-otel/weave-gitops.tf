@@ -58,7 +58,7 @@ resource "kubernetes_config_map_v1" "gitops_server_helm_values" {
       adminUser     = {
         create       = true
         username     = "admin"
-        passwordHash = bcrypt("admin")
+        passwordHash = null_resource.weave_gitops_admin_password.triggers.password
       }
       ingress = {
         className = "nginx"
@@ -71,6 +71,16 @@ resource "kubernetes_config_map_v1" "gitops_server_helm_values" {
         ]
       }
     })
+  }
+}
+
+resource "null_resource" "weave_gitops_admin_password" {
+  triggers = {
+    password = bcrypt("admin")
+  }
+
+  lifecycle {
+    ignore_changes = [triggers["password"]]
   }
 }
 
