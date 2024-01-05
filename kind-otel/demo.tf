@@ -28,6 +28,14 @@ resource "kubectl_manifest" "kustomization_football_bets" {
           name: teams
           namespace: ${kubernetes_namespace.demo.metadata[0].name}
       timeout: 5m
+      patches:
+        - patch: |
+            - op: add
+              path: "/spec/template/metadata/annotations"
+              value:
+                sidecar.opentelemetry.io/inject: "true"
+          target:
+            kind: Deployment
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
