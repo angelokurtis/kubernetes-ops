@@ -29,10 +29,25 @@ resource "kubectl_manifest" "helm_release_opentelemetry_operator" {
             kind: HelmRepository
             name: opentelemetry
             namespace: ${kubernetes_namespace.flux.metadata[0].name}
+      valuesFrom:
+        - kind: ConfigMap
+          name: ${kubernetes_config_map_v1.opentelemetry_operator_helm_values.metadata[0].name}
       interval: 60s
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
+}
+
+resource "kubernetes_config_map_v1" "opentelemetry_operator_helm_values" {
+  metadata {
+    name      = "opentelemetry-operator-helm-values"
+    namespace = kubernetes_namespace.opentelemetry.metadata[0].name
+  }
+  data = {
+    "values.yaml" = yamlencode({
+      admissionWebhooks = { certManager = { enabled = true } }
+    })
+  }
 }
 
 resource "kubernetes_namespace" "opentelemetry" {
