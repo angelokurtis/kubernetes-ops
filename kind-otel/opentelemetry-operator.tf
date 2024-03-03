@@ -33,6 +33,9 @@ resource "kubectl_manifest" "helm_release_opentelemetry_operator" {
         - kind: ConfigMap
           name: ${kubernetes_config_map_v1.opentelemetry_operator_helm_values.metadata[0].name}
       interval: 60s
+      dependsOn:
+        - name: cert-manager
+          namespace: ${kubernetes_namespace.cert_manager.metadata[0].name}
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
