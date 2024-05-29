@@ -1,34 +1,40 @@
 terraform {
   required_providers {
-    kind       = { source = "kyma-incubator/kind", version = ">= 0" }
-    flux       = { source = "fluxcd/flux", version = ">= 0" }
-    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2" }
-    kubectl    = { source = "gavinbunney/kubectl", version = ">= 1" }
+    kind       = { source = "tehcyx/kind", version = ">= 0.2.1, < 0.3.0" }
+    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.25.1, < 4.0.0" }
+    helm       = { source = "hashicorp/helm", version = ">= 2.12.1, < 3.0.0" }
+    kubectl    = { source = "alekc/kubectl", version = ">= 2.0.4, < 3.0.0" }
+    null       = { source = "hashicorp/null", version = ">= 3.2.2, < 4.0.0" }
   }
   required_version = ">= 1.0"
 }
 
 provider "kind" {}
 
-provider "flux" {}
-
 provider "kubernetes" {
-  host = kind_cluster.keycloak_cluster.endpoint
+  host = kind_cluster.keycloak.endpoint
 
-  client_certificate     = kind_cluster.keycloak_cluster.client_certificate
-  client_key             = kind_cluster.keycloak_cluster.client_key
-  cluster_ca_certificate = kind_cluster.keycloak_cluster.cluster_ca_certificate
+  client_certificate     = kind_cluster.keycloak.client_certificate
+  client_key             = kind_cluster.keycloak.client_key
+  cluster_ca_certificate = kind_cluster.keycloak.cluster_ca_certificate
 }
+
+provider "helm" {
+  kubernetes {
+    host = kind_cluster.keycloak.endpoint
+
+    client_certificate     = kind_cluster.keycloak.client_certificate
+    client_key             = kind_cluster.keycloak.client_key
+    cluster_ca_certificate = kind_cluster.keycloak.cluster_ca_certificate
+  }
+}
+
 
 provider "kubectl" {
-  host = kind_cluster.keycloak_cluster.endpoint
+  host = kind_cluster.keycloak.endpoint
 
-  client_certificate     = kind_cluster.keycloak_cluster.client_certificate
-  client_key             = kind_cluster.keycloak_cluster.client_key
-  cluster_ca_certificate = kind_cluster.keycloak_cluster.cluster_ca_certificate
+  client_certificate     = kind_cluster.keycloak.client_certificate
+  client_key             = kind_cluster.keycloak.client_key
+  cluster_ca_certificate = kind_cluster.keycloak.cluster_ca_certificate
   load_config_file       = false
-}
-
-data "kubectl_server_version" "current" {
-  depends_on = [kind_cluster.keycloak_cluster]
 }
