@@ -1,5 +1,5 @@
-resource "kind_cluster" "keycloak_cluster" {
-  name           = "keycloak-cluster"
+resource "kind_cluster" "keycloak" {
+  name           = "keycloak"
   wait_for_ready = true
 
   kind_config {
@@ -7,12 +7,12 @@ resource "kind_cluster" "keycloak_cluster" {
     api_version = "kind.x-k8s.io/v1alpha4"
 
     node {
-      role  = "control-plane"
-      image = "kindest/node@sha256:a69c29d3d502635369a5fe92d8e503c09581fcd406ba6598acc5d80ff5ba81b1" # v1.23.5
+      role = "control-plane"
+      image = "kindest/node:${local.kind.version}"
 
       kubeadm_config_patches = [
         yamlencode({
-          "kind"             = "InitConfiguration"
+          "kind" = "InitConfiguration"
           "nodeRegistration" = { "kubeletExtraArgs" = { "node-labels" = "ingress-ready=true" } }
         }),
       ]
@@ -35,4 +35,8 @@ resource "kind_cluster" "keycloak_cluster" {
       }
     }
   }
+}
+
+data "kubectl_server_version" "current" {
+  depends_on = [kind_cluster.keycloak]
 }
