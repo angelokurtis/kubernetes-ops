@@ -34,7 +34,7 @@ spec:
 YAML
 
   depends_on = [
-    kubectl_manifest.fluxcd,
+    kubernetes_job_v1.wait_flux_crd,
     kubectl_manifest.bitnami_helm_repository
   ]
 }

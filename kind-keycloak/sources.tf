@@ -10,7 +10,7 @@ spec:
   url: https://charts.bitnami.com/bitnami
 YAML
 
-  depends_on = [kubectl_manifest.fluxcd]
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
 resource "kubectl_manifest" "ingress_nginx_helm_repository" {
@@ -25,5 +25,5 @@ spec:
   url: https://kubernetes.github.io/ingress-nginx
 YAML
 
-  depends_on = [kubectl_manifest.fluxcd]
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
