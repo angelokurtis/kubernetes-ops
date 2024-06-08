@@ -48,13 +48,15 @@ spec:
     spec:
       chart: postgresql
       reconcileStrategy: ChartVersion
-      version: ">=10.0.0 <11.0.0"
+      version: "15.5.0"
       sourceRef:
         kind: HelmRepository
         name: bitnami
         namespace: default
   values:
-    initdbScriptsSecret: "${kubernetes_secret.userdata.metadata[0].name}"
+    primary:
+      initdb:
+        scriptsSecret: "${kubernetes_secret.userdata.metadata[0].name}"
     fullnameOverride: postgresql
 YAML
 
