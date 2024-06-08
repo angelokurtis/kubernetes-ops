@@ -21,15 +21,13 @@ spec:
   values:
     auth:
       adminUser: admin
-      existingSecretPerPassword:
-        adminPassword:
-          name: ${kubernetes_secret_v1.keycloak_passwords.metadata[0].name}
-        databasePassword:
-          name: ${kubernetes_secret_v1.keycloak_passwords.metadata[0].name}
-        managementPassword:
-          name: ${kubernetes_secret_v1.keycloak_passwords.metadata[0].name}
     externalDatabase:
-      existingSecret: ${kubernetes_secret_v1.database_env_vars.metadata[0].name}
+      existingSecret: ${kubernetes_secret_v1.database_credentials.metadata[0].name}
+      existingSecretDatabaseKey: db-name
+      existingSecretHostKey: db-host
+      existingSecretPortKey: db-port
+      existingSecretUserKey: db-user
+      existingSecretPasswordKey: db-password
     extraEnvVars:
       - name: KEYCLOAK_LOGLEVEL
         value: DEBUG
@@ -68,16 +66,17 @@ resource "kubernetes_secret_v1" "keycloak_passwords" {
   }
 }
 
-resource "kubernetes_secret_v1" "database_env_vars" {
+resource "kubernetes_secret_v1" "database_credentials" {
   metadata {
-    name      = "database-env-vars"
+    name      = "database-credentials"
     namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
   data = {
-    KEYCLOAK_DATABASE_HOST = "postgresql.${kubernetes_namespace.postgresql.metadata[0].name}.svc.cluster.local"
-    KEYCLOAK_DATABASE_PORT = 5432
-    KEYCLOAK_DATABASE_NAME = local.database["keycloak"]["database"]
-    KEYCLOAK_DATABASE_USER = local.database["keycloak"]["user"]
+    db-host     = "postgresql.${kubernetes_namespace.postgresql.metadata[0].name}.svc.cluster.local"
+    db-port     = 5432
+    db-name     = local.database["keycloak"]["database"]
+    db-user     = local.database["keycloak"]["user"]
+    db-password = local.database["keycloak"]["password"]
   }
 }
 
