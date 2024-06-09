@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"log"
+
 	"github.com/Nerzal/gocloak/v11"
 	"github.com/pkg/errors"
-	"log"
 )
 
 type RealmService struct {
@@ -18,13 +19,16 @@ func NewRealmService(keycloak Keycloak, token AccessToken) *RealmService {
 
 func (svc *RealmService) CreateRealm(realm *Realm) error {
 	ctx := context.Background()
+
 	_, err := svc.keycloak.CreateRealm(ctx, string(svc.token), newRealm(realm.ID))
 	if isConflictError(err) {
 		return nil
 	} else if err != nil {
 		return errors.WithStack(err)
 	}
+
 	log.Printf("realm %q created", realm.ID)
+
 	return nil
 }
 

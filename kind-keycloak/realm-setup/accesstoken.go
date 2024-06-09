@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/pkg/errors"
 )
 
@@ -12,5 +13,6 @@ func NewAccessToken(keycloak Keycloak, config *KeycloakConfig) (AccessToken, err
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
+
 	return AccessToken(token.AccessToken), nil
 }

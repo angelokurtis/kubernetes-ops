@@ -10,15 +10,19 @@ func main() {
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
+
 	realm, err := NewRealm(keycloakConfig)
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
+
 	keycloak := NewKeycloak(keycloakConfig)
+
 	accessToken, err := NewAccessToken(keycloak, keycloakConfig)
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
+
 	userService := NewUserService(keycloak, accessToken)
 	realmService := NewRealmService(keycloak, accessToken)
 	clientService := NewClientService(keycloak, accessToken)

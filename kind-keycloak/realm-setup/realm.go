@@ -2,17 +2,20 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
+
+	"github.com/pkg/errors"
 )
 
 func UnmarshalRealm(data []byte) (*Realm, error) {
 	r := new(Realm)
+
 	err := json.Unmarshal(data, r)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return r, nil
 }
 
@@ -32,10 +35,12 @@ func NewRealm(config *KeycloakConfig) (*Realm, error) {
 		return nil, errors.WithStack(err)
 	}
 	defer file.Close()
+
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return UnmarshalRealm(data)
 }
 

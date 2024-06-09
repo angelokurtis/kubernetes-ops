@@ -16,9 +16,11 @@ type KeycloakConfig struct {
 // NewKeycloakConfig read Keycloak configs from env vars
 func NewKeycloakConfig() (*KeycloakConfig, error) {
 	k := new(KeycloakConfig)
+
 	err := envconfig.Process("KEYCLOAK", k)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return k, nil
 }
