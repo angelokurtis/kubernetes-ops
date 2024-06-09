@@ -21,6 +21,7 @@ spec:
   values:
     auth:
       adminUser: admin
+      existingSecret: ${kubernetes_secret_v1.keycloak_passwords.metadata[0].name}
     externalDatabase:
       existingSecret: ${kubernetes_secret_v1.database_credentials.metadata[0].name}
       existingSecretDatabaseKey: db-name
@@ -37,6 +38,10 @@ spec:
       enabled: false
     service:
       type: ClusterIP
+    ingress:
+      enabled: true
+      ingressClassName: "nginx"
+      hostname: ${local.keycloak.host}
 YAML
 
   depends_on = [
@@ -60,9 +65,9 @@ resource "kubernetes_secret_v1" "keycloak_passwords" {
     namespace = kubernetes_namespace.keycloak.metadata[0].name
   }
   data = {
-    adminPassword      = random_password.keycloak_admin.result
-    managementPassword = random_password.keycloak_management.result
-    databasePassword   = local.database["keycloak"]["password"]
+    admin-password      = random_password.keycloak_admin.result
+    management-password = random_password.keycloak_management.result
+    database-password   = local.database["keycloak"]["password"]
   }
 }
 
