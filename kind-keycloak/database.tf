@@ -48,7 +48,7 @@ spec:
     spec:
       chart: postgresql
       reconcileStrategy: ChartVersion
-      version: "15.5.0"
+      version: "^15.0.0"
       sourceRef:
         kind: HelmRepository
         name: bitnami
