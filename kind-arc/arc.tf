@@ -57,10 +57,12 @@ resource "kubernetes_secret_v1" "github_config" {
     name      = "github-config"
     namespace = kubernetes_namespace.arc.metadata[0].name
   }
+  binary_data = {
+    github_app_private_key = filebase64(var.github_app_private_key_path)
+  }
   data = {
     github_app_id              = var.github_app_id
     github_app_installation_id = var.github_app_installation_id
-    github_app_private_key     = "-----BEGIN RSA PRIVATE KEY-----\n${var.github_app_private_key}"
   }
 }
 
