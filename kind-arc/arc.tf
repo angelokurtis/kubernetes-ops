@@ -47,7 +47,22 @@ resource "kubernetes_config_map_v1" "arc_helm_values" {
   }
   data = {
     "values.yaml" = yamlencode({
+      githubConfigSecret = kubernetes_secret_v1.github_config.metadata[0].name
     })
+  }
+}
+
+resource "kubernetes_secret_v1" "github_config" {
+  metadata {
+    name      = "github-config"
+    namespace = kubernetes_namespace.arc.metadata[0].name
+  }
+  binary_data = {
+    github_app_private_key = filebase64(var.github_app_private_key_path)
+  }
+  data = {
+    github_app_id              = var.github_app_id
+    github_app_installation_id = var.github_app_installation_id
   }
 }
 
