@@ -52,6 +52,46 @@ resource "kubernetes_config_map_v1" "arc_helm_values" {
   }
 }
 
+
+resource "kubectl_manifest" "helm_release_arc_runner_set" {
+  yaml_body = <<-YAML
+    apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    metadata:
+      name: arc-runner-set
+      namespace: ${kubernetes_namespace.arc.metadata[0].name}
+    spec:
+      chart:
+        spec:
+          chart: gha-runner-scale-set
+          version: "^0.9.0"
+          reconcileStrategy: ChartVersion
+          sourceRef:
+            kind: HelmRepository
+            name: actions-runner-controller
+            namespace: ${kubernetes_namespace.flux.metadata[0].name}
+      valuesFrom:
+        - kind: ConfigMap
+          name: ${kubernetes_config_map_v1.arc_runner_set_helm_values.metadata[0].name}
+      interval: 60s
+  YAML
+
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
+}
+
+resource "kubernetes_config_map_v1" "arc_runner_set_helm_values" {
+  metadata {
+    name      = "arc-runner-set-helm-values"
+    namespace = kubernetes_namespace.arc.metadata[0].name
+  }
+  data = {
+    "values.yaml" = yamlencode({
+      githubConfigUrl    = "https://github.com/BugExtermination-Co/my-go-app"
+      githubConfigSecret = kubernetes_secret_v1.github_config.metadata[0].name
+    })
+  }
+}
+
 resource "kubernetes_secret_v1" "github_config" {
   metadata {
     name      = "github-config"
