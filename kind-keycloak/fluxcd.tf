@@ -23,6 +23,14 @@ resource "helm_release" "flux" {
 
   name      = "flux"
   namespace = kubernetes_namespace.flux.metadata[0].name
+
+  values = [
+    yamlencode({
+      imageAutomationController = { create = false }
+      imageReflectionController = { create = false }
+      notificationController = { create = false }
+    })
+  ]
 }
 
 resource "kubernetes_job_v1" "wait_flux_crd" {
@@ -38,7 +46,7 @@ resource "kubernetes_job_v1" "wait_flux_crd" {
         container {
           name  = "kubectl"
           image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
-          args  = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
+          args = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
         }
         restart_policy = "Never"
       }
