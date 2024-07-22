@@ -1,18 +1,12 @@
 locals {
   flux_crds = [
-    "customresourcedefinition.apiextensions.k8s.io/alerts.notification.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/buckets.source.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/gitrepositories.source.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/helmcharts.source.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/helmreleases.helm.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/helmrepositories.source.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/imagepolicies.image.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/imagerepositories.image.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/imageupdateautomations.image.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/kustomizations.kustomize.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/ocirepositories.source.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/providers.notification.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/receivers.notification.toolkit.fluxcd.io",
   ]
 }
 
