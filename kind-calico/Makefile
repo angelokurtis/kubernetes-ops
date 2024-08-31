@@ -26,8 +26,8 @@ apply: ## Starts a Kubernetes cluster running local using Docker containers and 
 
 .PHONY: down
 down: clean ## Uninstall all solution components and destroy the local Kubernetes cluster.
-	kind delete cluster --name calico
+	kind delete cluster --name ktstst
 
 .PHONY: clean
 clean: ## Removing all Terraform generated config files.
-	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* calico-config
+	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* ktstst-config
