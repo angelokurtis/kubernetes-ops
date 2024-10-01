@@ -27,6 +27,8 @@ resource "kubectl_manifest" "helm_release_gitops_server" {
     metadata:
       name: gitops-server
       namespace: ${kubernetes_namespace.weave_gitops.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.gitops_server_helm_values.data["values.yaml"])}
     spec:
       chart:
         spec:

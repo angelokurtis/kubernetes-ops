@@ -20,6 +20,8 @@ resource "kubectl_manifest" "helm_release_grafana" {
     metadata:
       name: grafana
       namespace: ${kubernetes_namespace.grafana.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.grafana_helm_values.data["values.yaml"])}
     spec:
       chart:
         spec:

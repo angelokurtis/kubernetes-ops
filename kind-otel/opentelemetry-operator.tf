@@ -20,6 +20,8 @@ resource "kubectl_manifest" "helm_release_opentelemetry_operator" {
     metadata:
       name: opentelemetry-operator
       namespace: ${kubernetes_namespace.opentelemetry.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.opentelemetry_operator_helm_values.data["values.yaml"])}
     spec:
       chart:
         spec:
@@ -49,6 +51,7 @@ resource "kubernetes_config_map_v1" "opentelemetry_operator_helm_values" {
   data = {
     "values.yaml" = yamlencode({
       admissionWebhooks = { certManager = { enabled = true } }
+      manager = { collectorImage = { repository = "otel/opentelemetry-collector-contrib" } }
     })
   }
 }

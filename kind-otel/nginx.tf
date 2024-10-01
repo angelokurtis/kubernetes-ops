@@ -20,6 +20,8 @@ resource "kubectl_manifest" "helm_release_nginx" {
     metadata:
       name: nginx
       namespace: ${kubernetes_namespace.nginx.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.nginx_helm_values.data["values.yaml"])}
     spec:
       chart:
         spec:

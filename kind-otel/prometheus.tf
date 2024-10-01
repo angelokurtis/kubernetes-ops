@@ -20,6 +20,8 @@ resource "kubectl_manifest" "helm_release_prometheus" {
     metadata:
       name: prometheus
       namespace: ${kubernetes_namespace.prometheus.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.prometheus_helm_values.data["values.yaml"])}
     spec:
       chart:
         spec:

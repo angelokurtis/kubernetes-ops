@@ -20,6 +20,8 @@ resource "kubectl_manifest" "helm_release_jaeger" {
     metadata:
       name: jaeger
       namespace: ${kubernetes_namespace.jaeger.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.jaeger_helm_values.data["values.yaml"])}
     spec:
       chart:
         spec:

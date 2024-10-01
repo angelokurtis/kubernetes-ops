@@ -20,6 +20,8 @@ resource "kubectl_manifest" "helm_release_cert_manager" {
     metadata:
       name: cert-manager
       namespace: ${kubernetes_namespace.cert_manager.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.cert_manager_helm_values.data["values.yaml"])}
     spec:
       chart:
         spec:
