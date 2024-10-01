@@ -67,6 +67,21 @@ resource "kubernetes_config_map_v1" "grafana_helm_values" {
               url       = "http://prometheus-server.${kubernetes_namespace.prometheus.metadata[0].name}:80"
               access    = "proxy"
               isDefault = true
+            },
+            {
+              "name"   = "Tempo",
+              "type"   = "tempo",
+              "url"    = "http://tempo.${kubernetes_namespace.tempo.metadata[0].name}:3100"
+              "access" = "proxy",
+              "jsonData" = {
+                "httpMethod" = "GET",
+                "traceToLogs" = {
+                  "datasourceUid"      = "",
+                  "spanStartTimeShift" = "",
+                  "spanEndTimeShift"   = "",
+                  "filterByTraceID"    = true
+                }
+              },
             }
           ]
         }
