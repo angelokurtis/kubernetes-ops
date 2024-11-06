@@ -10,27 +10,27 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 .PHONY: init
-init: ## Initialize Terraform configurations
+init: ## Set up Terraform with latest updates.
 	terraform init -upgrade=true
 
 .PHONY: quickstart
-quickstart: init ## Initialize Terraform configurations
+quickstart: init ## Run setup, load images, and apply all configurations.
 	terraform apply -auto-approve -target=kind_cluster.otel
 	scripts/loadimages.sh
 	terraform apply -auto-approve
 
 .PHONY: plan
-plan: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+plan: ## Show planned changes without applying.
 	terraform plan
 
 .PHONY: apply
-apply: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
+apply: ## Apply all configurations to start the cluster.
 	terraform apply -auto-approve
 
 .PHONY: down
-down: clean ## Uninstall all solution components and destroy the local Kubernetes cluster
+down: clean ## Remove cluster and components.
 	kind delete cluster --name otel
 
 .PHONY: clean
-clean: ## Removing all Terraform generated config files
+clean: ## Delete generated Terraform files.
 	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* otel-config
