@@ -9,7 +9,7 @@ resource "kubectl_manifest" "git_repository_angelokurtis_provider_github" {
       interval: 60s
       url: https://github.com/angelokurtis/provider-github
       ref:
-        branch: main
+        branch: develop
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
