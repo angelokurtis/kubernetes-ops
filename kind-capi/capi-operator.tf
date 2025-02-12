@@ -50,6 +50,7 @@ resource "kubernetes_config_map_v1" "capi_operator_helm_values" {
   }
   data = {
     "values.yaml" = yamlencode({
+      infrastructure = "proxmox"
       cert-manager = { enabled = true }
       configSecret = {
         name      = kubernetes_secret_v1.proxmox_credentials.metadata[0].name
@@ -65,21 +66,12 @@ resource "kubernetes_secret_v1" "proxmox_credentials" {
     namespace = kubernetes_namespace.capi_operator.metadata[0].name
   }
   data = {
-    PROXMOX_URL      = "https://X.X.X.X:8006/api2/json"
-    PROXMOX_USER     = "user@pam"
-    PROXMOX_PASSWORD = ""
+    PROXMOX_URL    = "https://pve.example:8006/api2/json"
+    PROXMOX_TOKEN  = "root@pam!capi"
+    PROXMOX_SECRET = ""
   }
 }
 
 resource "kubernetes_namespace" "capi_operator" {
   metadata { name = "capi-operator" }
 }
-
-# helm install capi-operator capi-operator/cluster-api-operator
-#   --create-namespace
-#   -n capi-operator-system
-#   --set infrastructure=docker
-#   --set cert-manager.enabled=true
-#   --set configSecret.name=${CREDENTIALS_SECRET_NAME}
-#   --set configSecret.namespace=${CREDENTIALS_SECRET_NAMESPACE}
-#   --wait --timeout 90s
