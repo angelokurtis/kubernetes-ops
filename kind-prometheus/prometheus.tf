@@ -49,13 +49,15 @@ resource "kubernetes_config_map_v1" "kube_prometheus_stack_helm_values" {
     "values.yaml" = yamlencode({
       prometheus = {
         ingress = {
-          enabled = true
+          enabled          = true
+          ingressClassName = "nginx"
           hosts = ["prometheus.${local.cluster_host}"]
         }
       }
       alertmanager = {
         ingress = {
-          enabled = true
+          enabled          = true
+          ingressClassName = "nginx"
           hosts = ["alertmanager.${local.cluster_host}"]
         }
       }
