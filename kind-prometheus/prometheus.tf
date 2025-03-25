@@ -1,41 +1,66 @@
-resource "kubectl_manifest" "prometheus_helm_release" {
-  yaml_body = <<YAML
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
-metadata:
-  name: prometheus
-  namespace: ${kubernetes_namespace.prometheus.metadata[0].name}
-spec:
-  interval: ${local.fluxcd.default_interval}
-  chart:
+resource "kubectl_manifest" "helm_repository_prometheus_community" {
+  yaml_body = <<-YAML
+    apiVersion: source.toolkit.fluxcd.io/v1beta2
+    kind: HelmRepository
+    metadata:
+      name: prometheus-community
+      namespace: ${kubernetes_namespace.flux.metadata[0].name}
     spec:
-      chart: prometheus
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-        namespace: ${kubernetes_namespace.fluxcd.metadata[0].name}
-  values:
-    server:
-      ingress:
-        enabled: true
-        hosts:
-          - prometheus.${local.cluster_host}
-    pushgateway:
-      ingress:
-        enabled: true
-        hosts:
-          - pushgateway.${local.cluster_host}
-    alertmanager:
-      ingress:
-        enabled: true
-        hosts:
-          - alertmanager.${local.cluster_host}
-YAML
+      interval: 60s
+      url: https://prometheus-community.github.io/helm-charts
+  YAML
 
-  depends_on = [
-    kubectl_manifest.fluxcd,
-    kubectl_manifest.prometheus_community_helm_repository
-  ]
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
+}
+
+resource "kubectl_manifest" "helm_release_kube_prometheus_stack" {
+  yaml_body = <<-YAML
+    apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    metadata:
+      name: kube-prometheus-stack
+      namespace: ${kubernetes_namespace.prometheus.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.kube_prometheus_stack_helm_values.data["values.yaml"])}
+    spec:
+      chart:
+        spec:
+          chart: kube-prometheus-stack
+          reconcileStrategy: ChartVersion
+          sourceRef:
+            kind: HelmRepository
+            name: prometheus-community
+            namespace: ${kubernetes_namespace.flux.metadata[0].name}
+      valuesFrom:
+        - kind: ConfigMap
+          name: ${kubernetes_config_map_v1.kube_prometheus_stack_helm_values.metadata[0].name}
+      interval: 60s
+  YAML
+
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
+}
+
+resource "kubernetes_config_map_v1" "kube_prometheus_stack_helm_values" {
+  metadata {
+    name      = "kube-prometheus-stack-helm-values"
+    namespace = kubernetes_namespace.prometheus.metadata[0].name
+  }
+  data = {
+    "values.yaml" = yamlencode({
+      prometheus = {
+        ingress = {
+          enabled = true
+          hosts = ["prometheus.${local.cluster_host}"]
+        }
+      }
+      alertmanager = {
+        ingress = {
+          enabled = true
+          hosts = ["alertmanager.${local.cluster_host}"]
+        }
+      }
+    })
+  }
 }
 
 resource "kubernetes_namespace" "prometheus" {
