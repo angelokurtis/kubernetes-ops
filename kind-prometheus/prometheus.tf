@@ -65,6 +65,16 @@ resource "kubernetes_config_map_v1" "kube_prometheus_stack_helm_values" {
   }
 }
 
+resource "kubernetes_secret_v1" "alertmanager_slack_secret" {
+  metadata {
+    name      = "alertmanager-slack"
+    namespace = kubernetes_namespace.prometheus.metadata[0].name
+  }
+  binary_data = {
+    slack_api_url = base64encode(var.slack_webhook_url)
+  }
+}
+
 resource "kubernetes_namespace" "prometheus" {
   metadata { name = var.prometheus_namespace }
 }
