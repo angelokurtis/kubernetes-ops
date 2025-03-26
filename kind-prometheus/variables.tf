@@ -13,10 +13,6 @@ variable "fluxcd_namespace" {
   default = "fluxcd"
 }
 
-variable "traefik_namespace" {
-  default = "traefik"
-}
-
 variable "prometheus_namespace" {
   default = "prometheus"
 }
