@@ -10,9 +10,20 @@ variable "load_balancer_address" {
 }
 
 variable "fluxcd_namespace" {
-  default = "fluxcd"
+  type        = string
+  description = "The namespace for FluxCD, a tool for GitOps, which automates Kubernetes deployments"
+  default     = "fluxcd"
 }
 
 variable "prometheus_namespace" {
-  default = "prometheus"
+  type        = string
+  description = "The namespace for Prometheus, a monitoring and alerting toolkit for Kubernetes"
+  default     = "prometheus"
+}
+
+variable "slack_webhook_url" {
+  type        = string
+  description = "The URL of the Slack webhook for sending alerts and notifications"
+  sensitive   = true
+  nullable    = false
 }
