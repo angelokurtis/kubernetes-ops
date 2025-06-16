@@ -11,21 +11,21 @@ help: ## This help.
 
 .PHONY: init
 init: ## Set up Terraform with latest updates.
-	terraform init -upgrade=true
+	tofu init -upgrade=true
 
 .PHONY: quickstart
 quickstart: init ## Run setup, load images, and apply all configurations.
-	terraform apply -auto-approve -target=kind_cluster.crossplane
+	tofu apply -auto-approve -target=kind_cluster.crossplane
 	scripts/loadimages.sh
-	terraform apply -auto-approve
+	tofu apply -auto-approve
 
 .PHONY: plan
 plan: ## Show planned changes without applying.
-	terraform plan
+	tofu plan
 
 .PHONY: apply
 apply: ## Apply all configurations to start the cluster.
-	terraform apply -auto-approve
+	tofu apply -auto-approve
 
 .PHONY: down
 down: clean ## Remove cluster and components.
