@@ -1,22 +1,12 @@
 terraform {
   required_providers {
-    kind       = { source = "tehcyx/kind", version = ">= 0.2.1, < 0.3.0" }
-    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.25.1, < 4.0.0" }
-    helm       = { source = "hashicorp/helm", version = ">= 2.12.1, < 3.0.0" }
-    kubectl    = { source = "alekc/kubectl", version = ">= 2.0.4, < 3.0.0" }
-    null       = { source = "hashicorp/null", version = ">= 3.2.2, < 4.0.0" }
+    helm = { source = "hashicorp/helm", version = "~> 2.17" }
+    kind = { source = "tehcyx/kind", version = "~> 0.9" }
+    kubectl = { source = "alekc/kubectl", version = "~> 2.1" }
+    kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.37" }
+    null = { source = "hashicorp/null", version = "~> 3.2" }
   }
-  required_version = ">= 1.0"
-}
-
-provider "kind" {}
-
-provider "kubernetes" {
-  host = kind_cluster.crossplane.endpoint
-
-  client_certificate     = kind_cluster.crossplane.client_certificate
-  client_key             = kind_cluster.crossplane.client_key
-  cluster_ca_certificate = kind_cluster.crossplane.cluster_ca_certificate
+  required_version = ">= 1.9"
 }
 
 provider "helm" {
@@ -29,6 +19,7 @@ provider "helm" {
   }
 }
 
+provider "kind" {}
 
 provider "kubectl" {
   host = kind_cluster.crossplane.endpoint
@@ -37,4 +28,15 @@ provider "kubectl" {
   client_key             = kind_cluster.crossplane.client_key
   cluster_ca_certificate = kind_cluster.crossplane.cluster_ca_certificate
   load_config_file       = false
+}
+
+provider "kubernetes" {
+  host = kind_cluster.crossplane.endpoint
+
+  client_certificate     = kind_cluster.crossplane.client_certificate
+  client_key             = kind_cluster.crossplane.client_key
+  cluster_ca_certificate = kind_cluster.crossplane.cluster_ca_certificate
+}
+
+provider "null" {
 }
