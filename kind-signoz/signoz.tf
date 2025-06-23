@@ -62,7 +62,21 @@ resource "kubernetes_config_map_v1" "signoz_helm_values" {
             {
               host = "signoz.${local.cluster_host}"
               paths = [
-                { path = "/", pathType = "ImplementationSpecific", port = 8080 }
+                { path = "/", pathType = "Prefix", port = 8080 }
+              ]
+            },
+          ]
+        }
+      }
+      otelCollector = {
+        ingress = {
+          className = "nginx"
+          enabled   = true
+          hosts = [
+            {
+              host = "otelcollector.${local.cluster_host}"
+              paths = [
+                { path = "/", pathType = "Prefix", port = 4318 }
               ]
             },
           ]
