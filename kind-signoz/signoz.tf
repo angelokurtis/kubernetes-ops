@@ -54,6 +54,20 @@ resource "kubernetes_config_map_v1" "signoz_helm_values" {
       global = {
         storageClass = data.kubernetes_storage_class.standard.metadata[0].name
       }
+      signoz = {
+        ingress = {
+          className = "nginx"
+          enabled   = true
+          hosts = [
+            {
+              host = "signoz.${local.cluster_host}"
+              paths = [
+                { path = "/", pathType = "ImplementationSpecific", port = 8080 }
+              ]
+            },
+          ]
+        }
+      }
     })
   }
 }
