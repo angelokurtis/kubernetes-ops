@@ -15,6 +15,6 @@ metadata:
       Marketplace](https://marketplace.upbound.io/providers/upbound/provider-opentofu).
     friendly-name.meta.crossplane.io: Provider OpenTofu
 spec:
-  package: xpkg.upbound.io/upbound/provider-opentofu:v0.2.5
+  package: xpkg.upbound.io/upbound/provider-opentofu:v0.2.6
   runtimeConfigRef:
     name: opentofu-config
