@@ -41,7 +41,7 @@ spec:
     ingress:
       enabled: true
       ingressClassName: "nginx"
-      hostname: ${local.keycloak.host}
+      hostname: "keycloak.${local.cluster_host}"
 YAML
 
   depends_on = [
@@ -86,5 +86,5 @@ resource "kubernetes_secret_v1" "database_credentials" {
 }
 
 resource "kubernetes_namespace" "keycloak" {
-  metadata { name = local.keycloak.namespace }
+  metadata { name = "keycloak" }
 }
