@@ -22,7 +22,7 @@ resource "kubectl_manifest" "git_repository_weave_gitops" {
 
 resource "kubectl_manifest" "helm_release_gitops_server" {
   yaml_body = <<-YAML
-    apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
       name: gitops-server
