@@ -3,19 +3,19 @@ locals {
     "keycloak",
   ]
   database = {
-  for db in local.databases : db => {
-    database = "${db}_db"
-    user     = db
-    password = random_password.databases[db].result
-  }
+    for db in local.databases : db => {
+      database = "${db}_db"
+      user     = db
+      password = random_password.databases[db].result
+    }
   }
 }
 
 resource "random_password" "databases" {
   for_each = toset(local.databases)
-  keepers  = { database = each.key }
-  length   = 16
-  special  = false
+  keepers = { database = each.key }
+  length  = 16
+  special = false
 }
 
 resource "kubernetes_secret" "userdata" {
@@ -67,5 +67,5 @@ YAML
 }
 
 resource "kubernetes_namespace" "postgresql" {
-  metadata { name = local.postgresql.namespace }
+  metadata { name = "postgresql" }
 }
