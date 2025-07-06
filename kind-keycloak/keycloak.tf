@@ -1,6 +1,23 @@
+resource "kubectl_manifest" "oci_repository_keycloak" {
+  yaml_body = <<-YAML
+    apiVersion: source.toolkit.fluxcd.io/v1beta2
+    kind: OCIRepository
+    metadata:
+      name: keycloak
+      namespace: ${kubernetes_namespace.flux.metadata[0].name}
+    spec:
+      interval: 60s
+      url: oci://registry-1.docker.io/bitnamicharts/keycloak
+      ref:
+        semver: "^24.0.0"
+  YAML
+
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
+}
+
 resource "kubectl_manifest" "helm_release_keycloak" {
   yaml_body = <<YAML
-    apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
       name: keycloak
@@ -8,18 +25,10 @@ resource "kubectl_manifest" "helm_release_keycloak" {
       annotations:
         "checksum/config": ${sha256(kubernetes_config_map_v1.keycloak_helm_values.data["values.yaml"])}
     spec:
-      dependsOn:
-        - name: postgresql
-          namespace: ${kubernetes_namespace.postgresql.metadata[0].name}
-      interval: 60s
-      chart:
-        spec:
-          chart: keycloak
-          reconcileStrategy: ChartVersion
-          sourceRef:
-            kind: HelmRepository
-            name: bitnami
-            namespace: ${kubernetes_namespace.flux.metadata[0].name}
+      chartRef:
+        kind: OCIRepository
+        name: keycloak
+        namespace: ${kubernetes_namespace.flux.metadata[0].name}
       valuesFrom:
         - kind: ConfigMap
           name: ${kubernetes_config_map_v1.keycloak_helm_values.metadata[0].name}
@@ -29,7 +38,7 @@ resource "kubectl_manifest" "helm_release_keycloak" {
   depends_on = [
     kubernetes_job_v1.wait_flux_crd,
     kubectl_manifest.helm_repository_bitnami,
-    kubectl_manifest.postgresql_helm_release,
+    kubectl_manifest.helm_release_postgresql,
   ]
 }
 
@@ -89,7 +98,7 @@ resource "kubernetes_secret_v1" "keycloak_passwords" {
   data = {
     admin-password      = random_password.keycloak_admin.result
     management-password = random_password.keycloak_management.result
-    database-password   = local.database["keycloak"]["password"]
+    database-password   = local.database_credentials["keycloak"]["password"]
   }
 }
 
@@ -101,9 +110,9 @@ resource "kubernetes_secret_v1" "database_credentials" {
   data = {
     db-host     = "postgresql.${kubernetes_namespace.postgresql.metadata[0].name}.svc.cluster.local"
     db-port     = 5432
-    db-name     = local.database["keycloak"]["database"]
-    db-user     = local.database["keycloak"]["user"]
-    db-password = local.database["keycloak"]["password"]
+    db-name     = local.database_credentials["keycloak"]["database"]
+    db-user     = local.database_credentials["keycloak"]["user"]
+    db-password = local.database_credentials["keycloak"]["password"]
   }
 }
 
