@@ -18,3 +18,4 @@ crash.*.log
 *.iml
 **/.terraform/*
 .env
+tfplan
