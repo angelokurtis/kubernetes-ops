@@ -6,7 +6,7 @@ metadata:
   name: bitnami
   namespace: default
 spec:
-  interval: ${local.fluxcd.default_interval}
+  interval: 60s
   url: https://charts.bitnami.com/bitnami
 YAML
 
@@ -21,7 +21,7 @@ metadata:
   name: ingress-nginx
   namespace: default
 spec:
-  interval: ${local.fluxcd.default_interval}
+  interval: 60s
   url: https://kubernetes.github.io/ingress-nginx
 YAML
 

@@ -43,7 +43,7 @@ metadata:
   name: postgresql
   namespace: ${kubernetes_namespace.postgresql.metadata[0].name}
 spec:
-  interval: ${local.fluxcd.default_interval}
+  interval: 60s
   chart:
     spec:
       chart: postgresql

@@ -9,7 +9,7 @@ spec:
   dependsOn:
     - name: postgresql
       namespace: ${kubernetes_namespace.postgresql.metadata[0].name}
-  interval: ${local.fluxcd.default_interval}
+  interval: 60s
   chart:
     spec:
       chart: keycloak
