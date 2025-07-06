@@ -1,22 +1,13 @@
 terraform {
   required_providers {
-    kind       = { source = "tehcyx/kind", version = ">= 0.5.1, < 1.0.0" }
-    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.30.0, < 4.0.0" }
-    helm       = { source = "hashicorp/helm", version = ">= 2.13.2, < 3.0.0" }
-    kubectl    = { source = "alekc/kubectl", version = ">= 2.0.4, < 3.0.0" }
-    null       = { source = "hashicorp/null", version = ">= 3.2.2, < 4.0.0" }
+    helm = { source = "hashicorp/helm", version = "~> 2.17" }
+    kind = { source = "tehcyx/kind", version = "~> 0.9" }
+    kubectl = { source = "alekc/kubectl", version = "~> 2.1" }
+    kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.37" }
+    kustomization = { source = "kbst/kustomization", version = "~> 0.9" }
+    null = { source = "hashicorp/null", version = "~> 3.2" }
   }
-  required_version = ">= 1.0"
-}
-
-provider "kind" {}
-
-provider "kubernetes" {
-  host = kind_cluster.keycloak.endpoint
-
-  client_certificate     = kind_cluster.keycloak.client_certificate
-  client_key             = kind_cluster.keycloak.client_key
-  cluster_ca_certificate = kind_cluster.keycloak.cluster_ca_certificate
+  required_version = ">= 1.9"
 }
 
 provider "helm" {
@@ -29,6 +20,7 @@ provider "helm" {
   }
 }
 
+provider "kind" {}
 
 provider "kubectl" {
   host = kind_cluster.keycloak.endpoint
@@ -37,4 +29,19 @@ provider "kubectl" {
   client_key             = kind_cluster.keycloak.client_key
   cluster_ca_certificate = kind_cluster.keycloak.cluster_ca_certificate
   load_config_file       = false
+}
+
+provider "kubernetes" {
+  host = kind_cluster.keycloak.endpoint
+
+  client_certificate     = kind_cluster.keycloak.client_certificate
+  client_key             = kind_cluster.keycloak.client_key
+  cluster_ca_certificate = kind_cluster.keycloak.cluster_ca_certificate
+}
+
+provider "kustomization" {
+  kubeconfig_raw = kind_cluster.keycloak.kubeconfig
+}
+
+provider "null" {
 }
