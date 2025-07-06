@@ -22,6 +22,10 @@ plan: ## Show planned changes without applying.
 apply: ## Apply all configurations to start the cluster.
 	tofu apply -input=false tfplan
 
+.PHONY: output
+output: ## Show Keycloak access info (URL, user, password)
+	tofu output keycloak_access_info
+
 .PHONY: down
 down: clean ## Remove cluster and components.
 	kind delete cluster --name keycloak
