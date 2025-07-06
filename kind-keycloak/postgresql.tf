@@ -97,7 +97,7 @@ resource "kubernetes_secret" "userdata" {
     namespace = kubernetes_namespace.postgresql.metadata[0].name
   }
 
-  data = {
+  binary_data = {
     "userdata.sql" = base64encode(local.userdata_sql)
   }
 }
