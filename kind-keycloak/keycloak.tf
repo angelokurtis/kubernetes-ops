@@ -1,54 +1,76 @@
-resource "kubectl_manifest" "keycloak_helm_release" {
+resource "kubectl_manifest" "helm_release_keycloak" {
   yaml_body = <<YAML
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
-metadata:
-  name: keycloak
-  namespace: ${kubernetes_namespace.keycloak.metadata[0].name}
-spec:
-  dependsOn:
-    - name: postgresql
-      namespace: ${kubernetes_namespace.postgresql.metadata[0].name}
-  interval: 60s
-  chart:
+    apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    metadata:
+      name: keycloak
+      namespace: ${kubernetes_namespace.keycloak.metadata[0].name}
+      annotations:
+        "checksum/config": ${sha256(kubernetes_config_map_v1.keycloak_helm_values.data["values.yaml"])}
     spec:
-      chart: keycloak
-      reconcileStrategy: ChartVersion
-      sourceRef:
-        kind: HelmRepository
-        name: bitnami
-        namespace: default
-  values:
-    auth:
-      adminUser: admin
-      existingSecret: ${kubernetes_secret_v1.keycloak_passwords.metadata[0].name}
-    externalDatabase:
-      existingSecret: ${kubernetes_secret_v1.database_credentials.metadata[0].name}
-      existingSecretDatabaseKey: db-name
-      existingSecretHostKey: db-host
-      existingSecretPortKey: db-port
-      existingSecretUserKey: db-user
-      existingSecretPasswordKey: db-password
-    extraEnvVars:
-      - name: KEYCLOAK_LOGLEVEL
-        value: DEBUG
-      - name: ROOT_LOGLEVEL
-        value: DEBUG
-    postgresql:
-      enabled: false
-    service:
-      type: ClusterIP
-    ingress:
-      enabled: true
-      ingressClassName: "nginx"
-      hostname: "keycloak.${local.cluster_host}"
-YAML
+      dependsOn:
+        - name: postgresql
+          namespace: ${kubernetes_namespace.postgresql.metadata[0].name}
+      interval: 60s
+      chart:
+        spec:
+          chart: keycloak
+          reconcileStrategy: ChartVersion
+          sourceRef:
+            kind: HelmRepository
+            name: bitnami
+            namespace: ${kubernetes_namespace.flux.metadata[0].name}
+      valuesFrom:
+        - kind: ConfigMap
+          name: ${kubernetes_config_map_v1.keycloak_helm_values.metadata[0].name}
+      interval: 60s
+  YAML
 
   depends_on = [
     kubernetes_job_v1.wait_flux_crd,
-    kubectl_manifest.bitnami_helm_repository,
+    kubectl_manifest.helm_repository_bitnami,
     kubectl_manifest.postgresql_helm_release,
   ]
+}
+
+resource "kubernetes_config_map_v1" "keycloak_helm_values" {
+  metadata {
+    name      = "keycloak-helm-values"
+    namespace = kubernetes_namespace.keycloak.metadata[0].name
+  }
+  data = {
+    "values.yaml" = yamlencode({
+      auth = {
+        adminUser      = "admin"
+        existingSecret = kubernetes_secret_v1.keycloak_passwords.metadata[0].name
+      }
+      externalDatabase = {
+        existingSecret            = kubernetes_secret_v1.database_credentials.metadata[0].name
+        existingSecretDatabaseKey = "db-name"
+        existingSecretHostKey     = "db-host"
+        existingSecretPasswordKey = "db-password"
+        existingSecretPortKey     = "db-port"
+        existingSecretUserKey     = "db-user"
+      }
+      extraEnvVars = [
+        {
+          name  = "KEYCLOAK_LOGLEVEL"
+          value = "DEBUG"
+        },
+        {
+          name  = "ROOT_LOGLEVEL"
+          value = "DEBUG"
+        },
+      ]
+      ingress = {
+        enabled          = true
+        hostname         = "keycloak.${local.cluster_host}"
+        ingressClassName = "nginx"
+      }
+      postgresql = { enabled = false }
+      service = { type = "ClusterIP" }
+    })
+  }
 }
 
 resource "random_password" "keycloak_admin" {
