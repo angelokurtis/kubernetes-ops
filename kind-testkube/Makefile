@@ -9,25 +9,23 @@ help: ## This help.
 
 .DEFAULT_GOAL := help
 
-.PHONY: up
-up: init apply
-
 .PHONY: init
-init: ## Initialize Terraform configurations
-	terraform init -upgrade=true
+init: ## Set up OpenTofu with latest updates.
+	tofu init -upgrade=true -input=false
 
 .PHONY: plan
-plan: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
-	terraform plan
+plan: ## Show planned changes without applying.
+	tofu plan -out=tfplan -input=false
+	TF_BINARY=tofu tf-summarize tfplan
 
 .PHONY: apply
-apply: ## Starts a Kubernetes cluster running local using Docker containers and apply all solution components
-	terraform apply -auto-approve
+apply: ## Apply all configurations to start the cluster.
+	tofu apply -input=false tfplan
 
 .PHONY: down
-down: clean ## Uninstall all solution components and destroy the local Kubernetes cluster
+down: clean ## Remove cluster and components.
 	kind delete cluster --name testkube
 
 .PHONY: clean
-clean: ## Removing all Terraform generated config files
+clean: ## Delete generated OpenTofu files.
 	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* testkube-config
