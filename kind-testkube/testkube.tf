@@ -38,7 +38,7 @@ resource "kubectl_manifest" "helm_release_testkube" {
       chart:
         spec:
           chart: testkube
-          version: "~1.16.7"
+          version: "^1.0.0"
           reconcileStrategy: ChartVersion
           sourceRef:
             kind: HelmRepository
