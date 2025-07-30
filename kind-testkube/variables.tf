@@ -1,7 +1,7 @@
 variable "docker_volume" {
   type        = string
   description = "Docker volume for kind Image caching"
-  default     = null
+  nullable    = false
 }
 
 variable "load_balancer_address" {
