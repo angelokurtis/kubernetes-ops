@@ -9,7 +9,7 @@ resource "kubectl_manifest" "oci_repository_keycloak" {
       interval: 60s
       url: oci://registry-1.docker.io/bitnamicharts/keycloak
       ref:
-        semver: "^24.0.0"
+        semver: "^24.8.1"
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
