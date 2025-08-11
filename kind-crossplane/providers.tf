@@ -1,9 +1,10 @@
 terraform {
   required_providers {
+    external = { source = "hashicorp/external", version = "~> 2.3" }
     helm = { source = "hashicorp/helm", version = "~> 2.17" }
     kind = { source = "tehcyx/kind", version = "~> 0.9" }
     kubectl = { source = "alekc/kubectl", version = "~> 2.1" }
-    kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.37" }
+    kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.38" }
     kustomization = { source = "kbst/kustomization", version = "~> 0.9" }
     null = { source = "hashicorp/null", version = "~> 3.2" }
   }
