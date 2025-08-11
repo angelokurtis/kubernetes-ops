@@ -27,6 +27,7 @@ resource "kubectl_manifest" "helm_release_crossplane" {
       chart:
         spec:
           chart: crossplane
+          version: 1.20.1
           reconcileStrategy: ChartVersion
           sourceRef:
             kind: HelmRepository
