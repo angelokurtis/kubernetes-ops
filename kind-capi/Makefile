@@ -11,15 +11,16 @@ help: ## This help.
 
 .PHONY: init
 init: ## Set up Terraform with latest updates.
-	terraform init -upgrade=true
+	tofu init -upgrade=true -input=false
 
 .PHONY: plan
 plan: ## Show planned changes without applying.
-	terraform plan
+	tofu plan -out=tfplan -input=false
+	TF_BINARY=tofu tf-summarize tfplan
 
 .PHONY: apply
 apply: ## Apply all configurations to start the cluster.
-	terraform apply -auto-approve
+	tofu apply -input=false tfplan
 
 .PHONY: down
 down: clean ## Remove cluster and components.

@@ -59,7 +59,7 @@ resource "kubernetes_config_map_v1" "cert_manager_helm_values" {
   data = {
     "values.yaml" = yamlencode({
       installCRDs = true
-      prometheus = { enabled = false }
+      prometheus  = { enabled = false }
     })
   }
 }
@@ -77,7 +77,7 @@ resource "kubernetes_job_v1" "wait_cert_manager_crd" {
         container {
           name  = "kubectl"
           image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
-          args  = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
+          args  = flatten(["wait", "--for=condition=Established", local.cert_manager_crds, "--timeout", "10m"])
         }
         restart_policy = "Never"
       }

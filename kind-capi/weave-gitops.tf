@@ -57,7 +57,7 @@ resource "kubernetes_config_map_v1" "gitops_server_helm_values" {
   data = {
     "values.yaml" = yamlencode({
       networkPolicy = { create = false }
-      adminUser     = {
+      adminUser = {
         create       = true
         username     = "admin"
         passwordHash = null_resource.weave_gitops_admin_password.triggers.password
@@ -65,7 +65,7 @@ resource "kubernetes_config_map_v1" "gitops_server_helm_values" {
       ingress = {
         className = "nginx"
         enabled   = true
-        hosts     = [
+        hosts = [
           {
             host  = "gitops.${local.cluster_host}"
             paths = [{ path = "/", pathType = "Prefix" }]

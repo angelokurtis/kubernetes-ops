@@ -51,7 +51,7 @@ resource "kubernetes_config_map_v1" "capi_operator_helm_values" {
   data = {
     "values.yaml" = yamlencode({
       infrastructure = "proxmox"
-      cert-manager = { enabled = true }
+      cert-manager   = { enabled = true }
       configSecret = {
         name      = kubernetes_secret_v1.proxmox_credentials.metadata[0].name
         namespace = kubernetes_secret_v1.proxmox_credentials.metadata[0].namespace
