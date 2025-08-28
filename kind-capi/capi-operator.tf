@@ -39,7 +39,6 @@ resource "kubectl_manifest" "helm_release_capi_operator" {
 
   depends_on = [
     kubernetes_job_v1.wait_flux_crd,
-    kubernetes_job_v1.wait_cert_manager_crd,
   ]
 }
 
