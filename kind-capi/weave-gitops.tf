@@ -46,6 +46,13 @@ resource "kubectl_manifest" "helm_release_gitops_server" {
           namespace: ${kubernetes_namespace.nginx.metadata[0].name}
   YAML
 
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
+
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 

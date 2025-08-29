@@ -48,6 +48,13 @@ resource "kubectl_manifest" "helm_release_cert_manager" {
       interval: 60s
   YAML
 
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
+
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
@@ -64,10 +71,42 @@ resource "kubernetes_config_map_v1" "cert_manager_helm_values" {
   }
 }
 
+resource "kubernetes_job_v1" "wait_cert_manager_crd" {
+  metadata {
+    name      = "wait-cert-manager-crd"
+    namespace = kubernetes_namespace.cert_manager.metadata[0].name
+  }
+  spec {
+    template {
+      metadata {}
+      spec {
+        service_account_name = kubernetes_service_account_v1.wait_cert_manager_crd.metadata[0].name
+        container {
+          name  = "kubectl"
+          image = "rancher/kubectl:${data.kubectl_server_version.current.version}"
+          args  = flatten(["wait", "--for=condition=Established", local.cert_manager_crds, "--timeout", "10m"])
+        }
+        restart_policy = "Never"
+      }
+    }
+  }
+  wait_for_completion = true
+
+  timeouts {
+    create = "10m"
+    update = "10m"
+  }
+
+  depends_on = [
+    kubectl_manifest.helm_release_cert_manager,
+    kubernetes_cluster_role_binding_v1.wait_cert_manager_crd,
+  ]
+}
+
 resource "kubernetes_service_account_v1" "wait_cert_manager_crd" {
   metadata {
     name      = "wait-cert-manager-crd"
-    namespace = kubernetes_namespace.flux.metadata[0].name
+    namespace = kubernetes_namespace.cert_manager.metadata[0].name
   }
 }
 

@@ -37,8 +37,16 @@ resource "kubectl_manifest" "helm_release_capi_operator" {
       interval: 60s
   YAML
 
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
+
   depends_on = [
     kubernetes_job_v1.wait_flux_crd,
+    kubernetes_job_v1.wait_cert_manager_crd,
   ]
 }
 
