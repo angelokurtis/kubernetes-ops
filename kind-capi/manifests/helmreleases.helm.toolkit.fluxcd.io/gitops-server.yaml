@@ -9,12 +9,11 @@ spec:
   chart:
     spec:
       chart: charts/gitops-server
-      reconcileStrategy: ChartVersion
+      reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository
         name: weave-gitops
         namespace: "${source_namespace}"
-      version: '*'
   dependsOn:
     - name: nginx
       namespace: nginx

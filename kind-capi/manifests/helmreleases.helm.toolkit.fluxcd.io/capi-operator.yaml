@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: capi-operator
         namespace: "${source_namespace}"
-      version: '*'
+      version: "${semver}"
   interval: 60s
   valuesFrom:
     - kind: ConfigMap

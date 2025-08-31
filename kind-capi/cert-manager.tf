@@ -23,6 +23,7 @@ resource "kubectl_manifest" "helm_release_cert_manager" {
     source_namespace  = kubernetes_namespace.flux.metadata[0].name
     configmap_hecksum = sha256(kubernetes_config_map_v1.cert_manager_helm_values.data["values.yaml"])
     configmap_name    = kubernetes_config_map_v1.cert_manager_helm_values.metadata[0].name
+    semver            = "^v1.18.2"
   })
 
   wait_for {

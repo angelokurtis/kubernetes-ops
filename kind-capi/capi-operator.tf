@@ -12,6 +12,7 @@ resource "kubectl_manifest" "helm_release_capi_operator" {
     source_namespace  = kubernetes_namespace.flux.metadata[0].name
     configmap_hecksum = sha256(kubernetes_config_map_v1.capi_operator_helm_values.data["values.yaml"])
     configmap_name    = kubernetes_config_map_v1.capi_operator_helm_values.metadata[0].name
+    semver            = "^0.23.0"
   })
 
   wait_for {

@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: nginx
         namespace: "${source_namespace}"
-      version: '*'
+      version: "${semver}"
   interval: 60s
   valuesFrom:
     - kind: ConfigMap
