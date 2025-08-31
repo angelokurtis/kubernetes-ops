@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  annotations:
+    checksum/config: "${configmap_hecksum}"
+  name: cert-manager
+  namespace: "${namespace}"
+spec:
+  chart:
+    spec:
+      chart: cert-manager
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: jetstack
+        namespace: "${source_namespace}"
+      version: '*'
+  interval: 60s
+  valuesFrom:
+    - kind: ConfigMap
+      name: "${configmap_name}"

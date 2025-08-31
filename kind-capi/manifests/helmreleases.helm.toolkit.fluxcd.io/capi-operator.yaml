@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  annotations:
+    checksum/config: "${configmap_hecksum}"
+  name: capi-operator
+  namespace: "${namespace}"
+spec:
+  chart:
+    spec:
+      chart: cluster-api-operator
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: capi-operator
+        namespace: "${source_namespace}"
+      version: '*'
+  interval: 60s
+  valuesFrom:
+    - kind: ConfigMap
+      name: "${configmap_name}"

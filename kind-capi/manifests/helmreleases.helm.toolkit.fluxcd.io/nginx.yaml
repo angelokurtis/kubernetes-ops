@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  annotations:
+    checksum/config: "${configmap_hecksum}"
+  name: nginx
+  namespace: "${namespace}"
+spec:
+  chart:
+    spec:
+      chart: ingress-nginx
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: nginx
+        namespace: "${source_namespace}"
+      version: '*'
+  interval: 60s
+  valuesFrom:
+    - kind: ConfigMap
+      name: "${configmap_name}"

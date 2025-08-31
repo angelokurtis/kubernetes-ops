@@ -1,5 +1,6 @@
 terraform {
   required_providers {
+    external   = { source = "hashicorp/external", version = "~> 2.3" }
     helm       = { source = "hashicorp/helm", version = "~> 2.17" }
     kind       = { source = "tehcyx/kind", version = "~> 0.9" }
     kubectl    = { source = "alekc/kubectl", version = "~> 2.1" }
@@ -7,6 +8,9 @@ terraform {
     null       = { source = "hashicorp/null", version = "~> 3.2" }
   }
   required_version = ">= 1.9"
+}
+
+provider "external" {
 }
 
 provider "helm" {
