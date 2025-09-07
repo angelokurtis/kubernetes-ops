@@ -13,10 +13,6 @@ data "http" "schematic_id" {
   request_body = file("${path.module}/image/schematic.yaml")
 }
 
-output "schematic_id" {
-  value = jsondecode(data.http.schematic_id.response_body)["id"]
-}
-
 resource "proxmox_virtual_environment_download_file" "talos_image" {
   node_name               = "pve"
   content_type            = "iso"
@@ -30,11 +26,4 @@ resource "proxmox_virtual_environment_download_file" "talos_image" {
 
 resource "talos_machine_secrets" "_" {
   talos_version = local.talos.version
-}
-
-data "talos_client_configuration" "_" {
-  cluster_name         = var.cluster.name
-  client_configuration = talos_machine_secrets._.client_configuration
-  nodes                = [for k, v in var.nodes : v.ip]
-  endpoints            = [for k, v in var.nodes : v.ip if v.machine_type == "controlplane"]
 }
