@@ -1,3 +1,19 @@
+variable "proxmox_address" {
+  description = "Proxmox server address (hostname or IP, without protocol/port)"
+  type        = string
+}
+
+variable "proxmox_user" {
+  description = "Proxmox API user, e.g. root@pam or terraform@pve"
+  type        = string
+}
+
+variable "proxmox_password" {
+  description = "Password for the Proxmox API user"
+  type        = string
+  sensitive   = true
+}
+
 variable "cluster" {
   description = "Cluster configuration"
   type = object({
