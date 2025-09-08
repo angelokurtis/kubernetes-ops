@@ -1,7 +1,7 @@
 resource "proxmox_virtual_environment_vm" "worker" {
   count       = var.worker_count
   node_name   = local.proxmox_node_name
-  name        = "worker-${count.index + 1}"
+  name        = "k8s-wrk-${count.index + 1}"
   description = "Kubernetes worker node for running containerized workloads."
   tags = [
     "k8s",
@@ -10,39 +10,39 @@ resource "proxmox_virtual_environment_vm" "worker" {
   ]
   on_boot       = true
   vm_id         = 801 + count.index
-  scsi_hardware = "virtio-scsi-single" # Recommended SCSI controller for performance
+  scsi_hardware = "virtio-scsi-single"
 
   agent {
     enabled = true
   }
 
   cpu {
-    cores = 2
+    cores = 1
     units = 100
     numa  = false
-    type  = "x86-64-v2-AES" # CPU type for compatibility + AES support
+    type  = "x86-64-v2-AES"
   }
 
   memory {
-    dedicated = 2048
-    floating  = 2048 # Max ballooned memory (MB)
+    dedicated = 1024 # 1 GiB
+    floating  = 1024
   }
 
   operating_system {
-    type = "l26" # Linux kernel 2.6/3.x/4.x (generic Linux guest type)
+    type = "l26"
   }
 
   cdrom {
-    interface = "ide2" # CD-ROM interface
+    interface = "ide2"
     file_id   = proxmox_virtual_environment_download_file.talos_image.id
   }
 
   disk {
-    interface    = "scsi0" # Primary disk interface
+    interface    = "scsi0"
     datastore_id = "local-lvm"
     ssd          = true
     iothread     = true
-    size         = 10 # Disk size in GB
+    size         = 10 # 10 GiB
   }
 
   boot_order = [
@@ -51,7 +51,7 @@ resource "proxmox_virtual_environment_vm" "worker" {
   ]
 
   network_device {
-    bridge   = "vmbr0" # Proxmox bridge interface (LAN)
+    bridge   = "vmbr0"
     firewall = true
   }
 }
