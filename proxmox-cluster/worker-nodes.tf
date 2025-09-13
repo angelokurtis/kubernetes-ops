@@ -55,3 +55,13 @@ resource "proxmox_virtual_environment_vm" "worker" {
     firewall = true
   }
 }
+
+output "workers" {
+  value = [
+    for vm in proxmox_virtual_environment_vm.worker : {
+      name = vm.name
+      ip   = [for ip in flatten(vm.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
+      mac  = [for nic in vm.network_device : nic.mac_address if nic.bridge == "vmbr0"][0]
+    }
+  ]
+}

@@ -55,3 +55,13 @@ resource "proxmox_virtual_environment_vm" "control_plane" {
     firewall = true
   }
 }
+
+output "control_plane" {
+  value = [
+    for vm in proxmox_virtual_environment_vm.control_plane : {
+      name = vm.name
+      ip   = [for ip in flatten(vm.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
+      mac  = [for nic in vm.network_device : nic.mac_address if nic.bridge == "vmbr0"][0]
+    }
+  ]
+}
