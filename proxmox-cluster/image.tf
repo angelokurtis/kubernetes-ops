@@ -28,7 +28,3 @@ resource "proxmox_virtual_environment_download_file" "talos_image" {
   content_type = "iso"
   datastore_id = local.proxmox_iso_datastore["id"]
 }
-
-resource "talos_machine_secrets" "_" {
-  talos_version = local.talos_version
-}
