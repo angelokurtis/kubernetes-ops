@@ -56,6 +56,41 @@ resource "proxmox_virtual_environment_vm" "control_plane" {
   }
 }
 
+data "talos_machine_configuration" "control_plane" {
+  for_each     = { for vm in proxmox_virtual_environment_vm.control_plane : vm.name => vm }
+  cluster_name = local.cluster_name
+  cluster_endpoint = format(
+    "https://%s:6443",
+    [
+      for ip in flatten(proxmox_virtual_environment_vm.control_plane[0].ipv4_addresses) : ip
+      if ip != "127.0.0.1"
+    ][0]
+  )
+  talos_version   = local.talos_version
+  machine_type    = "controlplane"
+  machine_secrets = talos_machine_secrets._.machine_secrets
+  config_patches = [
+    yamlencode({
+      machine = {
+        network = {
+          hostname = each.key
+        }
+        nodeLabels = {
+          "topology.kubernetes.io/region" = local.cluster_name
+          "topology.kubernetes.io/zone"   = local.proxmox_node_name
+        }
+      }
+    })
+  ]
+}
+
+resource "talos_machine_configuration_apply" "control_plane" {
+  for_each                    = { for vm in proxmox_virtual_environment_vm.control_plane : vm.name => vm }
+  node                        = [for ip in flatten(each.value.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
+  client_configuration        = talos_machine_secrets._.client_configuration
+  machine_configuration_input = data.talos_machine_configuration.control_plane[each.key].machine_configuration
+}
+
 output "control_plane" {
   value = [
     for vm in proxmox_virtual_environment_vm.control_plane : {

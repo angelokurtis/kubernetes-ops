@@ -56,6 +56,41 @@ resource "proxmox_virtual_environment_vm" "worker" {
   }
 }
 
+data "talos_machine_configuration" "worker" {
+  for_each     = { for vm in proxmox_virtual_environment_vm.worker : vm.name => vm }
+  cluster_name = local.cluster_name
+  cluster_endpoint = format(
+    "https://%s:6443",
+    [
+      for ip in flatten(proxmox_virtual_environment_vm.control_plane[0].ipv4_addresses) : ip
+      if ip != "127.0.0.1"
+    ][0]
+  )
+  talos_version   = local.talos_version
+  machine_type    = "worker"
+  machine_secrets = talos_machine_secrets._.machine_secrets
+  config_patches = [
+    yamlencode({
+      machine = {
+        network = {
+          hostname = each.key
+        }
+        nodeLabels = {
+          "topology.kubernetes.io/region" = local.cluster_name
+          "topology.kubernetes.io/zone"   = local.proxmox_node_name
+        }
+      }
+    })
+  ]
+}
+
+resource "talos_machine_configuration_apply" "worker" {
+  for_each                    = { for vm in proxmox_virtual_environment_vm.worker : vm.name => vm }
+  node                        = [for ip in flatten(each.value.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
+  client_configuration        = talos_machine_secrets._.client_configuration
+  machine_configuration_input = data.talos_machine_configuration.worker[each.key].machine_configuration
+}
+
 output "workers" {
   value = [
     for vm in proxmox_virtual_environment_vm.worker : {
