@@ -82,6 +82,8 @@ data "talos_machine_configuration" "worker" {
       }
     })
   ]
+
+  depends_on = [proxmox_virtual_environment_vm.worker]
 }
 
 resource "talos_machine_configuration_apply" "worker" {
@@ -89,6 +91,16 @@ resource "talos_machine_configuration_apply" "worker" {
   node                        = [for ip in flatten(each.value.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
   client_configuration        = talos_machine_secrets._.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker[each.key].machine_configuration
+
+  depends_on = [data.talos_machine_configuration.worker]
+}
+
+resource "talos_machine_bootstrap" "worker" {
+  for_each             = talos_machine_configuration_apply.worker
+  node                 = each.value.node
+  client_configuration = each.value.client_configuration
+
+  depends_on = [talos_machine_configuration_apply.worker]
 }
 
 output "workers" {
