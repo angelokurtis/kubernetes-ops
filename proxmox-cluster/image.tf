@@ -2,7 +2,7 @@ locals {
   talos_factory_url = "https://factory.talos.dev"
   talos_platform    = "nocloud"
   talos_arch        = "amd64"
-  talos_version     = "v1.11.0"
+  talos_version     = "v1.11.1"
   talos_chematic_id = jsondecode(data.http.schematic_id.response_body)["id"]
   proxmox_node_name = "pve"
   proxmox_iso_datastore = one([
