@@ -1,0 +1,16 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: keycloak-k8s-resources
+  namespace: "${namespace}"
+spec:
+  ignore: |
+    # exclude all
+    /*
+    # include kubernetes dir
+    !/kubernetes
+  interval: 60s
+  ref:
+    semver: "${semver}"
+  timeout: 60s
+  url: https://github.com/keycloak/keycloak-k8s-resources
