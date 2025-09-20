@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  annotations:
+    checksum/config: "${configmap_hecksum}"
+  name: weave-gitops
+  namespace: "${namespace}"
+spec:
+  chart:
+    spec:
+      chart: charts/gitops-server
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: weave-gitops
+        namespace: "${source_namespace}"
+  dependsOn:
+    - name: nginx
+      namespace: nginx
+  interval: 60s
+  valuesFrom:
+    - kind: ConfigMap
+      name: "${configmap_name}"
