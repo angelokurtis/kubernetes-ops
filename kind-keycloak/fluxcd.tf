@@ -19,7 +19,7 @@ locals {
 resource "helm_release" "flux" {
   repository = "https://fluxcd-community.github.io/helm-charts"
   chart      = "flux2"
-  version    = "2.16.3"
+  version    = "2.16.4"
 
   name      = "flux"
   namespace = kubernetes_namespace.flux.metadata[0].name
@@ -37,7 +37,7 @@ resource "kubernetes_job_v1" "wait_flux_crd" {
         service_account_name = kubernetes_service_account_v1.wait_flux_crd.metadata[0].name
         container {
           name  = "kubectl"
-          image = "docker.io/bitnami/kubectl:${data.kubectl_server_version.current.major}.${data.kubectl_server_version.current.minor}"
+          image = "rancher/kubectl:${data.kubectl_server_version.current.version}"
           args  = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
         }
         restart_policy = "Never"

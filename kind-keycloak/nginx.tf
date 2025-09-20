@@ -1,41 +1,26 @@
 resource "kubectl_manifest" "helm_repository_nginx" {
-  yaml_body = <<-YAML
-    apiVersion: source.toolkit.fluxcd.io/v1beta2
-    kind: HelmRepository
-    metadata:
-      name: nginx
-      namespace: ${kubernetes_namespace.flux.metadata[0].name}
-    spec:
-      interval: 60s
-      url: https://kubernetes.github.io/ingress-nginx
-  YAML
+  yaml_body = templatefile("${path.module}/manifests/helmrepositories.source.toolkit.fluxcd.io/nginx.yaml", {
+    namespace = kubernetes_namespace.flux.metadata[0].name
+  })
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
 resource "kubectl_manifest" "helm_release_nginx" {
-  yaml_body = <<-YAML
-    apiVersion: helm.toolkit.fluxcd.io/v2
-    kind: HelmRelease
-    metadata:
-      name: nginx
-      namespace: ${kubernetes_namespace.nginx.metadata[0].name}
-      annotations:
-        "checksum/config": ${sha256(kubernetes_config_map_v1.nginx_helm_values.data["values.yaml"])}
-    spec:
-      chart:
-        spec:
-          chart: ingress-nginx
-          reconcileStrategy: ChartVersion
-          sourceRef:
-            kind: HelmRepository
-            name: nginx
-            namespace: ${kubernetes_namespace.flux.metadata[0].name}
-      valuesFrom:
-        - kind: ConfigMap
-          name: ${kubernetes_config_map_v1.nginx_helm_values.metadata[0].name}
-      interval: 60s
-  YAML
+  yaml_body = templatefile("${path.module}/manifests/helmreleases.helm.toolkit.fluxcd.io/nginx.yaml", {
+    namespace         = kubernetes_namespace.nginx.metadata[0].name
+    source_namespace  = kubernetes_namespace.flux.metadata[0].name
+    configmap_hecksum = sha256(kubernetes_config_map_v1.nginx_helm_values.data["values.yaml"])
+    configmap_name    = kubernetes_config_map_v1.nginx_helm_values.metadata[0].name
+    semver            = "^4.13.2"
+  })
+
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
