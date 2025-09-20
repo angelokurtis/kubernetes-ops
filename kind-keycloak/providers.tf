@@ -4,7 +4,6 @@ terraform {
     kind       = { source = "tehcyx/kind", version = "~> 0.9" }
     kubectl    = { source = "alekc/kubectl", version = "~> 2.1" }
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.38" }
-    null       = { source = "hashicorp/null", version = "~> 3.2" }
   }
   required_version = ">= 1.9"
 }
@@ -36,7 +35,4 @@ provider "kubernetes" {
   client_certificate     = kind_cluster.keycloak.client_certificate
   client_key             = kind_cluster.keycloak.client_key
   cluster_ca_certificate = kind_cluster.keycloak.cluster_ca_certificate
-}
-
-provider "null" {
 }
