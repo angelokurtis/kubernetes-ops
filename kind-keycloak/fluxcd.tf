@@ -23,6 +23,14 @@ resource "helm_release" "flux" {
 
   name      = "flux"
   namespace = kubernetes_namespace.flux.metadata[0].name
+
+  values = [
+    yamlencode({
+      imageAutomationController = { create = false }
+      imageReflectionController = { create = false }
+      notificationController    = { create = false }
+    })
+  ]
 }
 
 resource "kubernetes_job_v1" "wait_flux_crd" {
