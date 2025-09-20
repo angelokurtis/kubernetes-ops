@@ -7,6 +7,15 @@ resource "kubectl_manifest" "git_repository_keycloak_operator" {
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
+resource "kubectl_manifest" "kustomization_keycloak_operator" {
+  yaml_body = templatefile("${path.module}/manifests/kustomizations.kustomize.toolkit.fluxcd.io/keycloak-operator.yaml", {
+    namespace            = kubernetes_namespace.keycloak.metadata[0].name
+    source_ref_namespace = kubernetes_namespace.flux.metadata[0].name
+  })
+
+  depends_on = [kubernetes_job_v1.wait_flux_crd]
+}
+
 resource "kubernetes_namespace" "keycloak" {
   metadata { name = "keycloak" }
 }

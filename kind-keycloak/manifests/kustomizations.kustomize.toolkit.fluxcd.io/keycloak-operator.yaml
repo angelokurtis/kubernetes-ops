@@ -1,0 +1,15 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: keycloak-operator
+  namespace: "${namespace}"
+spec:
+  force: false
+  interval: 60s
+  path: ./kubernetes
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: keycloak-k8s-resources
+    namespace: "${source_ref_namespace}"
+  targetNamespace: "${namespace}"
