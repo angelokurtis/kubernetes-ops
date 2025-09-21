@@ -12,12 +12,12 @@ spec:
       secret: "${keycloak_admin_secret}"
   db:
     database: keycloak
-    host: "${postgresql_service}.${postgresql_service}.svc.cluster.local"
+    host: "${postgresql_service}.${postgresql_namespace}.svc.cluster.local"
     passwordSecret:
-      name: "${postgresql_password_secret}"
+      name: "${postgresql_secret}"
       key: password
     usernameSecret:
-      name: "${postgresql_username_secret}"
+      name: "${postgresql_secret}"
       key: username
     vendor: postgres
   hostname:
