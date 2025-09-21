@@ -43,7 +43,3 @@ resource "kubernetes_secret_v1" "keycloak_db" {
     password = random_password.keycloak_db.result
   }
 }
-
-resource "kubernetes_namespace" "keycloak" {
-  metadata { name = "keycloak" }
-}
