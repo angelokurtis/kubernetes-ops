@@ -5,6 +5,7 @@ terraform {
     kubectl    = { source = "alekc/kubectl", version = "~> 2.1" }
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.38" }
     null       = { source = "hashicorp/null", version = "~> 3.2" }
+    random     = { source = "hashicorp/random", version = "~> 3.7" }
   }
   required_version = ">= 1.9"
 }
@@ -39,4 +40,7 @@ provider "kubernetes" {
 }
 
 provider "null" {
+}
+
+provider "random" {
 }
