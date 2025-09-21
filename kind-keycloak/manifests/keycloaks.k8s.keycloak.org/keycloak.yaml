@@ -1,0 +1,27 @@
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  name: keycloak
+  namespace: "${namespace}"
+spec:
+  additionalOptions:
+    - name: proxy-address-forwarding
+      value: "true"
+  bootstrapAdmin:
+    user:
+      secret: "${keycloak_admin_secret}"
+  db:
+    database: keycloak
+    host: "${postgresql_service}.${postgresql_service}.svc.cluster.local"
+    passwordSecret:
+      name: "${postgresql_password_secret}"
+      key: password
+    usernameSecret:
+      name: "${postgresql_username_secret}"
+      key: username
+    vendor: postgres
+  hostname:
+    hostname: "${host}"
+  ingress:
+    enabled: true
+  instances: 3
