@@ -22,6 +22,9 @@ spec:
     vendor: postgres
   hostname:
     hostname: "${host}"
+  http:
+    httpEnabled: true
   ingress:
+    className: nginx
     enabled: true
   instances: 3
