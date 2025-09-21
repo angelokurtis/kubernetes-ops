@@ -13,6 +13,13 @@ resource "kubectl_manifest" "kustomization_keycloak_operator" {
     source_ref_namespace = kubernetes_namespace.flux.metadata[0].name
   })
 
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
+
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
