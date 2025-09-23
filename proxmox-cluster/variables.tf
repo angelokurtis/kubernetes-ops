@@ -22,6 +22,8 @@ variable "nodes" {
     cores  = number
     memory = number
     disk   = number
+    ip     = optional(string)
+    mac    = optional(string)
   }))
 
   default = [
