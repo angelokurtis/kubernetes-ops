@@ -14,14 +14,44 @@ variable "proxmox_password" {
   sensitive   = true
 }
 
-variable "control_plane_count" {
-  description = "Number of Kubernetes control plane nodes"
-  type        = number
-  default     = 1
-}
+variable "nodes" {
+  description = "List of nodes (both control plane and worker)"
+  type = list(object({
+    name   = string
+    type   = string # "control-plane" or "worker"
+    cores  = number
+    memory = number
+    disk   = number
+  }))
 
-variable "worker_count" {
-  description = "Number of Kubernetes worker nodes"
-  type        = number
-  default     = 2
+  default = [
+    {
+      name   = "cp-1"
+      type   = "control-plane"
+      cores  = 2
+      memory = 4096
+      disk   = 50
+    },
+    {
+      name   = "worker-1"
+      type   = "worker"
+      cores  = 2
+      memory = 4096
+      disk   = 50
+    },
+    {
+      name   = "worker-2"
+      type   = "worker"
+      cores  = 2
+      memory = 4096
+      disk   = 50
+    }
+  ]
+
+  validation {
+    condition = alltrue([
+      for node in var.nodes : contains(["control-plane", "worker"], node.type)
+    ])
+    error_message = "Node type must be either \"control-plane\" or \"worker\"."
+  }
 }
