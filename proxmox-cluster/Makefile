@@ -22,6 +22,15 @@ plan: ## Show planned changes without applying.
 apply: ## Apply all configurations to start the cluster.
 	tofu apply -input=false tfplan
 
+.PHONY: plan-destroy
+plan-destroy: ## Create and show a destroy plan.
+	tofu plan -destroy -out=tfplan-destroy -input=false
+	TF_BINARY=tofu tf-summarize tfplan-destroy || true
+
+.PHONY: destroy
+destroy: ## Apply the destroy plan.
+	tofu apply -input=false tfplan-destroy
+
 .PHONY: clean
 clean: ## Delete generated Terraform files.
 	rm -rf .terraform .terraform.lock.hcl terraform.tfstate*
