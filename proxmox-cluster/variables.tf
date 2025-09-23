@@ -14,40 +14,27 @@ variable "proxmox_password" {
   sensitive   = true
 }
 
+variable "cluster_gateway" {
+  description = "Default gateway for the Kubernetes cluster"
+  type        = string
+}
+
 variable "nodes" {
   description = "List of nodes (both control plane and worker)"
   type = list(object({
     name   = optional(string)
     type   = string # "control-plane" or "worker"
-    cores  = number
-    memory = number
-    disk   = number
+    cores  = optional(number)
+    memory = optional(number)
+    disk   = optional(number)
     ip     = optional(string)
     mac    = optional(string)
   }))
 
   default = [
-    {
-      name   = "cp-1"
-      type   = "control-plane"
-      cores  = 2
-      memory = 4096
-      disk   = 50
-    },
-    {
-      name   = "worker-1"
-      type   = "worker"
-      cores  = 2
-      memory = 4096
-      disk   = 50
-    },
-    {
-      name   = "worker-2"
-      type   = "worker"
-      cores  = 2
-      memory = 4096
-      disk   = 50
-    }
+    { type = "control-plane" },
+    { type = "worker" },
+    { type = "worker" },
   ]
 
   validation {
