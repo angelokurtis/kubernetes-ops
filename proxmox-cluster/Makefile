@@ -33,4 +33,5 @@ destroy: ## Apply the destroy plan.
 
 .PHONY: clean
 clean: ## Delete generated Terraform files.
-	rm -rf .terraform .terraform.lock.hcl terraform.tfstate*
+	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* tfplan*
+	find . -type d -empty -delete
