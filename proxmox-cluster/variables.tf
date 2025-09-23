@@ -17,7 +17,7 @@ variable "proxmox_password" {
 variable "nodes" {
   description = "List of nodes (both control plane and worker)"
   type = list(object({
-    name   = string
+    name   = optional(string)
     type   = string # "control-plane" or "worker"
     cores  = number
     memory = number
