@@ -11,7 +11,7 @@ terraform {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host = kind_cluster.keycloak.endpoint
 
     client_certificate     = kind_cluster.keycloak.client_certificate
