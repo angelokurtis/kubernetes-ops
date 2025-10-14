@@ -1,6 +1,6 @@
 terraform {
   required_providers {
-    helm       = { source = "hashicorp/helm", version = "~> 2.17" }
+    helm       = { source = "hashicorp/helm", version = "~> 3.0" }
     kind       = { source = "tehcyx/kind", version = "~> 0.9" }
     kubectl    = { source = "alekc/kubectl", version = "~> 2.1" }
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.38" }
