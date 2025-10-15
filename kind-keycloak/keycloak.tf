@@ -3,9 +3,9 @@ resource "kubectl_manifest" "keycloak" {
     namespace             = kubernetes_namespace.keycloak.metadata[0].name
     host                  = "keycloak.${local.cluster_host}"
     keycloak_admin_secret = kubernetes_secret_v1.keycloak_admin.metadata[0].name
-    postgresql_secret    = kubernetes_secret_v1.keycloak_db.metadata[0].name
-    postgresql_service   = kubernetes_service_v1.keycloak_postgresql.metadata[0].name
-    postgresql_namespace = kubernetes_namespace.postgresql.metadata[0].name
+    postgresql_secret     = kubernetes_secret_v1.keycloak_db.metadata[0].name
+    postgresql_service    = kubernetes_service_v1.keycloak_postgresql.metadata[0].name
+    postgresql_namespace  = kubernetes_namespace.postgresql.metadata[0].name
   })
 
   depends_on = [
@@ -41,5 +41,15 @@ resource "kubernetes_secret_v1" "keycloak_db" {
   data = {
     username = "keycloak"
     password = random_password.keycloak_db.result
+  }
+}
+
+output "keycloak_access_info" {
+  description = "Keycloak access info (URL, user, password)"
+  sensitive   = true
+  value = {
+    url      = "http://keycloak.${local.cluster_host}"
+    username = kubernetes_secret_v1.keycloak_admin.data["username"]
+    password = kubernetes_secret_v1.keycloak_admin.data["password"]
   }
 }
