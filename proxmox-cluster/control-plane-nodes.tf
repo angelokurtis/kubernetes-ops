@@ -122,6 +122,13 @@ resource "talos_machine_configuration_apply" "control_plane" {
   depends_on = [data.talos_machine_configuration.control_plane]
 }
 
+resource "talos_machine_bootstrap" "control_plane" {
+  node                 = values(local.control_planes)[0].ip
+  client_configuration = talos_machine_secrets._.client_configuration
+
+  depends_on = [talos_machine_configuration_apply.control_plane]
+}
+
 output "control_plane" {
   value = local.control_planes
 }
