@@ -1,5 +1,5 @@
 locals {
-  cluster_name       = "homelab-talos-dev"
+  cluster_name = "homelab-talos-dev"
   cluster_endpoint = format(
     "https://%s:6443",
     proxmox_virtual_environment_vm.control_plane[0].ipv4_addresses[

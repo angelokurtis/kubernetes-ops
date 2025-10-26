@@ -7,6 +7,7 @@ locals {
   talos_factory_host   = "factory.talos.dev"
   talos_factory_url    = "${local.talos_factory_scheme}://${local.talos_factory_host}"
   talos_schematic_id   = jsondecode(data.http.schematic_id.response_body)["id"]
+  talos_install_image  = "${local.talos_factory_host}/installer/${local.talos_schematic_id}:${local.talos_version}"
 
   proxmox_node_name = "pve"
   proxmox_iso_datastore = one([
