@@ -17,9 +17,17 @@ locals {
 }
 
 data "http" "schematic_id" {
-  url          = "${local.talos_factory_url}/schematics"
-  method       = "POST"
-  request_body = file("${path.module}/image/schematic.yaml")
+  url    = "${local.talos_factory_url}/schematics"
+  method = "POST"
+  request_body = yamlencode({
+    customization = {
+      systemExtensions = {
+        officialExtensions = [
+          "siderolabs/qemu-guest-agent",
+        ]
+      }
+    }
+  })
 }
 
 data "proxmox_virtual_environment_datastores" "_" {
