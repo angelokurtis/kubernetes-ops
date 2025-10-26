@@ -1,3 +1,7 @@
+locals {
+  talos_install_image = "${local.talos_factory_host}/installer/${local.talos_schematic_id}:${local.talos_version}"
+}
+
 resource "proxmox_virtual_environment_vm" "control_plane" {
   count       = var.control_plane_count
   node_name   = local.proxmox_node_name
@@ -46,8 +50,8 @@ resource "proxmox_virtual_environment_vm" "control_plane" {
   }
 
   boot_order = [
-    "ide2",
     "scsi0",
+    "ide2",
   ]
 
   network_device {
@@ -57,46 +61,57 @@ resource "proxmox_virtual_environment_vm" "control_plane" {
 }
 
 data "talos_machine_configuration" "control_plane" {
-  for_each     = { for vm in proxmox_virtual_environment_vm.control_plane : vm.name => vm }
-  cluster_name = local.cluster_name
-  cluster_endpoint = format(
-    "https://%s:6443",
-    [
-      for ip in flatten(proxmox_virtual_environment_vm.control_plane[0].ipv4_addresses) : ip
-      if ip != "127.0.0.1"
-    ][0]
-  )
-  talos_version   = local.talos_version
-  machine_type    = "controlplane"
-  machine_secrets = talos_machine_secrets._.machine_secrets
+  for_each         = { for vm in proxmox_virtual_environment_vm.control_plane : vm.name => vm }
+  cluster_name     = local.cluster_name
+  cluster_endpoint = local.cluster_endpoint
+  talos_version    = local.talos_version
+  machine_type     = "controlplane"
+  machine_secrets  = talos_machine_secrets._.machine_secrets
   config_patches = [
     yamlencode({
       machine = {
         network = {
           hostname = each.key
         }
+        install = {
+          extraKernelArgs = [
+            "net.ifnames=0"
+          ]
+          image = local.talos_install_image
+        }
         nodeLabels = {
-          "topology.kubernetes.io/region" = local.cluster_name
+          "topology.kubernetes.io/region" = "br-southeast-1a" # São Carlos - SP
           "topology.kubernetes.io/zone"   = local.proxmox_node_name
         }
+      }
+      cluster = {
+        proxy   = { disabled = true }
+        network = { cni = { name = "none" } } # We install Cilium manually
       }
     })
   ]
 }
 
-resource "talos_machine_configuration_apply" "control_plane" {
-  for_each                    = { for vm in proxmox_virtual_environment_vm.control_plane : vm.name => vm }
-  node                        = [for ip in flatten(each.value.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
-  client_configuration        = talos_machine_secrets._.client_configuration
-  machine_configuration_input = data.talos_machine_configuration.control_plane[each.key].machine_configuration
-}
-
 output "control_plane" {
-  value = [
-    for vm in proxmox_virtual_environment_vm.control_plane : {
-      name = vm.name
-      ip   = [for ip in flatten(vm.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
-      mac  = [for nic in vm.network_device : nic.mac_address if nic.bridge == "vmbr0"][0]
+  value = {
+    for idx, vm in proxmox_virtual_environment_vm.control_plane :
+    vm.name => {
+      mac = one([
+        for nd in vm.network_device :
+        nd.mac_address
+        if nd.bridge == "vmbr0"
+      ])
+
+      ip = vm.ipv4_addresses[
+        index(
+          vm.mac_addresses,
+          one([
+            for nd in vm.network_device :
+            nd.mac_address
+            if nd.bridge == "vmbr0"
+          ])
+        )
+      ][0]
     }
-  ]
+  }
 }

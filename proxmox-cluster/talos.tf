@@ -1,10 +1,21 @@
 locals {
-  cluster_name = "talos-cluster"
+  cluster_name       = "homelab-talos-dev"
+  cluster_endpoint = format(
+    "https://%s:6443",
+    proxmox_virtual_environment_vm.control_plane[0].ipv4_addresses[
+      index(
+        proxmox_virtual_environment_vm.control_plane[0].mac_addresses,
+        one([
+          for nd in proxmox_virtual_environment_vm.control_plane[0].network_device :
+          nd.mac_address
+          if nd.bridge == "vmbr0"
+        ])
+      )
+    ][0]
+  )
 }
 
-resource "talos_machine_secrets" "_" {
-  talos_version = local.talos_version
-}
+resource "talos_machine_secrets" "_" {}
 
 data "talos_client_configuration" "_" {
   cluster_name         = local.cluster_name

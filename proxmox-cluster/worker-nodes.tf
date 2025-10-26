@@ -46,8 +46,8 @@ resource "proxmox_virtual_environment_vm" "worker" {
   }
 
   boot_order = [
-    "ide2",
     "scsi0",
+    "ide2",
   ]
 
   network_device {
@@ -56,59 +56,26 @@ resource "proxmox_virtual_environment_vm" "worker" {
   }
 }
 
-data "talos_machine_configuration" "worker" {
-  for_each     = { for vm in proxmox_virtual_environment_vm.worker : vm.name => vm }
-  cluster_name = local.cluster_name
-  cluster_endpoint = format(
-    "https://%s:6443",
-    [
-      for ip in flatten(proxmox_virtual_environment_vm.control_plane[0].ipv4_addresses) : ip
-      if ip != "127.0.0.1"
-    ][0]
-  )
-  talos_version   = local.talos_version
-  machine_type    = "worker"
-  machine_secrets = talos_machine_secrets._.machine_secrets
-  config_patches = [
-    yamlencode({
-      machine = {
-        network = {
-          hostname = each.key
-        }
-        nodeLabels = {
-          "topology.kubernetes.io/region" = local.cluster_name
-          "topology.kubernetes.io/zone"   = local.proxmox_node_name
-        }
-      }
-    })
-  ]
-
-  depends_on = [proxmox_virtual_environment_vm.worker]
-}
-
-resource "talos_machine_configuration_apply" "worker" {
-  for_each                    = { for vm in proxmox_virtual_environment_vm.worker : vm.name => vm }
-  node                        = [for ip in flatten(each.value.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
-  client_configuration        = talos_machine_secrets._.client_configuration
-  machine_configuration_input = data.talos_machine_configuration.worker[each.key].machine_configuration
-
-  depends_on = [data.talos_machine_configuration.worker]
-}
-
-resource "talos_machine_bootstrap" "worker" {
-  for_each             = talos_machine_configuration_apply.worker
-  node                 = each.value.node
-  client_configuration = each.value.client_configuration
-
-  depends_on = [talos_machine_configuration_apply.worker]
-}
-
 output "workers" {
-  value = [
-    for vm in proxmox_virtual_environment_vm.worker : {
-      name = vm.name
-      ip   = [for ip in flatten(vm.ipv4_addresses) : ip if ip != "127.0.0.1"][0]
-      mac  = [for nic in vm.network_device : nic.mac_address if nic.bridge == "vmbr0"][0]
+  value = {
+    for idx, vm in proxmox_virtual_environment_vm.worker :
+    vm.name => {
+      mac = one([
+        for nd in vm.network_device :
+        nd.mac_address
+        if nd.bridge == "vmbr0"
+      ])
+
+      ip = vm.ipv4_addresses[
+        index(
+          vm.mac_addresses,
+          one([
+            for nd in vm.network_device :
+            nd.mac_address
+            if nd.bridge == "vmbr0"
+          ])
+        )
+      ][0]
     }
-  ]
+  }
 }
