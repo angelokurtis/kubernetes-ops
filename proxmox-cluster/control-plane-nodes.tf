@@ -1,5 +1,25 @@
 locals {
-  talos_install_image = "${local.talos_factory_host}/installer/${local.talos_schematic_id}:${local.talos_version}"
+  control_planes = {
+    for _, vm in proxmox_virtual_environment_vm.control_plane :
+    vm.name => {
+      mac = one([
+        for nd in vm.network_device :
+        nd.mac_address
+        if nd.bridge == "vmbr0"
+      ])
+
+      ip = vm.ipv4_addresses[
+        index(
+          vm.mac_addresses,
+          one([
+            for nd in vm.network_device :
+            nd.mac_address
+            if nd.bridge == "vmbr0"
+          ])
+        )
+      ][0]
+    }
+  }
 }
 
 resource "proxmox_virtual_environment_vm" "control_plane" {
@@ -92,26 +112,16 @@ data "talos_machine_configuration" "control_plane" {
   ]
 }
 
-output "control_plane" {
-  value = {
-    for idx, vm in proxmox_virtual_environment_vm.control_plane :
-    vm.name => {
-      mac = one([
-        for nd in vm.network_device :
-        nd.mac_address
-        if nd.bridge == "vmbr0"
-      ])
+resource "talos_machine_configuration_apply" "control_plane" {
+  for_each                    = { for vm in proxmox_virtual_environment_vm.control_plane : vm.name => vm }
+  node                        = local.control_planes[each.key].ip
+  endpoint                    = local.control_planes[each.key].ip
+  client_configuration        = talos_machine_secrets._.client_configuration
+  machine_configuration_input = data.talos_machine_configuration.control_plane[each.key].machine_configuration
 
-      ip = vm.ipv4_addresses[
-        index(
-          vm.mac_addresses,
-          one([
-            for nd in vm.network_device :
-            nd.mac_address
-            if nd.bridge == "vmbr0"
-          ])
-        )
-      ][0]
-    }
-  }
+  depends_on = [data.talos_machine_configuration.control_plane]
+}
+
+output "control_plane" {
+  value = local.control_planes
 }

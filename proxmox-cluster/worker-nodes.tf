@@ -1,3 +1,27 @@
+locals {
+  workers = {
+    for _, vm in proxmox_virtual_environment_vm.worker :
+    vm.name => {
+      mac = one([
+        for nd in vm.network_device :
+        nd.mac_address
+        if nd.bridge == "vmbr0"
+      ])
+
+      ip = vm.ipv4_addresses[
+        index(
+          vm.mac_addresses,
+          one([
+            for nd in vm.network_device :
+            nd.mac_address
+            if nd.bridge == "vmbr0"
+          ])
+        )
+      ][0]
+    }
+  }
+}
+
 resource "proxmox_virtual_environment_vm" "worker" {
   count       = var.worker_count
   node_name   = local.proxmox_node_name
@@ -88,26 +112,16 @@ data "talos_machine_configuration" "worker" {
   ]
 }
 
-output "workers" {
-  value = {
-    for idx, vm in proxmox_virtual_environment_vm.worker :
-    vm.name => {
-      mac = one([
-        for nd in vm.network_device :
-        nd.mac_address
-        if nd.bridge == "vmbr0"
-      ])
+resource "talos_machine_configuration_apply" "worker" {
+  for_each                    = { for vm in proxmox_virtual_environment_vm.worker : vm.name => vm }
+  node                        = local.workers[each.key].ip
+  endpoint                    = local.workers[each.key].ip
+  client_configuration        = talos_machine_secrets._.client_configuration
+  machine_configuration_input = data.talos_machine_configuration.worker[each.key].machine_configuration
 
-      ip = vm.ipv4_addresses[
-        index(
-          vm.mac_addresses,
-          one([
-            for nd in vm.network_device :
-            nd.mac_address
-            if nd.bridge == "vmbr0"
-          ])
-        )
-      ][0]
-    }
-  }
+  depends_on = [data.talos_machine_configuration.worker]
+}
+
+output "workers" {
+  value = local.workers
 }
