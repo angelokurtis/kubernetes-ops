@@ -107,6 +107,11 @@ data "talos_machine_configuration" "worker" {
       cluster = {
         proxy   = { disabled = true }
         network = { cni = { name = "none" } } # We install Cilium manually
+        apiServer = {
+          certSANs = [
+            "127.0.0.1"
+          ]
+        }
       }
     })
   ]
