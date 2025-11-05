@@ -1,6 +1,6 @@
 resource "kubectl_manifest" "helm_repository_crossplane" {
   yaml_body = <<-YAML
-    apiVersion: source.toolkit.fluxcd.io/v1beta2
+    apiVersion: source.toolkit.fluxcd.io/v1
     kind: HelmRepository
     metadata:
       name: crossplane
@@ -16,7 +16,7 @@ resource "kubectl_manifest" "helm_repository_crossplane" {
 
 resource "kubectl_manifest" "helm_release_crossplane" {
   yaml_body = <<-YAML
-    apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
       name: crossplane
