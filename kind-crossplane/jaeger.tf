@@ -82,7 +82,7 @@ data "external" "jaeger_latest_release" {
 }
 
 locals {
-  jaeger_latest_release = data.external.jaeger_latest_release.result["tag_name"]
+  jaeger_latest_release = data.external.jaeger_latest_release.result["normalized_tag"]
 }
 
 resource "kubernetes_namespace" "jaeger" {
