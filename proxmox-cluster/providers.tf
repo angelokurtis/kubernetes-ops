@@ -21,6 +21,9 @@ provider "proxmox" {
 
 provider "helm" {
   kubernetes = {
-    config_path = "${path.module}/kubeconfig"
+    host                   = yamldecode(talos_cluster_kubeconfig._.kubeconfig_raw)["clusters"][0]["cluster"]["server"]
+    client_certificate     = base64decode(yamldecode(talos_cluster_kubeconfig._.kubeconfig_raw)["users"][0]["user"]["client-certificate-data"])
+    client_key             = base64decode(yamldecode(talos_cluster_kubeconfig._.kubeconfig_raw)["users"][0]["user"]["client-key-data"])
+    cluster_ca_certificate = base64decode(yamldecode(talos_cluster_kubeconfig._.kubeconfig_raw)["clusters"][0]["cluster"]["certificate-authority-data"])
   }
 }
