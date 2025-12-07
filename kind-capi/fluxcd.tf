@@ -1,28 +1,30 @@
 locals {
   flux_crds = [
-    "customresourcedefinition.apiextensions.k8s.io/alerts.notification.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/buckets.source.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/gitrepositories.source.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/helmcharts.source.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/helmreleases.helm.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/helmrepositories.source.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/imagepolicies.image.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/imagerepositories.image.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/imageupdateautomations.image.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/kustomizations.kustomize.toolkit.fluxcd.io",
     "customresourcedefinition.apiextensions.k8s.io/ocirepositories.source.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/providers.notification.toolkit.fluxcd.io",
-    "customresourcedefinition.apiextensions.k8s.io/receivers.notification.toolkit.fluxcd.io",
   ]
 }
 
 resource "helm_release" "flux" {
   repository = "https://fluxcd-community.github.io/helm-charts"
   chart      = "flux2"
-  version    = "2.16.4"
+  version    = "2.17.1"
 
   name      = "flux"
   namespace = kubernetes_namespace.flux.metadata[0].name
+
+  values = [
+    yamlencode({
+      imageAutomationController = { create = false }
+      imageReflectionController = { create = false }
+      notificationController    = { create = false }
+    })
+  ]
 }
 
 resource "kubernetes_job_v1" "wait_flux_crd" {
