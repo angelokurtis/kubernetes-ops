@@ -52,9 +52,9 @@ resource "kubernetes_secret_v1" "proxmox_credentials" {
     namespace = kubernetes_namespace.capi.metadata[0].name
   }
   data = {
-    PROXMOX_URL    = "https://pve.example:8006/api2/json"
-    PROXMOX_TOKEN  = "root@pam!capi"
-    PROXMOX_SECRET = ""
+    PROXMOX_URL    = var.proxmox_url
+    PROXMOX_TOKEN  = var.proxmox_token
+    PROXMOX_SECRET = var.proxmox_secret
   }
 }
 
