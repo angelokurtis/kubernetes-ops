@@ -15,7 +15,7 @@ init: ## Set up Terraform with latest updates.
 
 .PHONY: plan
 plan: ## Show planned changes without applying.
-	tofu plan -out=tfplan -input=false
+	tofu plan -out=tfplan -input=false -show-sensitive
 	TF_BINARY=tofu tf-summarize tfplan
 
 .PHONY: apply
