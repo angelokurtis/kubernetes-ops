@@ -1,6 +1,7 @@
 terraform {
   required_providers {
     external   = { source = "hashicorp/external", version = "~> 2.3" }
+    helm       = { source = "hashicorp/helm", version = "~> 3.1" }
     http       = { source = "hashicorp/http", version = "~> 3.5" }
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.38" }
     local      = { source = "hashicorp/local", version = "~> 2.6.1" }
@@ -16,4 +17,10 @@ provider "proxmox" {
   username = var.proxmox_user
   password = var.proxmox_password
   insecure = true
+}
+
+provider "helm" {
+  kubernetes = {
+    config_path = "${path.module}/kubeconfig"
+  }
 }
