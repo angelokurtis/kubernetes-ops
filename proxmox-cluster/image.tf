@@ -1,5 +1,5 @@
 locals {
-  talos_version  = "v1.11.3"
+  talos_version  = data.external.talos_latest_release.result.tag_name
   talos_arch     = "amd64"
   talos_platform = "nocloud"
 
@@ -14,6 +14,15 @@ locals {
     for ds in data.proxmox_virtual_environment_datastores._.datastores :
     ds if contains(ds["content_types"], "iso")
   ])
+}
+
+data "external" "talos_latest_release" {
+  program = ["python3", "${path.module}/get_latest_github_release_version.py"]
+
+  query = {
+    repo   = "siderolabs/talos"
+    semver = ">= 1.0.0, < 2.0.0"
+  }
 }
 
 data "http" "schematic_id" {
