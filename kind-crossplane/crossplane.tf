@@ -49,7 +49,7 @@ resource "kubernetes_config_map_v1" "crossplane_helm_values" {
   }
   data = {
     "values.yaml" = yamlencode({
-
+      metrics = { enabled = true }
     })
   }
 }
