@@ -18,3 +18,4 @@ charlescd*config
 *.iws
 *.iml
 **/.terraform/*
+tfplan

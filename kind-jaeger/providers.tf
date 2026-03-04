@@ -1,18 +1,18 @@
 terraform {
   required_providers {
-    flux       = { source = "fluxcd/flux", version = ">= 0.16.0, < 0.17.0" }
-    helm       = { source = "hashicorp/helm", version = ">= 2.6.0, < 2.7.0" }
-    kind       = { source = "tehcyx/kind", version = ">= 0.0.13, < 0.1.0" }
-    kubectl    = { source = "gavinbunney/kubectl", version = ">= 1.14.0, < 1.15.0" }
-    kubernetes = { source = "hashicorp/kubernetes", version = ">= 2.12.1, < 2.13.0" }
+    external      = { source = "hashicorp/external",   version = "~> 2.3" }
+    helm          = { source = "hashicorp/helm",       version = "~> 3.1" }
+    kind          = { source = "tehcyx/kind",          version = "~> 0.11" }
+    kubectl       = { source = "alekc/kubectl",        version = "~> 2.1" }
+    kubernetes    = { source = "hashicorp/kubernetes", version = "~> 3.0" }
+    kustomization = { source = "kbst/kustomization",   version = "~> 0.9" }
+    null          = { source = "hashicorp/null",       version = "~> 3.2" }
   }
-  required_version = ">= 1.0"
+  required_version = ">= 1.9"
 }
 
-provider "flux" {}
-
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host = kind_cluster.jaeger.endpoint
 
     client_certificate     = kind_cluster.jaeger.client_certificate
@@ -38,4 +38,11 @@ provider "kubernetes" {
   client_certificate     = kind_cluster.jaeger.client_certificate
   client_key             = kind_cluster.jaeger.client_key
   cluster_ca_certificate = kind_cluster.jaeger.cluster_ca_certificate
+}
+
+provider "kustomization" {
+  kubeconfig_raw = kind_cluster.jaeger.kubeconfig
+}
+
+provider "null" {
 }

@@ -1,3 +1,8 @@
+locals {
+  cluster_host = var.load_balancer_address == "127.0.0.1" ? "lvh.me" : "${join("", formatlist("%02x", split(".", var.load_balancer_address)))}.nip.io"
+  kind         = { version = "v1.34.3" }
+}
+
 resource "kind_cluster" "jaeger" {
   name           = "jaeger"
   wait_for_ready = true
@@ -8,18 +13,26 @@ resource "kind_cluster" "jaeger" {
 
     node {
       role  = "control-plane"
-      image = "kindest/node:v1.21.12"
+      image = "kindest/node:${local.kind.version}"
+    }
+
+    node {
+      role  = "worker"
+      image = "kindest/node:${local.kind.version}"
 
       kubeadm_config_patches = [
         yamlencode({
-          kind             = "InitConfiguration"
+          kind             = "JoinConfiguration"
           nodeRegistration = { kubeletExtraArgs = { "node-labels" = "ingress-ready=true" } }
         })
       ]
 
-      extra_mounts {
-        container_path = "/var/lib/containerd"
-        host_path      = "/var/lib/docker/volumes/${var.docker_volume}/_data"
+      dynamic "extra_mounts" {
+        for_each = toset(var.docker_volume != null ? [var.docker_volume] : [])
+        content {
+          container_path = "/var/lib/containerd"
+          host_path      = "/var/lib/docker/volumes/${var.docker_volume}/_data"
+        }
       }
 
       extra_port_mappings {
@@ -27,12 +40,10 @@ resource "kind_cluster" "jaeger" {
         host_port      = 80
         protocol       = "TCP"
       }
-
-      extra_port_mappings {
-        container_port = 443
-        host_port      = 443
-        protocol       = "TCP"
-      }
     }
   }
+}
+
+data "kubectl_server_version" "current" {
+  depends_on = [kind_cluster.jaeger]
 }
