@@ -39,7 +39,7 @@ if [[ -z "$WORKSPACE_UID" ]]; then
 fi
 
 # Find pod
-POD_NAME=$(kubectl get pods "${NS_ARGS[@]}" -l pkg.crossplane.io/provider=crossplane-provider-opentofu -o jsonpath='{.items[0].metadata.name}')
+POD_NAME=$(kubectl get pods "${NS_ARGS[@]}" -n crossplane -l pkg.crossplane.io/provider=crossplane-provider-opentofu -o jsonpath='{.items[0].metadata.name}')
 
 if [[ -z "$POD_NAME" ]]; then
   echo "No matching pod found"
