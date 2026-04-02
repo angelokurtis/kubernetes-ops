@@ -6,4 +6,4 @@ source "$(dirname "$0")/resources.sh"
 joined_resources="$(join_resources)"
 
 set -x
-kubectl get --all-namespaces "${joined_resources}"
+watch kubectl get --all-namespaces "${joined_resources}"
