@@ -25,7 +25,7 @@ resource "kubectl_manifest" "workspaces" {
       namespace: ${kubernetes_namespace_v1.namespaces[each.key].metadata[0].name}
     spec:
       providerConfigRef:
-        kind: ClusterProviderConfig
+        kind: ProviderConfig
         name: random
       forProvider:
         initArgs:
@@ -43,12 +43,15 @@ resource "kubectl_manifest" "workspaces" {
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
-resource "kubectl_manifest" "random_clusterproviderconfig" {
+resource "kubectl_manifest" "random_providerconfig" {
+  for_each = toset(local.workspaces)
+
   yaml_body = <<-YAML
     apiVersion: opentofu.m.upbound.io/v1beta1
-    kind: ClusterProviderConfig
+    kind: ProviderConfig
     metadata:
       name: random
+      namespace: ${kubernetes_namespace_v1.namespaces[each.key].metadata[0].name}
     spec:
       pluginCache: true
       configuration: |
