@@ -767,14 +767,14 @@ metadata:
       blockOwnerDeletion: true
       controller: true
       kind: ProviderRevision
-      name: crossplane-provider-opentofu-d0662d177d24
-      uid: 82a79ca8-86d6-4646-a5a7-2591ca3285dd
+      name: crossplane-provider-opentofu-bae19390c7e5
+      uid: b7c4aa47-7301-4172-80d4-6ff8679159db
     - apiVersion: pkg.crossplane.io/v1
       blockOwnerDeletion: true
       controller: false
       kind: Provider
       name: crossplane-provider-opentofu
-      uid: 94313ef0-b0ad-4e3b-ba4b-ecfd833affd9
+      uid: 62a46636-6d5b-4bb8-a7cc-867d843c8669
 spec:
   conversion:
     strategy: None
@@ -972,7 +972,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: clusterusages.protection.crossplane.io
 spec:
   conversion:
@@ -1008,7 +1008,7 @@ spec:
             resources with dependent resources.
 
             Read the Crossplane documentation for
-            [more information about usages](https://docs.crossplane.io/latest/concepts/usages).
+            [more information about usages](https://docs.crossplane.io/latest/managed-resources/usages/).
           properties:
             apiVersion:
               description: |-
@@ -1183,7 +1183,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: compositeresourcedefinitions.apiextensions.crossplane.io
 spec:
   conversion:
@@ -1221,7 +1221,7 @@ spec:
             API.
 
             Read the Crossplane documentation for
-            [more information about CustomResourceDefinitions](https://docs.crossplane.io/latest/concepts/composite-resource-definitions).
+            [more information about CustomResourceDefinitions](https://docs.crossplane.io/latest/composition/composite-resource-definitions/).
           properties:
             apiVersion:
               description: |-
@@ -1434,6 +1434,52 @@ spec:
                   required:
                     - name
                   type: object
+                defaultCompositionRevisionSelector:
+                  description: |-
+                    DefaultCompositionRevisionSelector refers to the CompositionRevision that will be used
+                    in case no compositionRevision selector is given.
+                  properties:
+                    matchExpressions:
+                      description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                      items:
+                        description: |-
+                          A label selector requirement is a selector that contains values, a key, and an operator that
+                          relates the key and values.
+                        properties:
+                          key:
+                            description: key is the label key that the selector applies to.
+                            type: string
+                          operator:
+                            description: |-
+                              operator represents a key's relationship to a set of values.
+                              Valid operators are In, NotIn, Exists and DoesNotExist.
+                            type: string
+                          values:
+                            description: |-
+                              values is an array of string values. If the operator is In or NotIn,
+                              the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                              the values array must be empty. This array is replaced during a strategic
+                              merge patch.
+                            items:
+                              type: string
+                            type: array
+                            x-kubernetes-list-type: atomic
+                        required:
+                          - key
+                          - operator
+                        type: object
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    matchLabels:
+                      additionalProperties:
+                        type: string
+                      description: |-
+                        matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                        map is equivalent to an element of matchExpressions, whose key field is "key", the
+                        operator is "In", and the values array contains only "value". The requirements are ANDed.
+                      type: object
+                  type: object
+                  x-kubernetes-map-type: atomic
                 defaultCompositionUpdatePolicy:
                   default: Automatic
                   description: |-
@@ -1791,7 +1837,7 @@ spec:
             API.
 
             Read the Crossplane documentation for
-            [more information about CustomResourceDefinitions](https://docs.crossplane.io/latest/concepts/composite-resource-definitions).
+            [more information about CustomResourceDefinitions](https://docs.crossplane.io/latest/composition/composite-resource-definitions/).
           properties:
             apiVersion:
               description: |-
@@ -2000,6 +2046,52 @@ spec:
                   required:
                     - name
                   type: object
+                defaultCompositionRevisionSelector:
+                  description: |-
+                    DefaultCompositionRevisionSelector refers to the CompositionRevision that will be used
+                    in case no compositionRevision selector is given.
+                  properties:
+                    matchExpressions:
+                      description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                      items:
+                        description: |-
+                          A label selector requirement is a selector that contains values, a key, and an operator that
+                          relates the key and values.
+                        properties:
+                          key:
+                            description: key is the label key that the selector applies to.
+                            type: string
+                          operator:
+                            description: |-
+                              operator represents a key's relationship to a set of values.
+                              Valid operators are In, NotIn, Exists and DoesNotExist.
+                            type: string
+                          values:
+                            description: |-
+                              values is an array of string values. If the operator is In or NotIn,
+                              the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                              the values array must be empty. This array is replaced during a strategic
+                              merge patch.
+                            items:
+                              type: string
+                            type: array
+                            x-kubernetes-list-type: atomic
+                        required:
+                          - key
+                          - operator
+                        type: object
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    matchLabels:
+                      additionalProperties:
+                        type: string
+                      description: |-
+                        matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                        map is equivalent to an element of matchExpressions, whose key field is "key", the
+                        operator is "In", and the values array contains only "value". The requirements are ANDed.
+                      type: object
+                  type: object
+                  x-kubernetes-map-type: atomic
                 defaultCompositionUpdatePolicy:
                   default: Automatic
                   description: |-
@@ -2342,7 +2434,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: compositionrevisions.apiextensions.crossplane.io
 spec:
   conversion:
@@ -2554,6 +2646,33 @@ spec:
                             x-kubernetes-list-map-keys:
                               - requirementName
                             x-kubernetes-list-type: map
+                          requiredSchemas:
+                            description: |-
+                              RequiredSchemas is a list of OpenAPI schemas that must be fetched before
+                              this function is called.
+                            items:
+                              description: RequiredSchemaSelector selects a required OpenAPI schema.
+                              properties:
+                                apiVersion:
+                                  description: APIVersion of the resource kind whose schema is required, e.g. "example.org/v1".
+                                  type: string
+                                kind:
+                                  description: Kind of resource whose schema is required, e.g. "MyResource".
+                                  type: string
+                                requirementName:
+                                  description: |-
+                                    RequirementName is the unique name to identify this required schema
+                                    in the Required Schemas map in the function request.
+                                  type: string
+                              required:
+                                - apiVersion
+                                - kind
+                                - requirementName
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                              - requirementName
+                            x-kubernetes-list-type: map
                         type: object
                       step:
                         description: Step name. Must be unique within its Pipeline.
@@ -2647,7 +2766,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: compositions.apiextensions.crossplane.io
 spec:
   conversion:
@@ -2682,7 +2801,7 @@ spec:
             Crossplane uses to create and manage new composite resources.
 
             Read the Crossplane documentation for
-            [more information about Compositions](https://docs.crossplane.io/latest/concepts/compositions).
+            [more information about Compositions](https://docs.crossplane.io/latest/composition/compositions/).
           properties:
             apiVersion:
               description: |-
@@ -2855,6 +2974,33 @@ spec:
                             x-kubernetes-list-map-keys:
                               - requirementName
                             x-kubernetes-list-type: map
+                          requiredSchemas:
+                            description: |-
+                              RequiredSchemas is a list of OpenAPI schemas that must be fetched before
+                              this function is called.
+                            items:
+                              description: RequiredSchemaSelector selects a required OpenAPI schema.
+                              properties:
+                                apiVersion:
+                                  description: APIVersion of the resource kind whose schema is required, e.g. "example.org/v1".
+                                  type: string
+                                kind:
+                                  description: Kind of resource whose schema is required, e.g. "MyResource".
+                                  type: string
+                                requirementName:
+                                  description: |-
+                                    RequirementName is the unique name to identify this required schema
+                                    in the Required Schemas map in the function request.
+                                  type: string
+                              required:
+                                - apiVersion
+                                - kind
+                                - requirementName
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                              - requirementName
+                            x-kubernetes-list-type: map
                         type: object
                       step:
                         description: Step name. Must be unique within its Pipeline.
@@ -2891,7 +3037,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: configurationrevisions.pkg.crossplane.io
 spec:
   conversion:
@@ -3161,7 +3307,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: configurations.pkg.crossplane.io
 spec:
   conversion:
@@ -3199,7 +3345,7 @@ spec:
             Compositions.
 
             Read the Crossplane documentation for
-            [more information about Configuration packages](https://docs.crossplane.io/latest/concepts/packages).
+            [more information about Configuration packages]( https://docs.crossplane.io/latest/packages/configurations/).
           properties:
             apiVersion:
               description: |-
@@ -3401,7 +3547,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: cronoperations.ops.crossplane.io
 spec:
   conversion:
@@ -3615,6 +3761,35 @@ spec:
                                     x-kubernetes-list-map-keys:
                                       - requirementName
                                     x-kubernetes-list-type: map
+                                  requiredSchemas:
+                                    description: |-
+                                      RequiredSchemas that will be fetched before this pipeline step
+                                      is called for the first time.
+                                    items:
+                                      description: |-
+                                        RequiredSchemaSelector selects an OpenAPI schema that should be fetched
+                                        before a pipeline step runs.
+                                      properties:
+                                        apiVersion:
+                                          description: APIVersion of the resource kind whose schema is required, e.g. "example.org/v1".
+                                          type: string
+                                        kind:
+                                          description: Kind of resource whose schema is required, e.g. "MyResource".
+                                          type: string
+                                        requirementName:
+                                          description: |-
+                                            RequirementName uniquely identifies this schema.
+                                            This name will be used as the key in RunFunctionRequest.required_schemas.
+                                          type: string
+                                      required:
+                                        - apiVersion
+                                        - kind
+                                        - requirementName
+                                      type: object
+                                    type: array
+                                    x-kubernetes-list-map-keys:
+                                      - requirementName
+                                    x-kubernetes-list-type: map
                                 type: object
                               step:
                                 description: Step name. Must be unique within its Pipeline.
@@ -3741,7 +3916,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: deploymentruntimeconfigs.pkg.crossplane.io
 spec:
   conversion:
@@ -3768,7 +3943,7 @@ spec:
             of a Provider or composition function package.
 
             Read the Crossplane documentation for
-            [more information about DeploymentRuntimeConfigs](https://docs.crossplane.io/latest/concepts/providers/#runtime-configuration).
+            [more information about DeploymentRuntimeConfigs](https://docs.crossplane.io/latest/packages/providers/#runtime-configuration).
           properties:
             apiVersion:
               description: |-
@@ -4531,8 +4706,8 @@ spec:
                                             most preferred is the one with the greatest sum of weights, i.e.
                                             for each node that meets all of the scheduling requirements (resource
                                             request, requiredDuringScheduling anti-affinity expressions, etc.),
-                                            compute a sum by iterating through the elements of this field and adding
-                                            "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+                                            compute a sum by iterating through the elements of this field and subtracting
+                                            "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
                                             node(s) with the highest sum are the most preferred.
                                           items:
                                             description: The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
@@ -4910,7 +5085,9 @@ spec:
                                           description: EnvVar represents an environment variable present in a Container.
                                           properties:
                                             name:
-                                              description: Name of the environment variable. Must be a C_IDENTIFIER.
+                                              description: |-
+                                                Name of the environment variable.
+                                                May consist of any printable ASCII characters except '='.
                                               type: string
                                             value:
                                               description: |-
@@ -4962,6 +5139,42 @@ spec:
                                                       type: string
                                                   required:
                                                     - fieldPath
+                                                  type: object
+                                                  x-kubernetes-map-type: atomic
+                                                fileKeyRef:
+                                                  description: |-
+                                                    FileKeyRef selects a key of the env file.
+                                                    Requires the EnvFiles feature gate to be enabled.
+                                                  properties:
+                                                    key:
+                                                      description: |-
+                                                        The key within the env file. An invalid key will prevent the pod from starting.
+                                                        The keys defined within a source may consist of any printable ASCII characters except '='.
+                                                        During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                                                      type: string
+                                                    optional:
+                                                      default: false
+                                                      description: |-
+                                                        Specify whether the file or its key must be defined. If the file or key
+                                                        does not exist, then the env var is not published.
+                                                        If optional is set to true and the specified key does not exist,
+                                                        the environment variable will not be set in the Pod's containers.
+
+                                                        If optional is set to false and the specified key does not exist,
+                                                        an error will be returned during Pod creation.
+                                                      type: boolean
+                                                    path:
+                                                      description: |-
+                                                        The path within the volume from which to select the file.
+                                                        Must be relative and may not contain the '..' path or start with '..'.
+                                                      type: string
+                                                    volumeName:
+                                                      description: The name of the volume mount containing the env file.
+                                                      type: string
+                                                  required:
+                                                    - key
+                                                    - path
+                                                    - volumeName
                                                   type: object
                                                   x-kubernetes-map-type: atomic
                                                 resourceFieldRef:
@@ -5019,8 +5232,8 @@ spec:
                                       envFrom:
                                         description: |-
                                           List of sources to populate environment variables in the container.
-                                          The keys defined within a source must be a C_IDENTIFIER. All invalid keys
-                                          will be reported as an event when the container is starting. When a key exists in multiple
+                                          The keys defined within a source may consist of any printable ASCII characters except '='.
+                                          When a key exists in multiple
                                           sources, the value associated with the last source will take precedence.
                                           Values defined by an Env with a duplicate key will take precedence.
                                           Cannot be updated.
@@ -5045,7 +5258,9 @@ spec:
                                               type: object
                                               x-kubernetes-map-type: atomic
                                             prefix:
-                                              description: Optional text to prepend to the name of each environment variable. Must be a C_IDENTIFIER.
+                                              description: |-
+                                                Optional text to prepend to the name of each environment variable.
+                                                May consist of any printable ASCII characters except '='.
                                               type: string
                                             secretRef:
                                               description: The Secret to select from
@@ -5659,7 +5874,9 @@ spec:
                                             type: integer
                                         type: object
                                       resizePolicy:
-                                        description: Resources resize policy for the container.
+                                        description: |-
+                                          Resources resize policy for the container.
+                                          This field cannot be set on ephemeral containers.
                                         items:
                                           description: ContainerResizePolicy represents resource resize policy for the container.
                                           properties:
@@ -5690,7 +5907,7 @@ spec:
                                               Claims lists the names of resources, defined in spec.resourceClaims,
                                               that are used by this container.
 
-                                              This is an alpha field and requires enabling the
+                                              This field depends on the
                                               DynamicResourceAllocation feature gate.
 
                                               This field is immutable. It can only be set for containers.
@@ -5744,10 +5961,10 @@ spec:
                                       restartPolicy:
                                         description: |-
                                           RestartPolicy defines the restart behavior of individual containers in a pod.
-                                          This field may only be set for init containers, and the only allowed value is "Always".
-                                          For non-init containers or when this field is not specified,
+                                          This overrides the pod-level restart policy. When this field is not specified,
                                           the restart behavior is defined by the Pod's restart policy and the container type.
-                                          Setting the RestartPolicy as "Always" for the init container will have the following effect:
+                                          Additionally, setting the RestartPolicy as "Always" for the init container will
+                                          have the following effect:
                                           this init container will be continually restarted on
                                           exit until all regular containers have terminated. Once all regular
                                           containers have completed, all init containers with restartPolicy "Always"
@@ -5759,6 +5976,57 @@ spec:
                                           init container is started, or after any startupProbe has successfully
                                           completed.
                                         type: string
+                                      restartPolicyRules:
+                                        description: |-
+                                          Represents a list of rules to be checked to determine if the
+                                          container should be restarted on exit. The rules are evaluated in
+                                          order. Once a rule matches a container exit condition, the remaining
+                                          rules are ignored. If no rule matches the container exit condition,
+                                          the Container-level restart policy determines the whether the container
+                                          is restarted or not. Constraints on the rules:
+                                          - At most 20 rules are allowed.
+                                          - Rules can have the same action.
+                                          - Identical rules are not forbidden in validations.
+                                          When rules are specified, container MUST set RestartPolicy explicitly
+                                          even it if matches the Pod's RestartPolicy.
+                                        items:
+                                          description: ContainerRestartRule describes how a container exit is handled.
+                                          properties:
+                                            action:
+                                              description: |-
+                                                Specifies the action taken on a container exit if the requirements
+                                                are satisfied. The only possible value is "Restart" to restart the
+                                                container.
+                                              type: string
+                                            exitCodes:
+                                              description: Represents the exit codes to check on container exits.
+                                              properties:
+                                                operator:
+                                                  description: |-
+                                                    Represents the relationship between the container exit code(s) and the
+                                                    specified values. Possible values are:
+                                                    - In: the requirement is satisfied if the container exit code is in the
+                                                      set of specified values.
+                                                    - NotIn: the requirement is satisfied if the container exit code is
+                                                      not in the set of specified values.
+                                                  type: string
+                                                values:
+                                                  description: |-
+                                                    Specifies the set of values to check for container exit codes.
+                                                    At most 255 elements are allowed.
+                                                  items:
+                                                    format: int32
+                                                    type: integer
+                                                  type: array
+                                                  x-kubernetes-list-type: set
+                                              required:
+                                                - operator
+                                              type: object
+                                          required:
+                                            - action
+                                          type: object
+                                        type: array
+                                        x-kubernetes-list-type: atomic
                                       securityContext:
                                         description: |-
                                           SecurityContext defines the security options the container should be run with.
@@ -6356,7 +6624,9 @@ spec:
                                           description: EnvVar represents an environment variable present in a Container.
                                           properties:
                                             name:
-                                              description: Name of the environment variable. Must be a C_IDENTIFIER.
+                                              description: |-
+                                                Name of the environment variable.
+                                                May consist of any printable ASCII characters except '='.
                                               type: string
                                             value:
                                               description: |-
@@ -6408,6 +6678,42 @@ spec:
                                                       type: string
                                                   required:
                                                     - fieldPath
+                                                  type: object
+                                                  x-kubernetes-map-type: atomic
+                                                fileKeyRef:
+                                                  description: |-
+                                                    FileKeyRef selects a key of the env file.
+                                                    Requires the EnvFiles feature gate to be enabled.
+                                                  properties:
+                                                    key:
+                                                      description: |-
+                                                        The key within the env file. An invalid key will prevent the pod from starting.
+                                                        The keys defined within a source may consist of any printable ASCII characters except '='.
+                                                        During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                                                      type: string
+                                                    optional:
+                                                      default: false
+                                                      description: |-
+                                                        Specify whether the file or its key must be defined. If the file or key
+                                                        does not exist, then the env var is not published.
+                                                        If optional is set to true and the specified key does not exist,
+                                                        the environment variable will not be set in the Pod's containers.
+
+                                                        If optional is set to false and the specified key does not exist,
+                                                        an error will be returned during Pod creation.
+                                                      type: boolean
+                                                    path:
+                                                      description: |-
+                                                        The path within the volume from which to select the file.
+                                                        Must be relative and may not contain the '..' path or start with '..'.
+                                                      type: string
+                                                    volumeName:
+                                                      description: The name of the volume mount containing the env file.
+                                                      type: string
+                                                  required:
+                                                    - key
+                                                    - path
+                                                    - volumeName
                                                   type: object
                                                   x-kubernetes-map-type: atomic
                                                 resourceFieldRef:
@@ -6465,8 +6771,8 @@ spec:
                                       envFrom:
                                         description: |-
                                           List of sources to populate environment variables in the container.
-                                          The keys defined within a source must be a C_IDENTIFIER. All invalid keys
-                                          will be reported as an event when the container is starting. When a key exists in multiple
+                                          The keys defined within a source may consist of any printable ASCII characters except '='.
+                                          When a key exists in multiple
                                           sources, the value associated with the last source will take precedence.
                                           Values defined by an Env with a duplicate key will take precedence.
                                           Cannot be updated.
@@ -6491,7 +6797,9 @@ spec:
                                               type: object
                                               x-kubernetes-map-type: atomic
                                             prefix:
-                                              description: Optional text to prepend to the name of each environment variable. Must be a C_IDENTIFIER.
+                                              description: |-
+                                                Optional text to prepend to the name of each environment variable.
+                                                May consist of any printable ASCII characters except '='.
                                               type: string
                                             secretRef:
                                               description: The Secret to select from
@@ -7115,7 +7423,7 @@ spec:
                                               Claims lists the names of resources, defined in spec.resourceClaims,
                                               that are used by this container.
 
-                                              This is an alpha field and requires enabling the
+                                              This field depends on the
                                               DynamicResourceAllocation feature gate.
 
                                               This field is immutable. It can only be set for containers.
@@ -7170,9 +7478,51 @@ spec:
                                         description: |-
                                           Restart policy for the container to manage the restart behavior of each
                                           container within a pod.
-                                          This may only be set for init containers. You cannot set this field on
-                                          ephemeral containers.
+                                          You cannot set this field on ephemeral containers.
                                         type: string
+                                      restartPolicyRules:
+                                        description: |-
+                                          Represents a list of rules to be checked to determine if the
+                                          container should be restarted on exit. You cannot set this field on
+                                          ephemeral containers.
+                                        items:
+                                          description: ContainerRestartRule describes how a container exit is handled.
+                                          properties:
+                                            action:
+                                              description: |-
+                                                Specifies the action taken on a container exit if the requirements
+                                                are satisfied. The only possible value is "Restart" to restart the
+                                                container.
+                                              type: string
+                                            exitCodes:
+                                              description: Represents the exit codes to check on container exits.
+                                              properties:
+                                                operator:
+                                                  description: |-
+                                                    Represents the relationship between the container exit code(s) and the
+                                                    specified values. Possible values are:
+                                                    - In: the requirement is satisfied if the container exit code is in the
+                                                      set of specified values.
+                                                    - NotIn: the requirement is satisfied if the container exit code is
+                                                      not in the set of specified values.
+                                                  type: string
+                                                values:
+                                                  description: |-
+                                                    Specifies the set of values to check for container exit codes.
+                                                    At most 255 elements are allowed.
+                                                  items:
+                                                    format: int32
+                                                    type: integer
+                                                  type: array
+                                                  x-kubernetes-list-type: set
+                                              required:
+                                                - operator
+                                              type: object
+                                          required:
+                                            - action
+                                          type: object
+                                        type: array
+                                        x-kubernetes-list-type: atomic
                                       securityContext:
                                         description: |-
                                           Optional: SecurityContext defines the security options the ephemeral container should be run with.
@@ -7691,7 +8041,9 @@ spec:
                                 hostNetwork:
                                   description: |-
                                     Host networking requested for this pod. Use the host's network namespace.
-                                    If this option is set, the ports that will be used must be specified.
+                                    When using HostNetwork you should specify ports so the scheduler is aware.
+                                    When `hostNetwork` is true, specified `hostPort` fields in port definitions must match `containerPort`,
+                                    and unspecified `hostPort` fields in port definitions are defaulted to match `containerPort`.
                                     Default to false.
                                   type: boolean
                                 hostPID:
@@ -7715,6 +8067,19 @@ spec:
                                   description: |-
                                     Specifies the hostname of the Pod
                                     If not specified, the pod's hostname will be set to a system-defined value.
+                                  type: string
+                                hostnameOverride:
+                                  description: |-
+                                    HostnameOverride specifies an explicit override for the pod's hostname as perceived by the pod.
+                                    This field only specifies the pod's hostname and does not affect its DNS records.
+                                    When this field is set to a non-empty string:
+                                    - It takes precedence over the values set in `hostname` and `subdomain`.
+                                    - The Pod's hostname will be set to this value.
+                                    - `setHostnameAsFQDN` must be nil or set to false.
+                                    - `hostNetwork` must be set to false.
+
+                                    This field must be a valid DNS subdomain as defined in RFC 1123 and contain at most 64 characters.
+                                    Requires the HostnameOverride feature gate to be enabled.
                                   type: string
                                 imagePullSecrets:
                                   description: |-
@@ -7797,7 +8162,9 @@ spec:
                                           description: EnvVar represents an environment variable present in a Container.
                                           properties:
                                             name:
-                                              description: Name of the environment variable. Must be a C_IDENTIFIER.
+                                              description: |-
+                                                Name of the environment variable.
+                                                May consist of any printable ASCII characters except '='.
                                               type: string
                                             value:
                                               description: |-
@@ -7849,6 +8216,42 @@ spec:
                                                       type: string
                                                   required:
                                                     - fieldPath
+                                                  type: object
+                                                  x-kubernetes-map-type: atomic
+                                                fileKeyRef:
+                                                  description: |-
+                                                    FileKeyRef selects a key of the env file.
+                                                    Requires the EnvFiles feature gate to be enabled.
+                                                  properties:
+                                                    key:
+                                                      description: |-
+                                                        The key within the env file. An invalid key will prevent the pod from starting.
+                                                        The keys defined within a source may consist of any printable ASCII characters except '='.
+                                                        During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                                                      type: string
+                                                    optional:
+                                                      default: false
+                                                      description: |-
+                                                        Specify whether the file or its key must be defined. If the file or key
+                                                        does not exist, then the env var is not published.
+                                                        If optional is set to true and the specified key does not exist,
+                                                        the environment variable will not be set in the Pod's containers.
+
+                                                        If optional is set to false and the specified key does not exist,
+                                                        an error will be returned during Pod creation.
+                                                      type: boolean
+                                                    path:
+                                                      description: |-
+                                                        The path within the volume from which to select the file.
+                                                        Must be relative and may not contain the '..' path or start with '..'.
+                                                      type: string
+                                                    volumeName:
+                                                      description: The name of the volume mount containing the env file.
+                                                      type: string
+                                                  required:
+                                                    - key
+                                                    - path
+                                                    - volumeName
                                                   type: object
                                                   x-kubernetes-map-type: atomic
                                                 resourceFieldRef:
@@ -7906,8 +8309,8 @@ spec:
                                       envFrom:
                                         description: |-
                                           List of sources to populate environment variables in the container.
-                                          The keys defined within a source must be a C_IDENTIFIER. All invalid keys
-                                          will be reported as an event when the container is starting. When a key exists in multiple
+                                          The keys defined within a source may consist of any printable ASCII characters except '='.
+                                          When a key exists in multiple
                                           sources, the value associated with the last source will take precedence.
                                           Values defined by an Env with a duplicate key will take precedence.
                                           Cannot be updated.
@@ -7932,7 +8335,9 @@ spec:
                                               type: object
                                               x-kubernetes-map-type: atomic
                                             prefix:
-                                              description: Optional text to prepend to the name of each environment variable. Must be a C_IDENTIFIER.
+                                              description: |-
+                                                Optional text to prepend to the name of each environment variable.
+                                                May consist of any printable ASCII characters except '='.
                                               type: string
                                             secretRef:
                                               description: The Secret to select from
@@ -8546,7 +8951,9 @@ spec:
                                             type: integer
                                         type: object
                                       resizePolicy:
-                                        description: Resources resize policy for the container.
+                                        description: |-
+                                          Resources resize policy for the container.
+                                          This field cannot be set on ephemeral containers.
                                         items:
                                           description: ContainerResizePolicy represents resource resize policy for the container.
                                           properties:
@@ -8577,7 +8984,7 @@ spec:
                                               Claims lists the names of resources, defined in spec.resourceClaims,
                                               that are used by this container.
 
-                                              This is an alpha field and requires enabling the
+                                              This field depends on the
                                               DynamicResourceAllocation feature gate.
 
                                               This field is immutable. It can only be set for containers.
@@ -8631,10 +9038,10 @@ spec:
                                       restartPolicy:
                                         description: |-
                                           RestartPolicy defines the restart behavior of individual containers in a pod.
-                                          This field may only be set for init containers, and the only allowed value is "Always".
-                                          For non-init containers or when this field is not specified,
+                                          This overrides the pod-level restart policy. When this field is not specified,
                                           the restart behavior is defined by the Pod's restart policy and the container type.
-                                          Setting the RestartPolicy as "Always" for the init container will have the following effect:
+                                          Additionally, setting the RestartPolicy as "Always" for the init container will
+                                          have the following effect:
                                           this init container will be continually restarted on
                                           exit until all regular containers have terminated. Once all regular
                                           containers have completed, all init containers with restartPolicy "Always"
@@ -8646,6 +9053,57 @@ spec:
                                           init container is started, or after any startupProbe has successfully
                                           completed.
                                         type: string
+                                      restartPolicyRules:
+                                        description: |-
+                                          Represents a list of rules to be checked to determine if the
+                                          container should be restarted on exit. The rules are evaluated in
+                                          order. Once a rule matches a container exit condition, the remaining
+                                          rules are ignored. If no rule matches the container exit condition,
+                                          the Container-level restart policy determines the whether the container
+                                          is restarted or not. Constraints on the rules:
+                                          - At most 20 rules are allowed.
+                                          - Rules can have the same action.
+                                          - Identical rules are not forbidden in validations.
+                                          When rules are specified, container MUST set RestartPolicy explicitly
+                                          even it if matches the Pod's RestartPolicy.
+                                        items:
+                                          description: ContainerRestartRule describes how a container exit is handled.
+                                          properties:
+                                            action:
+                                              description: |-
+                                                Specifies the action taken on a container exit if the requirements
+                                                are satisfied. The only possible value is "Restart" to restart the
+                                                container.
+                                              type: string
+                                            exitCodes:
+                                              description: Represents the exit codes to check on container exits.
+                                              properties:
+                                                operator:
+                                                  description: |-
+                                                    Represents the relationship between the container exit code(s) and the
+                                                    specified values. Possible values are:
+                                                    - In: the requirement is satisfied if the container exit code is in the
+                                                      set of specified values.
+                                                    - NotIn: the requirement is satisfied if the container exit code is
+                                                      not in the set of specified values.
+                                                  type: string
+                                                values:
+                                                  description: |-
+                                                    Specifies the set of values to check for container exit codes.
+                                                    At most 255 elements are allowed.
+                                                  items:
+                                                    format: int32
+                                                    type: integer
+                                                  type: array
+                                                  x-kubernetes-list-type: set
+                                              required:
+                                                - operator
+                                              type: object
+                                          required:
+                                            - action
+                                          type: object
+                                        type: array
+                                        x-kubernetes-list-type: atomic
                                       securityContext:
                                         description: |-
                                           SecurityContext defines the security options the container should be run with.
@@ -9159,6 +9617,7 @@ spec:
                                     - spec.hostPID
                                     - spec.hostIPC
                                     - spec.hostUsers
+                                    - spec.resources
                                     - spec.securityContext.appArmorProfile
                                     - spec.securityContext.seLinuxOptions
                                     - spec.securityContext.seccompProfile
@@ -9255,8 +9714,8 @@ spec:
                                     will be made available to those containers which consume them
                                     by name.
 
-                                    This is an alpha field and requires enabling the
-                                    DynamicResourceAllocation feature gate.
+                                    This is a stable field but requires that the
+                                    DynamicResourceAllocation feature gate is enabled.
 
                                     This field is immutable.
                                   items:
@@ -9310,7 +9769,7 @@ spec:
                                   description: |-
                                     Resources is the total amount of CPU and Memory resources required by all
                                     containers in the pod. It supports specifying Requests and Limits for
-                                    "cpu" and "memory" resource names only. ResourceClaims are not supported.
+                                    "cpu", "memory" and "hugepages-" resource names only. ResourceClaims are not supported.
 
                                     This field enables fine-grained control over resource allocation for the
                                     entire pod, allowing resource sharing among containers in a pod.
@@ -9323,7 +9782,7 @@ spec:
                                         Claims lists the names of resources, defined in spec.resourceClaims,
                                         that are used by this container.
 
-                                        This is an alpha field and requires enabling the
+                                        This field depends on the
                                         DynamicResourceAllocation feature gate.
 
                                         This field is immutable. It can only be set for containers.
@@ -9708,9 +10167,10 @@ spec:
                                       operator:
                                         description: |-
                                           Operator represents a key's relationship to the value.
-                                          Valid operators are Exists and Equal. Defaults to Equal.
+                                          Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                                           Exists is equivalent to wildcard for value, so that a pod can
                                           tolerate all taints of a particular category.
+                                          Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                                         type: string
                                       tolerationSeconds:
                                         description: |-
@@ -10482,7 +10942,7 @@ spec:
                                                   resources:
                                                     description: |-
                                                       resources represents the minimum resources the volume should have.
-                                                      If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                                                      Users are allowed to specify resource requirements
                                                       that are lower than previous value but must still be higher than capacity recorded in the
                                                       status field of the claim.
                                                       More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -10566,15 +11026,13 @@ spec:
                                                       volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.
                                                       If specified, the CSI driver will create or update the volume with the attributes defined
                                                       in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,
-                                                      it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass
-                                                      will be applied to the claim but it's not allowed to reset this field to empty string once it is set.
-                                                      If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass
-                                                      will be set by the persistentvolume controller if it exists.
+                                                      it can be changed after the claim is created. An empty string or nil value indicates that no
+                                                      VolumeAttributesClass will be applied to the claim. If the claim enters an Infeasible error state,
+                                                      this field can be reset to its previous value (including nil) to cancel the modification.
                                                       If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be
                                                       set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
                                                       exists.
                                                       More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-                                                      (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
                                                     type: string
                                                   volumeMode:
                                                     description: |-
@@ -10748,12 +11206,9 @@ spec:
                                         description: |-
                                           glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
                                           Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported.
-                                          More info: https://examples.k8s.io/volumes/glusterfs/README.md
                                         properties:
                                           endpoints:
-                                            description: |-
-                                              endpoints is the endpoint name that details Glusterfs topology.
-                                              More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
+                                            description: endpoints is the endpoint name that details Glusterfs topology.
                                             type: string
                                           path:
                                             description: |-
@@ -10832,7 +11287,7 @@ spec:
                                         description: |-
                                           iscsi represents an ISCSI Disk resource that is attached to a
                                           kubelet's host machine and then exposed to the pod.
-                                          More info: https://examples.k8s.io/volumes/iscsi/README.md
+                                          More info: https://kubernetes.io/docs/concepts/storage/volumes/#iscsi
                                         properties:
                                           chapAuthDiscovery:
                                             description: chapAuthDiscovery defines whether support iSCSI Discovery CHAP authentication
@@ -11222,6 +11677,128 @@ spec:
                                                       type: array
                                                       x-kubernetes-list-type: atomic
                                                   type: object
+                                                podCertificate:
+                                                  description: |-
+                                                    Projects an auto-rotating credential bundle (private key and certificate
+                                                    chain) that the pod can use either as a TLS client or server.
+
+                                                    Kubelet generates a private key and uses it to send a
+                                                    PodCertificateRequest to the named signer.  Once the signer approves the
+                                                    request and issues a certificate chain, Kubelet writes the key and
+                                                    certificate chain to the pod filesystem.  The pod does not start until
+                                                    certificates have been issued for each podCertificate projected volume
+                                                    source in its spec.
+
+                                                    Kubelet will begin trying to rotate the certificate at the time indicated
+                                                    by the signer using the PodCertificateRequest.Status.BeginRefreshAt
+                                                    timestamp.
+
+                                                    Kubelet can write a single file, indicated by the credentialBundlePath
+                                                    field, or separate files, indicated by the keyPath and
+                                                    certificateChainPath fields.
+
+                                                    The credential bundle is a single file in PEM format.  The first PEM
+                                                    entry is the private key (in PKCS#8 format), and the remaining PEM
+                                                    entries are the certificate chain issued by the signer (typically,
+                                                    signers will return their certificate chain in leaf-to-root order).
+
+                                                    Prefer using the credential bundle format, since your application code
+                                                    can read it atomically.  If you use keyPath and certificateChainPath,
+                                                    your application must make two separate file reads. If these coincide
+                                                    with a certificate rotation, it is possible that the private key and leaf
+                                                    certificate you read may not correspond to each other.  Your application
+                                                    will need to check for this condition, and re-read until they are
+                                                    consistent.
+
+                                                    The named signer controls chooses the format of the certificate it
+                                                    issues; consult the signer implementation's documentation to learn how to
+                                                    use the certificates it issues.
+                                                  properties:
+                                                    certificateChainPath:
+                                                      description: |-
+                                                        Write the certificate chain at this path in the projected volume.
+
+                                                        Most applications should use credentialBundlePath.  When using keyPath
+                                                        and certificateChainPath, your application needs to check that the key
+                                                        and leaf certificate are consistent, because it is possible to read the
+                                                        files mid-rotation.
+                                                      type: string
+                                                    credentialBundlePath:
+                                                      description: |-
+                                                        Write the credential bundle at this path in the projected volume.
+
+                                                        The credential bundle is a single file that contains multiple PEM blocks.
+                                                        The first PEM block is a PRIVATE KEY block, containing a PKCS#8 private
+                                                        key.
+
+                                                        The remaining blocks are CERTIFICATE blocks, containing the issued
+                                                        certificate chain from the signer (leaf and any intermediates).
+
+                                                        Using credentialBundlePath lets your Pod's application code make a single
+                                                        atomic read that retrieves a consistent key and certificate chain.  If you
+                                                        project them to separate files, your application code will need to
+                                                        additionally check that the leaf certificate was issued to the key.
+                                                      type: string
+                                                    keyPath:
+                                                      description: |-
+                                                        Write the key at this path in the projected volume.
+
+                                                        Most applications should use credentialBundlePath.  When using keyPath
+                                                        and certificateChainPath, your application needs to check that the key
+                                                        and leaf certificate are consistent, because it is possible to read the
+                                                        files mid-rotation.
+                                                      type: string
+                                                    keyType:
+                                                      description: |-
+                                                        The type of keypair Kubelet will generate for the pod.
+
+                                                        Valid values are "RSA3072", "RSA4096", "ECDSAP256", "ECDSAP384",
+                                                        "ECDSAP521", and "ED25519".
+                                                      type: string
+                                                    maxExpirationSeconds:
+                                                      description: |-
+                                                        maxExpirationSeconds is the maximum lifetime permitted for the
+                                                        certificate.
+
+                                                        Kubelet copies this value verbatim into the PodCertificateRequests it
+                                                        generates for this projection.
+
+                                                        If omitted, kube-apiserver will set it to 86400(24 hours). kube-apiserver
+                                                        will reject values shorter than 3600 (1 hour).  The maximum allowable
+                                                        value is 7862400 (91 days).
+
+                                                        The signer implementation is then free to issue a certificate with any
+                                                        lifetime *shorter* than MaxExpirationSeconds, but no shorter than 3600
+                                                        seconds (1 hour).  This constraint is enforced by kube-apiserver.
+                                                        `kubernetes.io` signers will never issue certificates with a lifetime
+                                                        longer than 24 hours.
+                                                      format: int32
+                                                      type: integer
+                                                    signerName:
+                                                      description: Kubelet's generated CSRs will be addressed to this signer.
+                                                      type: string
+                                                    userAnnotations:
+                                                      additionalProperties:
+                                                        type: string
+                                                      description: |-
+                                                        userAnnotations allow pod authors to pass additional information to
+                                                        the signer implementation.  Kubernetes does not restrict or validate this
+                                                        metadata in any way.
+
+                                                        These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+                                                        the PodCertificateRequest objects that Kubelet creates.
+
+                                                        Entries are subject to the same validation as object metadata annotations,
+                                                        with the addition that all keys must be domain-prefixed. No restrictions
+                                                        are placed on values, except an overall size limitation on the entire field.
+
+                                                        Signers should document the keys and values they support. Signers should
+                                                        deny requests that contain keys they do not recognize.
+                                                      type: object
+                                                  required:
+                                                    - keyType
+                                                    - signerName
+                                                  type: object
                                                 secret:
                                                   description: secret information about the secret data to project
                                                   properties:
@@ -11351,7 +11928,6 @@ spec:
                                         description: |-
                                           rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
                                           Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported.
-                                          More info: https://examples.k8s.io/volumes/rbd/README.md
                                         properties:
                                           fsType:
                                             description: |-
@@ -11628,6 +12204,42 @@ spec:
                                   x-kubernetes-list-map-keys:
                                     - name
                                   x-kubernetes-list-type: map
+                                workloadRef:
+                                  description: |-
+                                    WorkloadRef provides a reference to the Workload object that this Pod belongs to.
+                                    This field is used by the scheduler to identify the PodGroup and apply the
+                                    correct group scheduling policies. The Workload object referenced
+                                    by this field may not exist at the time the Pod is created.
+                                    This field is immutable, but a Workload object with the same name
+                                    may be recreated with different policies. Doing this during pod scheduling
+                                    may result in the placement not conforming to the expected policies.
+                                  properties:
+                                    name:
+                                      description: |-
+                                        Name defines the name of the Workload object this Pod belongs to.
+                                        Workload must be in the same namespace as the Pod.
+                                        If it doesn't match any existing Workload, the Pod will remain unschedulable
+                                        until a Workload object is created and observed by the kube-scheduler.
+                                        It must be a DNS subdomain.
+                                      type: string
+                                    podGroup:
+                                      description: |-
+                                        PodGroup is the name of the PodGroup within the Workload that this Pod
+                                        belongs to. If it doesn't match any existing PodGroup within the Workload,
+                                        the Pod will remain unschedulable until the Workload object is recreated
+                                        and observed by the kube-scheduler. It must be a DNS label.
+                                      type: string
+                                    podGroupReplicaKey:
+                                      description: |-
+                                        PodGroupReplicaKey specifies the replica key of the PodGroup to which this
+                                        Pod belongs. It is used to distinguish pods belonging to different replicas
+                                        of the same pod group. The pod group policy is applied separately to each replica.
+                                        When set, it must be a DNS label.
+                                      type: string
+                                  required:
+                                    - name
+                                    - podGroup
+                                  type: object
                               required:
                                 - containers
                               type: object
@@ -11708,7 +12320,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: environmentconfigs.apiextensions.crossplane.io
 spec:
   conversion:
@@ -11737,7 +12349,7 @@ spec:
             use in a Composition.
 
             Read the Crossplane documentation for
-            [more information about EnvironmentConfigs](https://docs.crossplane.io/latest/concepts/environment-configs).
+            [more information about EnvironmentConfigs](https://docs.crossplane.io/latest/composition/environment-configs/).
           properties:
             apiVersion:
               description: |-
@@ -11972,7 +12584,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: functionrevisions.pkg.crossplane.io
 spec:
   conversion:
@@ -12588,7 +13200,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: functions.pkg.crossplane.io
 spec:
   conversion:
@@ -12625,7 +13237,7 @@ spec:
             Crossplane with support for a new kind of composition function.
 
             Read the Crossplane documentation for
-            [more information about Functions](https://docs.crossplane.io/latest/concepts/composition-functions).
+            [more information about Functions](https://docs.crossplane.io/latest/packages/functions/).
           properties:
             apiVersion:
               description: |-
@@ -12861,7 +13473,7 @@ spec:
             Crossplane with support for a new kind of composition function.
 
             Read the Crossplane documentation for
-            [more information about Functions](https://docs.crossplane.io/latest/concepts/composition-functions).
+            [more information about Functions](https://docs.crossplane.io/latest/packages/functions/).
           properties:
             apiVersion:
               description: |-
@@ -17939,7 +18551,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: imageconfigs.pkg.crossplane.io
 spec:
   conversion:
@@ -18048,6 +18660,29 @@ spec:
                       type: string
                   required:
                     - prefix
+                  type: object
+                runtime:
+                  description: Runtime allows configuration of runtime options for the image.
+                  properties:
+                    configRef:
+                      description: |-
+                        ConfigReference references a RuntimeConfig resource that will be
+                        used to configure the package runtime.
+                      properties:
+                        apiVersion:
+                          default: pkg.crossplane.io/v1beta1
+                          description: API version of the referent.
+                          type: string
+                        kind:
+                          default: DeploymentRuntimeConfig
+                          description: Kind of the referent.
+                          type: string
+                        name:
+                          description: Name of the RuntimeConfig.
+                          type: string
+                      required:
+                        - name
+                      type: object
                   type: object
                 verification:
                   description: Verification contains the configuration for verifying the image.
@@ -19506,7 +20141,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: locks.pkg.crossplane.io
 spec:
   conversion:
@@ -19576,6 +20211,7 @@ spec:
                         type:
                           description: |-
                             Type is the type of package. Can be either Configuration or Provider.
+
                             Deprecated: Specify an apiVersion and kind instead.
                           enum:
                             - Configuration
@@ -19599,6 +20235,7 @@ spec:
                   type:
                     description: |-
                       Type is the type of package.
+
                       Deprecated: Specify an apiVersion and kind instead.
                     enum:
                       - Configuration
@@ -19674,7 +20311,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: managedresourceactivationpolicies.apiextensions.crossplane.io
 spec:
   conversion:
@@ -19796,7 +20433,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: managedresourcedefinitions.apiextensions.crossplane.io
 spec:
   conversion:
@@ -21107,7 +21744,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: operations.ops.crossplane.io
 spec:
   conversion:
@@ -21290,6 +21927,35 @@ spec:
                             x-kubernetes-list-map-keys:
                               - requirementName
                             x-kubernetes-list-type: map
+                          requiredSchemas:
+                            description: |-
+                              RequiredSchemas that will be fetched before this pipeline step
+                              is called for the first time.
+                            items:
+                              description: |-
+                                RequiredSchemaSelector selects an OpenAPI schema that should be fetched
+                                before a pipeline step runs.
+                              properties:
+                                apiVersion:
+                                  description: APIVersion of the resource kind whose schema is required, e.g. "example.org/v1".
+                                  type: string
+                                kind:
+                                  description: Kind of resource whose schema is required, e.g. "MyResource".
+                                  type: string
+                                requirementName:
+                                  description: |-
+                                    RequirementName uniquely identifies this schema.
+                                    This name will be used as the key in RunFunctionRequest.required_schemas.
+                                  type: string
+                              required:
+                                - apiVersion
+                                - kind
+                                - requirementName
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                              - requirementName
+                            x-kubernetes-list-type: map
                         type: object
                       step:
                         description: Step name. Must be unique within its Pipeline.
@@ -21425,14 +22091,14 @@ metadata:
       blockOwnerDeletion: true
       controller: true
       kind: ProviderRevision
-      name: crossplane-provider-opentofu-d0662d177d24
-      uid: 82a79ca8-86d6-4646-a5a7-2591ca3285dd
+      name: crossplane-provider-opentofu-bae19390c7e5
+      uid: b7c4aa47-7301-4172-80d4-6ff8679159db
     - apiVersion: pkg.crossplane.io/v1
       blockOwnerDeletion: true
       controller: false
       kind: Provider
       name: crossplane-provider-opentofu
-      uid: 94313ef0-b0ad-4e3b-ba4b-ecfd833affd9
+      uid: 62a46636-6d5b-4bb8-a7cc-867d843c8669
 spec:
   conversion:
     strategy: None
@@ -21637,14 +22303,14 @@ metadata:
       blockOwnerDeletion: true
       controller: true
       kind: ProviderRevision
-      name: crossplane-provider-opentofu-d0662d177d24
-      uid: 82a79ca8-86d6-4646-a5a7-2591ca3285dd
+      name: crossplane-provider-opentofu-bae19390c7e5
+      uid: b7c4aa47-7301-4172-80d4-6ff8679159db
     - apiVersion: pkg.crossplane.io/v1
       blockOwnerDeletion: true
       controller: false
       kind: Provider
       name: crossplane-provider-opentofu
-      uid: 94313ef0-b0ad-4e3b-ba4b-ecfd833affd9
+      uid: 62a46636-6d5b-4bb8-a7cc-867d843c8669
 spec:
   conversion:
     strategy: None
@@ -21849,14 +22515,14 @@ metadata:
       blockOwnerDeletion: true
       controller: true
       kind: ProviderRevision
-      name: crossplane-provider-opentofu-d0662d177d24
-      uid: 82a79ca8-86d6-4646-a5a7-2591ca3285dd
+      name: crossplane-provider-opentofu-bae19390c7e5
+      uid: b7c4aa47-7301-4172-80d4-6ff8679159db
     - apiVersion: pkg.crossplane.io/v1
       blockOwnerDeletion: true
       controller: false
       kind: Provider
       name: crossplane-provider-opentofu
-      uid: 94313ef0-b0ad-4e3b-ba4b-ecfd833affd9
+      uid: 62a46636-6d5b-4bb8-a7cc-867d843c8669
 spec:
   conversion:
     strategy: None
@@ -21960,14 +22626,14 @@ metadata:
       blockOwnerDeletion: true
       controller: true
       kind: ProviderRevision
-      name: crossplane-provider-opentofu-d0662d177d24
-      uid: 82a79ca8-86d6-4646-a5a7-2591ca3285dd
+      name: crossplane-provider-opentofu-bae19390c7e5
+      uid: b7c4aa47-7301-4172-80d4-6ff8679159db
     - apiVersion: pkg.crossplane.io/v1
       blockOwnerDeletion: true
       controller: false
       kind: Provider
       name: crossplane-provider-opentofu
-      uid: 94313ef0-b0ad-4e3b-ba4b-ecfd833affd9
+      uid: 62a46636-6d5b-4bb8-a7cc-867d843c8669
 spec:
   conversion:
     strategy: None
@@ -22085,7 +22751,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: providerrevisions.pkg.crossplane.io
 spec:
   conversion:
@@ -22399,7 +23065,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: providers.pkg.crossplane.io
 spec:
   conversion:
@@ -22436,7 +23102,7 @@ spec:
             Crossplane with support for new kinds of managed resources.
 
             Read the Crossplane documentation for
-            [more information about Providers](https://docs.crossplane.io/latest/concepts/providers).
+            [more information about Providers](https://docs.crossplane.io/latest/packages/providers/).
           properties:
             apiVersion:
               description: |-
@@ -22659,7 +23325,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: usages.apiextensions.crossplane.io
 spec:
   conversion:
@@ -22696,7 +23362,7 @@ spec:
             resources with dependent resources.
 
             Read the Crossplane documentation for
-            [more information about Usages](https://docs.crossplane.io/latest/concepts/usages).
+            [more information about Usages](https://docs.crossplane.io/latest/managed-resources/usages/).
 
             Deprecated: Use protection.crossplane.io Usage or ClusterUsage.
           properties:
@@ -22889,7 +23555,7 @@ spec:
             resources with dependent resources.
 
             Read the Crossplane documentation for
-            [more information about Usages](https://docs.crossplane.io/latest/concepts/usages).
+            [more information about Usages](https://docs.crossplane.io/latest/managed-resources/usages/).
 
             Deprecated: Use protection.crossplane.io Usage or ClusterUsage.
           properties:
@@ -23066,7 +23732,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: usages.protection.crossplane.io
 spec:
   conversion:
@@ -23101,7 +23767,7 @@ spec:
             resources with dependent resources.
 
             Read the Crossplane documentation for
-            [more information about Compositions](https://docs.crossplane.io/latest/concepts/usages).
+            [more information about Usages](https://docs.crossplane.io/latest/managed-resources/usages/).
           properties:
             apiVersion:
               description: |-
@@ -23286,7 +23952,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: watchoperations.ops.crossplane.io
 spec:
   conversion:
@@ -23503,6 +24169,35 @@ spec:
                                     x-kubernetes-list-map-keys:
                                       - requirementName
                                     x-kubernetes-list-type: map
+                                  requiredSchemas:
+                                    description: |-
+                                      RequiredSchemas that will be fetched before this pipeline step
+                                      is called for the first time.
+                                    items:
+                                      description: |-
+                                        RequiredSchemaSelector selects an OpenAPI schema that should be fetched
+                                        before a pipeline step runs.
+                                      properties:
+                                        apiVersion:
+                                          description: APIVersion of the resource kind whose schema is required, e.g. "example.org/v1".
+                                          type: string
+                                        kind:
+                                          description: Kind of resource whose schema is required, e.g. "MyResource".
+                                          type: string
+                                        requirementName:
+                                          description: |-
+                                            RequirementName uniquely identifies this schema.
+                                            This name will be used as the key in RunFunctionRequest.required_schemas.
+                                          type: string
+                                      required:
+                                        - apiVersion
+                                        - kind
+                                        - requirementName
+                                      type: object
+                                    type: array
+                                    x-kubernetes-list-map-keys:
+                                      - requirementName
+                                    x-kubernetes-list-type: map
                                 type: object
                               step:
                                 description: Step name. Must be unique within its Pipeline.
@@ -23663,13 +24358,13 @@ metadata:
     - apiVersion: apiextensions.crossplane.io/v1alpha1
       kind: ManagedResourceDefinition
       name: workspaces.opentofu.m.upbound.io
-      uid: 7d56b598-7d28-446a-ba50-77d02fed7d63
+      uid: 0b187799-8967-4a56-befe-8a856e2b251e
     - apiVersion: pkg.crossplane.io/v1
       blockOwnerDeletion: true
       controller: true
       kind: ProviderRevision
-      name: crossplane-provider-opentofu-d0662d177d24
-      uid: 82a79ca8-86d6-4646-a5a7-2591ca3285dd
+      name: crossplane-provider-opentofu-bae19390c7e5
+      uid: b7c4aa47-7301-4172-80d4-6ff8679159db
 spec:
   conversion:
     strategy: None
@@ -23805,6 +24500,13 @@ spec:
                       items:
                         type: string
                       type: array
+                    remotePullPolicy:
+                      default: Always
+                      description: RemotePullPolicy determines when to download remote module sources.
+                      enum:
+                        - Always
+                        - IfNotPresent
+                      type: string
                     source:
                       description: Source of the root module of this workspace.
                       enum:
@@ -23953,6 +24655,9 @@ spec:
                       additionalProperties:
                         x-kubernetes-preserve-unknown-fields: true
                       type: object
+                    remoteSource:
+                      description: RemoteSource is the remote module URL that was last retrieved
+                      type: string
                   type: object
                 conditions:
                   description: Conditions of the resource.
@@ -24023,13 +24728,13 @@ metadata:
     - apiVersion: apiextensions.crossplane.io/v1alpha1
       kind: ManagedResourceDefinition
       name: workspaces.opentofu.upbound.io
-      uid: ef4584c7-36cf-4066-aa91-244e0afea5a4
+      uid: 16510aa2-d8c7-44f7-99e2-21f6fd25bb74
     - apiVersion: pkg.crossplane.io/v1
       blockOwnerDeletion: true
       controller: true
       kind: ProviderRevision
-      name: crossplane-provider-opentofu-d0662d177d24
-      uid: 82a79ca8-86d6-4646-a5a7-2591ca3285dd
+      name: crossplane-provider-opentofu-bae19390c7e5
+      uid: b7c4aa47-7301-4172-80d4-6ff8679159db
 spec:
   conversion:
     strategy: None
@@ -24187,6 +24892,13 @@ spec:
                       items:
                         type: string
                       type: array
+                    remotePullPolicy:
+                      default: Always
+                      description: RemotePullPolicy determines when to download remote module sources.
+                      enum:
+                        - Always
+                        - IfNotPresent
+                      type: string
                     source:
                       description: Source of the root module of this workspace.
                       enum:
@@ -24371,6 +25083,9 @@ spec:
                       additionalProperties:
                         x-kubernetes-preserve-unknown-fields: true
                       type: object
+                    remoteSource:
+                      description: RemoteSource is the remote module URL that was last retrieved
+                      type: string
                   type: object
                 conditions:
                   description: Conditions of the resource.
