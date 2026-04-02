@@ -59,9 +59,14 @@ resource "kubectl_manifest" "random_clusterproviderconfig" {
               version = "3.8.1"
             }
           }
+          backend "kubernetes" {}
         }
         provider "random" {
         }
+      backendFile: |-
+        secret_suffix     = "state"
+        namespace         = "${kubernetes_namespace.crossplane.metadata[0].name}"
+        in_cluster_config = true
   YAML
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
