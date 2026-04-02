@@ -6,7 +6,8 @@ data "kustomization_overlay" "provider_opentofu" {
       {
         op    = "replace"
         path  = "/spec/package"
-        value = "docker.io/kurtis/crossplane-opentofu-provider:b08563c"
+        # value = "docker.io/kurtis/crossplane-opentofu-provider:7b1ad0e"
+        value = "xpkg.upbound.io/upbound/provider-opentofu:${local.provider_opentofu_latest_release}"
       },
     ])
     target {
@@ -25,7 +26,11 @@ data "kustomization_overlay" "provider_opentofu" {
             name = "package-runtime",
             env = [
               # { name = "WATCH_NAMESPACE", value = each.value },
-              { name = "USER", value = "crossplane" }
+              { name = "USER", value = "crossplane" },
+              { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "http://jaeger-collector.jaeger:4317" },
+            ]
+            args = [
+              "--debug"
             ]
           }
         ]
