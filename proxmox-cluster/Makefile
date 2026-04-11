@@ -24,7 +24,7 @@ apply: ## Apply all configurations to start the cluster.
 
 .PHONY: plan-destroy
 plan-destroy: ## Create and show a destroy plan.
-	tofu plan -destroy -out=tfplan-destroy -input=false
+	tofu plan -destroy -out=tfplan-destroy -input=false -refresh=false
 	TF_BINARY=tofu tf-summarize tfplan-destroy || true
 
 .PHONY: destroy
