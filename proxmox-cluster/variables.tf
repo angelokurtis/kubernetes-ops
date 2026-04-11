@@ -23,5 +23,5 @@ variable "control_plane_count" {
 variable "worker_count" {
   description = "Number of Kubernetes worker nodes"
   type        = number
-  default     = 2
+  default     = 3
 }
