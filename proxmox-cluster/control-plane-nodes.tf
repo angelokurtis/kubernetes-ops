@@ -42,14 +42,14 @@ resource "proxmox_virtual_environment_vm" "control_plane" {
 
   cpu {
     cores = 2
-    units = 100
+    units = 200
     numa  = false
     type  = "x86-64-v2-AES"
   }
 
   memory {
-    dedicated = 2048 # 2 GiB
-    floating  = 2048
+    dedicated = 4096 # 4 GiB
+    floating  = 4096
   }
 
   operating_system {
@@ -90,9 +90,6 @@ data "talos_machine_configuration" "control_plane" {
   config_patches = [
     yamlencode({
       machine = {
-        network = {
-          hostname = each.key
-        }
         install = {
           extraKernelArgs = [
             "net.ifnames=0"
