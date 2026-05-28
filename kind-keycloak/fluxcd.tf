@@ -13,7 +13,7 @@ locals {
 resource "helm_release" "flux" {
   repository = "https://fluxcd-community.github.io/helm-charts"
   chart      = "flux2"
-  version    = "2.17.1"
+  version    = "2.18.4"
 
   name      = "flux"
   namespace = kubernetes_namespace.flux.metadata[0].name
