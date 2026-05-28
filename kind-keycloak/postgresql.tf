@@ -22,7 +22,7 @@ resource "kubernetes_stateful_set_v1" "postgresql_db" {
       spec {
         container {
           name  = "postgresql-db"
-          image = "postgres:15.14"
+          image = "postgres:15.18"
 
           env {
             name  = "POSTGRES_USER"
