@@ -1,7 +1,7 @@
 resource "kubectl_manifest" "git_repository_weave_gitops" {
   yaml_body = templatefile("${path.module}/manifests/gitrepositories.source.toolkit.fluxcd.io/weave-gitops.yaml", {
     namespace = kubernetes_namespace.flux.metadata[0].name
-    semver    = "^0.38.0"
+    semver    = "^0.39.0"
   })
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
