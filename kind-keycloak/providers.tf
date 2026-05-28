@@ -29,6 +29,7 @@ provider "kubectl" {
   client_key             = kind_cluster.keycloak.client_key
   cluster_ca_certificate = kind_cluster.keycloak.cluster_ca_certificate
   load_config_file       = false
+  lazy_load              = true
 }
 
 provider "kubernetes" {
