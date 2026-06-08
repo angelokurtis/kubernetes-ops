@@ -1,0 +1,99 @@
+locals {
+  flux_latest_helm_chart = data.external.flux_latest_helm_chart.result["version"]
+  flux_crds = [
+    "customresourcedefinition.apiextensions.k8s.io/buckets.source.toolkit.fluxcd.io",
+    "customresourcedefinition.apiextensions.k8s.io/gitrepositories.source.toolkit.fluxcd.io",
+    "customresourcedefinition.apiextensions.k8s.io/helmcharts.source.toolkit.fluxcd.io",
+    "customresourcedefinition.apiextensions.k8s.io/helmreleases.helm.toolkit.fluxcd.io",
+    "customresourcedefinition.apiextensions.k8s.io/helmrepositories.source.toolkit.fluxcd.io",
+    "customresourcedefinition.apiextensions.k8s.io/kustomizations.kustomize.toolkit.fluxcd.io",
+    "customresourcedefinition.apiextensions.k8s.io/ocirepositories.source.toolkit.fluxcd.io",
+  ]
+}
+
+resource "helm_release" "flux" {
+  repository = "https://fluxcd-community.github.io/helm-charts"
+  chart      = "flux2"
+  version    = local.flux_latest_helm_chart
+
+  name      = "flux"
+  namespace = kubernetes_namespace_v1.flux.metadata[0].name
+
+  values = [
+    yamlencode({
+      imageAutomationController = { create = false }
+      imageReflectionController = { create = false }
+      notificationController    = { create = false }
+    })
+  ]
+}
+
+resource "kubernetes_job_v1" "wait_flux_crd" {
+  metadata {
+    name      = "wait-flux-crd"
+    namespace = kubernetes_namespace_v1.flux.metadata[0].name
+  }
+  spec {
+    template {
+      metadata {}
+      spec {
+        service_account_name = kubernetes_service_account_v1.wait_flux_crd.metadata[0].name
+        container {
+          name  = "kubectl"
+          image = "rancher/kubectl:${data.kubectl_server_version.current.version}"
+          args  = flatten(["wait", "--for=condition=Established", local.flux_crds, "--timeout", "10m"])
+        }
+        restart_policy = "Never"
+      }
+    }
+  }
+  wait_for_completion = true
+
+  timeouts {
+    create = "10m"
+    update = "10m"
+  }
+
+  depends_on = [
+    helm_release.flux,
+    kubernetes_cluster_role_binding_v1.wait_flux_crd,
+  ]
+}
+
+resource "kubernetes_service_account_v1" "wait_flux_crd" {
+  metadata {
+    name      = "wait-flux-crd"
+    namespace = kubernetes_namespace_v1.flux.metadata[0].name
+  }
+}
+
+resource "kubernetes_cluster_role_binding_v1" "wait_flux_crd" {
+  metadata {
+    name = "wait-flux-crd"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role_v1.crd_reader.metadata[0].name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.wait_flux_crd.metadata[0].name
+    namespace = kubernetes_service_account_v1.wait_flux_crd.metadata[0].namespace
+  }
+}
+
+resource "kubernetes_namespace_v1" "flux" {
+  metadata { name = "flux" }
+}
+
+
+data "external" "flux_latest_helm_chart" {
+  program = ["python3", "${path.module}/get_latest_helm_chart_version.py"]
+
+  query = {
+    repo   = "https://fluxcd-community.github.io/helm-charts"
+    chart  = "flux2"
+    semver = ">= 2.0.0, < 3.0.0"
+  }
+}
