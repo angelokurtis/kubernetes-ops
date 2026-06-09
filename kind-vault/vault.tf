@@ -46,7 +46,17 @@ resource "kubernetes_config_map_v1" "vault_helm_values" {
   }
   data = {
     "values.yaml" = yamlencode({
-      server = { dev = { enabled = true } }
+      ui = { enabled = true }
+      server = {
+        dev = { enabled = true }
+        ingress = {
+          enabled          = true
+          ingressClassName = "nginx"
+          hosts = [
+            { host = "vault.${local.cluster_host}", paths = ["/"] }
+          ]
+        }
+      }
     })
   }
 }
