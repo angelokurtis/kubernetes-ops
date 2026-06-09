@@ -24,8 +24,8 @@ apply: ## Apply all configurations to start the cluster.
 
 .PHONY: down
 down: clean ## Remove cluster and components.
-	kind delete cluster --name jaeger
+	kind delete cluster --name vault
 
 .PHONY: clean
 clean: ## Delete generated Terraform files.
-	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* jaeger-config
+	rm -rf .terraform .terraform.lock.hcl terraform.tfstate* vault-config
