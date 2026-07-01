@@ -4,6 +4,7 @@ terraform {
     kubernetes    = { source = "hashicorp/kubernetes", version = "~> 3.2" }
     kustomization = { source = "kbst/kustomization", version = "~> 0.9" }
     null          = { source = "hashicorp/null", version = "~> 3.3" }
+    vault         = { source = "hashicorp/vault", version = "~> 5.10" }
     external      = { source = "hashicorp/external", version = "~> 2.4" }
     helm          = { source = "hashicorp/helm", version = "~> 3.2" }
     kind          = { source = "tehcyx/kind", version = "~> 0.11" }
@@ -34,6 +35,11 @@ provider "kustomization" {
 }
 
 provider "null" {
+}
+
+provider "vault" {
+  address = "http://vault.${local.cluster_host}/"
+  token   = "root"
 }
 
 provider "helm" {

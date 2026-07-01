@@ -10,6 +10,13 @@ resource "kubectl_manifest" "helm_repository_hashicorp" {
       url: https://helm.releases.hashicorp.com
   YAML
 
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
+
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
@@ -36,6 +43,13 @@ resource "kubectl_manifest" "helm_release_vault" {
       interval: 60s
   YAML
 
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
+
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
@@ -51,7 +65,7 @@ resource "kubernetes_config_map_v1" "vault_helm_values" {
         dev = { enabled = true }
         ingress = {
           enabled          = true
-          ingressClassName = "nginx"
+          ingressClassName = "traefik"
           hosts = [
             { host = "vault.${local.cluster_host}", paths = ["/"] }
           ]
@@ -63,4 +77,15 @@ resource "kubernetes_config_map_v1" "vault_helm_values" {
 
 resource "kubernetes_namespace_v1" "vault" {
   metadata { name = "vault" }
+}
+
+resource "vault_mount" "database" {
+  path = "database"
+  type = "database"
+
+  description = "Dynamic PostgreSQL credentials"
+
+  depends_on = [
+    kubectl_manifest.helm_release_vault
+  ]
 }

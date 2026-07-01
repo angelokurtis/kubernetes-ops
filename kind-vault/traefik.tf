@@ -10,6 +10,13 @@ resource "kubectl_manifest" "helm_repository_traefik" {
       url: https://traefik.github.io/charts
   YAML
 
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
+
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
 
@@ -36,6 +43,13 @@ resource "kubectl_manifest" "helm_release_traefik" {
           name: ${kubernetes_config_map_v1.traefik_helm_values.metadata[0].name}
       interval: 60s
   YAML
+
+  wait_for {
+    condition {
+      type   = "Ready"
+      status = "True"
+    }
+  }
 
   depends_on = [kubernetes_job_v1.wait_flux_crd]
 }
