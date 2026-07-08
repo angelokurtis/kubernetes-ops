@@ -79,6 +79,8 @@ resource "kubernetes_namespace_v1" "vault" {
   metadata { name = "vault" }
 }
 
+# Equivalent CLI:
+# vault secrets enable -path=database -description="Dynamic PostgreSQL credentials" database
 resource "vault_mount" "database" {
   path = "database"
   type = "database"
