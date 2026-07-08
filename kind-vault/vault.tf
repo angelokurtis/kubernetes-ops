@@ -80,12 +80,15 @@ resource "kubernetes_namespace_v1" "vault" {
 }
 
 # Equivalent CLI:
-# vault secrets enable -path=database -description="Dynamic PostgreSQL credentials" database
+# vault secrets enable \
+#   -path=database \
+#   -description="dynamic PostgreSQL credentials" \
+#   database
 resource "vault_mount" "database" {
   path = "database"
   type = "database"
 
-  description = "Dynamic PostgreSQL credentials"
+  description = "dynamic PostgreSQL credentials"
 
   depends_on = [
     kubectl_manifest.helm_release_vault
