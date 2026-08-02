@@ -60,7 +60,17 @@ resource "kubernetes_config_map_v1" "openfga_helm_values" {
   }
   data = {
     "values.yaml" = yamlencode({
-
+      ingress = {
+        annotations = {}
+        className   = "traefik"
+        enabled     = true
+        hosts = [
+          {
+            host  = "openfga.${local.cluster_host}"
+            paths = [{ path = "/", pathType = "ImplementationSpecific" }]
+          },
+        ]
+      }
     })
   }
 }
