@@ -19,3 +19,4 @@ charlescd*config
 *.iml
 **/.terraform/*
 tfplan
+bin/*
