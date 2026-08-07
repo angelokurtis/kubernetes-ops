@@ -83,16 +83,7 @@ resource "openfga_store" "development" {
 }
 
 data "openfga_authorization_model_document" "example" {
-  dsl = <<EOT
-model
-  schema 1.1
-
-type user
-
-type document
-  relations
-    define viewer: [user]
-  EOT
+  dsl = file("model.fga")
 }
 
 resource "openfga_authorization_model" "example" {
