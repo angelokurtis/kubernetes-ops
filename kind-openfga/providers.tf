@@ -4,6 +4,7 @@ terraform {
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 3.2" }
     helm       = { source = "hashicorp/helm", version = "~> 3.2" }
     kind       = { source = "tehcyx/kind", version = "~> 0.11" }
+    openfga    = { source = "openfga/openfga", version = "~> 0.5" }
   }
   required_version = ">= 1.9"
 }
@@ -37,3 +38,7 @@ provider "helm" {
 }
 
 provider "kind" {}
+
+provider "openfga" {
+  api_url = "http://openfga.${local.cluster_host}"
+}
