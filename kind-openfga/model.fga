@@ -3,6 +3,24 @@ model
 
 type user
 
-type document
+type team
   relations
-    define viewer: [user]
+    define member: [user]
+
+type organization
+  relations
+    define create_clusters: [user, team#member]
+    define view_clusters: [user, team#member]
+    define modify_clusters: [user, team#member]
+    define delete_clusters: [user, team#member]
+    define connect_clusters: [user, team#member]
+    define grant_cluster_access: [user, team#member]
+
+type cluster
+  relations
+    define organization: [organization]
+    define view: [user, team#member] or view_clusters from organization
+    define modify: [user, team#member] or modify_clusters from organization
+    define delete: [user, team#member] or delete_clusters from organization
+    define connect: [user, team#member] or connect_clusters from organization
+    define grant_access: [user, team#member] or grant_cluster_access from organization

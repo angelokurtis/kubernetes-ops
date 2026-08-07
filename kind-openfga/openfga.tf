@@ -92,13 +92,72 @@ resource "openfga_authorization_model" "example" {
   model_json = data.openfga_authorization_model_document.example.result
 }
 
-resource "openfga_relationship_tuple" "example" {
+# These tuples establish that the clusters belong to organization:acme
+resource "openfga_relationship_tuple" "production_organization" {
   store_id               = openfga_authorization_model.example.store_id
   authorization_model_id = openfga_authorization_model.example.id
 
-  user     = "user:user-1"
-  relation = "viewer"
-  object   = "document:document-1"
+  user     = "organization:acme"
+  relation = "organization"
+  object   = "cluster:production"
+}
+
+resource "openfga_relationship_tuple" "staging_organization" {
+  store_id               = openfga_authorization_model.example.store_id
+  authorization_model_id = openfga_authorization_model.example.id
+
+  user     = "organization:acme"
+  relation = "organization"
+  object   = "cluster:staging"
+}
+
+resource "openfga_relationship_tuple" "development_organization" {
+  store_id               = openfga_authorization_model.example.store_id
+  authorization_model_id = openfga_authorization_model.example.id
+
+  user     = "organization:acme"
+  relation = "organization"
+  object   = "cluster:development"
+}
+
+# Alice can view every cluster
+resource "openfga_relationship_tuple" "alice_view_clusters" {
+  store_id               = openfga_authorization_model.example.store_id
+  authorization_model_id = openfga_authorization_model.example.id
+
+  user     = "user:alice"
+  relation = "view_clusters"
+  object   = "organization:acme"
+}
+
+# Alice can connect to every cluster
+resource "openfga_relationship_tuple" "alice_connect_clusters" {
+  store_id               = openfga_authorization_model.example.store_id
+  authorization_model_id = openfga_authorization_model.example.id
+
+  user     = "user:alice"
+  relation = "connect_clusters"
+  object   = "organization:acme"
+}
+
+# Bob can configure only production
+resource "openfga_relationship_tuple" "bob_modify_production" {
+  store_id               = openfga_authorization_model.example.store_id
+  authorization_model_id = openfga_authorization_model.example.id
+
+  user     = "user:bob"
+  relation = "modify"
+  object   = "cluster:production"
+}
+
+# Because provisioning happens before a cluster exists, the capability belongs to the organization
+resource "openfga_relationship_tuple" "alice_create_clusters" {
+  store_id               = openfga_authorization_model.example.store_id
+  authorization_model_id = openfga_authorization_model.example.id
+
+  user     = "user:alice"
+  relation = "create_clusters"
+  object   = "organization:acme"
 }
 
 resource "kubernetes_namespace_v1" "openfga" {
