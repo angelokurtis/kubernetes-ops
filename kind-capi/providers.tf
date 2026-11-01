@@ -14,7 +14,7 @@ provider "external" {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host = kind_cluster.capi.endpoint
 
     client_certificate     = kind_cluster.capi.client_certificate
@@ -32,6 +32,7 @@ provider "kubectl" {
   client_key             = kind_cluster.capi.client_key
   cluster_ca_certificate = kind_cluster.capi.cluster_ca_certificate
   load_config_file       = false
+  lazy_load              = true
 }
 
 provider "kubernetes" {
